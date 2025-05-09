@@ -66,6 +66,11 @@ namespace Sivilab.Data.Repositories
             return result > 0; // Devuelve true si se actualizó algún registro
         }
 
+        public async Task<Usuario> ValidarCredenciales(string email, string contrasena)
+        {
+            var query = "EXEC spValidarCredenciales @Email, @Contrasena";
+            return await _db.QueryFirstOrDefaultAsync<Usuario>(query, new { Email = email, Contrasena = contrasena });
+        }
 
     }
 }

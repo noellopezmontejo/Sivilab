@@ -11,12 +11,13 @@ namespace Sivilab.API.Controllers
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IEmailService _emailService; // Servicio para enviar correos
+        private readonly IJwtService _jwtService;
 
-
-        public UsuarioController(IUsuarioRepository usuarioRepository, IEmailService emailService)
+        public UsuarioController(IUsuarioRepository usuarioRepository, IEmailService emailService, IJwtService jwtService)
         {
             _usuarioRepository = usuarioRepository;
             _emailService = emailService;
+            _jwtService = jwtService;
         }
 
         [HttpPost]
@@ -66,6 +67,21 @@ namespace Sivilab.API.Controllers
             return Ok(new { Message = "Correo validado correctamente." });
         }
 
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] Usuario usuario)
+        {
+            var usuarioValidado = await _usuarioRepository.ValidarCredenciales(usuario.Email, usuario.Contrasena);
+
+            if (usuarioValidado == null)
+                return Unauthorized("Credenciales incorrectas.");
+
+            if (!usuarioValidado.Validado)
+                return BadRequest("Por favor, valida tu correo electrónico antes de iniciar sesión.");
+
+            var token = _jwtService.GenerarToken(usuarioValidado.Id, usuarioValidado.Nombre);
+
+            return Ok(new { Token = token });
+        }
 
     }
 }

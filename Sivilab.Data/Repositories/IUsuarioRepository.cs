@@ -13,5 +13,6 @@ namespace Sivilab.Data.Repositories
         Task<IEnumerable<Usuario>> ObtenerTodos();
         Task <int>AgregarUsuario(Usuario usuario);
         Task<bool> ValidarCorreo(string codigoValidacion);
+        Task<Usuario> ValidarCredenciales(string email, string contrasena);
     }
 }
