@@ -11,6 +11,7 @@ namespace Sivilab.Data.Repositories
     {
         Task<Usuario> ObtenerUsuarioPorId(int id);
         Task<IEnumerable<Usuario>> ObtenerTodos();
+        Task<int> RegistrarUsuario(Usuario usuario);
         Task <int>AgregarUsuario(Usuario usuario);
         Task<bool> ValidarCorreo(string codigoValidacion);
         Task<Usuario> ValidarCredenciales(string email, string contrasena);

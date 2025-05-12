@@ -12,16 +12,16 @@ namespace Sivilab.API.Services
     {
         public async Task EnviarCorreo(string destinatario, string asunto, string mensaje)
         {
-            var smtpClient = new SmtpClient("smtp.tuServidor.com")
+            var smtpClient = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
-                Credentials = new NetworkCredential("tuEmail@dominio.com", "tuContraseña"),
+                Credentials = new NetworkCredential("noellopez1307@gmail.com", "ihqf blve nnen pvgs"),
                 EnableSsl = true,
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress("tuEmail@dominio.com"),
+                From = new MailAddress("noellopez1307@gmail.com"),
                 Subject = asunto,
                 Body = mensaje,
                 IsBodyHtml = true,

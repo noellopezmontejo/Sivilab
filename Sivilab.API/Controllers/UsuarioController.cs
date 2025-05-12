@@ -48,7 +48,7 @@ namespace Sivilab.API.Controllers
             if (usuario == null)
                 return BadRequest("El usuario no puede ser nulo.");
 
-            var id = await RegistrarUsuario(usuario);
+            var id = await _usuarioRepository.RegistrarUsuario(usuario);
 
             // Enviar correo con el código de validación
             var mensaje = $"Hola {usuario.Nombre}, valida tu correo usando este código: {usuario.CodigoValidacion}";
