@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Eventos";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2rem;
+    }
+
+    .event-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+    .event-img {
+        width: 100%;
+        height: 300px;
+        object-fit: contain;
+        object-position: center;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .event-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e1e1e;
+    }
+
+    .event-info {
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    .event-button {
+        border-radius: 25px;
+        font-weight: 600;
+        padding: 6px 18px;
+        width: auto;
+    }
+</style>
+
+<section class="container my-5">
+    <h2 class="text-center section-title">Próximos Eventos</h2>
+
+    <div class="row gy-4">
+        @{
+            var eventos = new[] {
+        new { Vigente=0, Titulo = "Feria de Empleo Escuintla 2025", Imagen = "/Img/FeriaEscuintla.jpeg", Fecha = "8 de mayo de 2025", Lugar = "Explanada del Parque Central.", Descripcion = "La Feria de Empleo Escuintla 2025 es un evento estratégico que reúne a las principales empresas e instituciones de la región con ciudadanos en búsqueda de oportunidades laborales.", Liga="https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode" },
+        new { Vigente=1, Titulo = "Día por el Empleo Tuxtla Gutiérrez", Imagen = "/Img/DiaEmpleoTuxtla.jpeg", Fecha = "20 de mayo de 2025", Lugar = "Parque Central de Plan de Ayala.", Descripcion = "En un ambiente dinámico y profesional, los asistentes tendrán acceso a vacantes de diversos sectores económicos representativos de Tuxtla Gutiérrez y sus alrededores." , Liga="https://forms.office.com/r/iVqHujs1CB"},
+        new { Vigente=1, Titulo = "Feria de Empleo Tonalá 2025", Imagen = "/Img/FeriaTonala.jpeg", Fecha = "23 de mayo de 2025", Lugar = "Explanada del Parque Central", Descripcion = "La Feria de Empleo Tonalá 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en este municipio emblemático.", Liga="https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode" },
+        };
+        }
+
+        @foreach (var evento in eventos)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="event-title">@evento.Titulo</h5>
+                        <p class="event-info flex-grow-1">@evento.Descripcion</p>
+                        <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
+                        <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
+                        @if (evento.Vigente == 1)
+                        {
+                            <div class="d-flex justify-content-center mt-auto">
+                                <a href=@evento.Liga target="_blank" class="btn btn-sm btn-primary event-button">Registrarse</a>
+                            </div>
+                        }
+                        else
+                        {
+
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
