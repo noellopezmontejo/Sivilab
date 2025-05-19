@@ -72,5 +72,6 @@ namespace Sivilab.Data.Repositories
             return await _db.QueryFirstOrDefaultAsync<Usuario>(query, new { Email = email, Contrasena = contrasena });
         }
 
+      
     }
 }
