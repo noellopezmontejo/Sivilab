@@ -1,0 +1,40 @@
+﻿<!-- Se debe mostrar el puesto, el salario, la experiencia requerida y las actividades.
+
+<h2>@offerName</h2>
+<h3>Experiencia Requerida</h3>
+<p>
+	@experience
+</p>
+<h3>Actividades</h3>
+<p>
+	@activities
+</p>
+<h3>Salario</h3>
+<p>
+	@salary
+</p>
+-->
+
+<div class="carousel-item">
+    <div class="carousel-image"
+         style="background-image: url('@imageURL');">
+    </div>
+    <div class="carousel-content">
+        <h4>@offerName</h4>
+        <p>@description</p>
+		<p>Experiencia Requerida: @experience años</p>
+		<p>Salario: $@salary</p>
+    </div>
+</div>
+
+
+
+@code {
+	[Parameter, EditorRequired] public string offerName		{ get; set; }
+	[Parameter, EditorRequired] public string description	{ get; set; }
+	[Parameter, EditorRequired] public string imageURL		{ get; set; }
+	[Parameter, EditorRequired]	public int	  experience	{ get; set; }
+	[Parameter, EditorRequired]	public double  salary		{ get; set; }
+
+
+}

@@ -1,0 +1,30 @@
+﻿<!--<h2>@evento</h2>
+<h3>@fecha</h3>
+<img src="imagenURL"/>
+<p>@descripcion</p>-->
+
+
+<div class="card" style="margin-bottom: 40px;">
+    <img src="@imagenURL" alt="Evento"
+         style="margin-top: 20px; width: 100%; min-height: 300px; object-fit: contain; display: block;">
+    <div class="card-content" style="margin-top: 20px;">
+        <h4>@nombreEvento</h4>
+        <h5>@fecha</h5>
+        <p style="margin-bottom: 20px;">@descripcion</p>
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="#registro" class="btn"
+               style="padding: 8px 16px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                Regístrarse
+            </a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+	[Parameter, EditorRequired] public string nombreEvento { get; set; }
+	[Parameter, EditorRequired] public string descripcion	{ get; set; }
+	[Parameter, EditorRequired] public string fecha	{ get; set; }
+	[Parameter, EditorRequired] public string imagenURL { get; set; }
+	//[Parameter, EditorRequired] public string offerName	{ get; set; }
+}

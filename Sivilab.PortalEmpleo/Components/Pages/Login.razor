@@ -1,0 +1,32 @@
+﻿@page "/login"
+
+<div class="login-form">
+<h2>Inicio de sesión.</h2>
+
+<form>
+	<div class="container">
+		<label for="email"><b>Correo electrónico</b></label>
+		<input type="text" name="email" placeholder="Ingrese su correo electrónico" required/>
+
+		<label for="passwd"><b>Contraseña</b></label>
+		<input type="password" name="passwd" placeholder="Ingrese su contraseña" />
+
+		<button type="submit">Iniciar sesión</button>
+		<br />
+		<label class="rememberme">
+		<input type="checkbox" /> <span>recordarme</span>
+		</label>
+	</div>
+
+	<div class="container">
+		<button type="button" class="cancel-btn">Cancelar</button>
+		<span class="frgt-passwd"><a href="#">¿Ha olvidado su contraseña?</a></span>
+		<span>¿No posee una cuenta? <a href="#">Regístrese aquí</a>.</span>
+	</div>
+</form>
+
+</div>
+
+@code {
+
+}
