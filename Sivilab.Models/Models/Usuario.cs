@@ -14,6 +14,7 @@ namespace Sivilab.Models.Models
         public string Contrasena { get; set; }
         public string Rol { get; set; }
         public bool Validado { get; set; }
+        public string CodigoValidacion { get; set; }
 
     }
 }

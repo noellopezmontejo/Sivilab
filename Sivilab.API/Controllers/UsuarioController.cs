@@ -78,7 +78,7 @@ namespace Sivilab.API.Controllers
             if (!usuarioValidado.Validado)
                 return BadRequest("Por favor, valida tu correo electrónico antes de iniciar sesión.");
 
-            var token = _jwtService.GenerarToken(usuarioValidado.Id, usuarioValidado.Nombre);
+            var token = _jwtService.GenerarToken(usuarioValidado.Id, usuarioValidado.Nombre, usuarioValidado.Rol);
 
             return Ok(new { Token = token });
         }
