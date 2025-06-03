@@ -1,7 +1,13 @@
 ﻿@page "/"
 
+
 <PageTitle>Portal de Empleo</PageTitle>
 
+<div class="nav-links">
+    <a href="#ofertas">Ofertas</a>
+    <a href="#eventos">Eventos</a>
+    <a href="#programas">Programas</a>
+</div>
     <section class="main-banner">
         <h2>PORTAL DEL EMPLEO</h2>
         <p>Encuentra empleo o candidatos.</p>
@@ -21,48 +27,48 @@
 
     <div class="divider"></div>
 
-    <section id="ofertas" class="slide-in-right">
-        <h3>Ofertas de empleo actuales</h3>
-        <div class="carousel-container">
-            <div class="carousel-slide">
-                <!--<div class="carousel-item">
-                    <div class="carousel-image"
-                        style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d');">
+<!-- Solución más simple usando solo CSS y Blazor -->
+<section id="ofertas" class="slide-in-right">
+    <h3>Ofertas de empleo actuales</h3>
+    <div class="simple-carousel-container">
+        @if (ofertas.Any())
+        {
+            <div class="simple-carousel-track">
+                @foreach (var oferta in ofertas)
+                {
+                    <div class="simple-carousel-item">
+                        <Sivilab.PortalEmpleo.Components.Portal.Ofertas description="@oferta.Description"
+                                                                        imageURL="@oferta.ImageURL"
+                                                                        experience="@oferta.Experience"
+                                                                        salary="@oferta.Salary"
+                                                                        offerName="@oferta.OfferName" />
                     </div>
-                    <div class="carousel-content">
-                        <h4>Desarrollador Web</h4>
-                        <p>Empresa ABC busca desarrollador Frontend con experiencia en HTML, CSS y JavaScript.</p>
-                    </div>
-                </div>-->
-                <Sivilab.PortalEmpleo.Components.Portal.Ofertas description="Empresa ABC busca desarrollador Frontend con experiencia en HTML, CSS y JavaScript."
-                imageURL="https://images.unsplash.com/photo-1504384308090-c894fdcc538d" experience="3" salary="5000.00" offerName="Desarrollador Web"/>
-                <!---<div class="carousel-item">
-                    <div class="carousel-image"
-                        style="background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df');">
-                    </div>
-                    <div class="carousel-content">
-                        <h4>Diseñador Gráfico</h4>
-                        <p>Agencia Creativa necesita diseñador con buen manejo de Illustrator y Photoshop.</p>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="carousel-image"
-                        style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d');">
-                    </div>
-                    <div class="carousel-content">
-                        <h4>Analista de Datos</h4>
-                        <p>Empresa de tecnología busca experto en análisis de datos para su equipo.</p>
-                    </div>
-                </div>-->
+                }
             </div>
-        </div>
-    </section>
+        }
+    </div>
+</section>
 
     <div class="divider"></div>
 
     <section id="eventos" style="padding-top: 40px;" class="slide-in-left">
         <h3 style="margin-bottom: 30px;">Próximos Eventos</h3>
-        <div class="cards">
+
+        @if (eventos.Any())
+        {
+            <div class="cards">
+                @foreach (var evento in eventos)
+                {
+                        <Sivilab.PortalEmpleo.Components.Portal.Evento  nombreEvento=   "@evento.EventName"
+                                                                        descripcion=    "@evento.Description"
+                                                                        fecha=          "@evento.EventDate"
+                                                                        imagenURL=      "@evento.ImageURL"
+                        />
+                }
+            </div>
+        }
+        
+        <!--div class="cards">
             <Sivilab.PortalEmpleo.Components.Portal.Evento
             nombreEvento="Feria del empleo"
             descripcion="Conoce a empresas líderes y presenta tu currículum en este gran evento."
@@ -82,7 +88,7 @@
             fecha="01/Dic/2025" />
 
 
-            <!-- El Componente tiene la misma síntaxis que el bloque siguiente.
+            < El Componente tiene la misma síntaxis que el bloque siguiente.
             <div class="card" style="margin-bottom: 40px;">
                 <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312" alt="Evento 3"
                     style="margin-top: 20px; width: 100%; min-height: 300px; object-fit: contain; display: block;">
@@ -97,8 +103,8 @@
                         </a>
                     </div>
                 </div>
-            </div> -->
-        </div>
+            </div> --
+        </div-->
     </section>
 
     <div class="divider"></div>
@@ -173,3 +179,76 @@
         // Mostrar el primer slide al cargar
         showSlide(currentSlide);
     </script>
+
+
+
+
+
+@code {
+    private List<EventoModel> eventos = new();
+    private List<OfertaModel> ofertas = new();
+
+    protected override void OnInitialized()
+    {
+        InicializarEventos();
+        InicializarOfertas();
+    }
+
+    private void InicializarEventos()
+    {
+        eventos = new List<EventoModel>
+        {
+            new EventoModel
+            {
+                EventName="Feria del empleo",
+                Description="Conoce a empresas líderes y presenta tu currículum en este gran evento.",
+                EventDate="15/Nov/2025",
+                ImageURL="https://images.unsplash.com/photo-1522071820081-009f0129c71c"
+            },
+            new EventoModel
+            {
+                EventName="Taller de Entrevistas",
+                Description="Aprende a destacar en entrevistas laborales con consejos de expertos.",
+                EventDate="19/Ago/2025",
+                ImageURL="https://images.unsplash.com/photo-1543269865-cbf427effbad"
+            },
+            new EventoModel {
+                EventName="Webinar de Emprendimiento",
+                Description="Inspírate con historias de éxito y consejos para emprender tu propio negocio.",
+                EventDate="01/Dic/2025",
+                ImageURL="https://images.unsplash.com/photo-1533750349088-cd871a92f312"
+            }
+        };
+    }
+
+    private void InicializarOfertas()
+    {
+        ofertas = new List<OfertaModel>
+        {
+            new OfertaModel
+            {
+                OfferName = "Desarrollador Web",
+                Description = "Empresa ABC busca desarrollador Frontend con experiencia en HTML, CSS y JavaScript.",
+                ImageURL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+                Experience = 3,
+                Salary = 5000.00
+            },
+            new OfertaModel
+            {
+                OfferName = "Diseñador Gráfico",
+                Description = "Agencia Creativa necesita diseñador con buen manejo de Illustrator y Photoshop.",
+                ImageURL = "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
+                Experience = 2,
+                Salary = 4500.00
+            },
+            new OfertaModel
+            {
+                OfferName = "Analista de Datos",
+                Description = "Empresa de tecnología busca experto en análisis de datos para su equipo.",
+                ImageURL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+                Experience = 4,
+                Salary = 6000.00
+            }
+        };
+    }
+}
