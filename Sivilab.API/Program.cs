@@ -7,6 +7,12 @@ using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
+    options.AddPolicy("Usuario", policy => policy.RequireRole("Usuario", "Administrador"));
+});
+
 // Registro de servicios del repositorio
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 

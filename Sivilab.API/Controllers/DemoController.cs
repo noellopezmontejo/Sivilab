@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Sivilab.API.Controllers
 {
@@ -6,11 +7,18 @@ namespace Sivilab.API.Controllers
     [Route("api/[controller]")]
     public class DemoController : ControllerBase
     {
-        [HttpGet("Protected")]
-        public IActionResult ProtectedEndpoint()
+        [Authorize(Policy = "Administrador")]
+        [HttpGet("AdminEndpoint")]
+        public IActionResult AdminEndpoint()
         {
-            var userId = HttpContext.Items["User"];
-            return Ok($"Este endpoint está protegido. Usuario ID: {userId}");
+            return Ok(new { Message = "Este endpoint solo es accesible para administradores." });
+        }
+
+        [Authorize(Policy = "Usuario")]
+        [HttpGet("UserEndpoint")]
+        public IActionResult UserEndpoint()
+        {
+            return Ok(new { Message = "Este endpoint es accesible para usuarios y administradores." });
         }
     }
 }
