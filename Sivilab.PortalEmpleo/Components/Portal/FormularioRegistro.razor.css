@@ -1,27 +1,30 @@
-﻿form {
+﻿.form {
     margin: 2rem auto;
-    width:75%;
-    max-width:960px;
-    box-sizing:border-box;
-
+    width: 75%;
+    max-width: 960px;
+    box-sizing: border-box;
     padding: 3rem;
-    background-color:#cfc8e4;
-    border-radius:3rem;
-
+    background-color: #cfc8e4;
+    border-radius: 3rem;
 }
 
-.textIn, textarea {
-    width: 100%;
+    .form div {
+        margin: 1.5rem 0;
+    }
+
+        .form div:first-child {
+            margin: 0;
+        }
+
+    .form p, label {
+        margin-top: 0.5rem;
+    }
+
+.textIn {
+    height: 2em;
 }
 
-form div {
-    margin: 1em 0;
-}
-
-form div:first-child {
-    margin: 0;
-}
-
-form p, label {
-    margin-bottom: 0.5em;
-}
+    .textIn, textarea {
+        width: 100%;
+        padding: 0.5em;
+    }

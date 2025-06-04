@@ -1,137 +1,310 @@
-﻿<form>
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+
+<style>
+    form {
+        margin: 2rem auto;
+        width: 75%;
+        max-width: 960px;
+        box-sizing: border-box;
+        padding: 3rem;
+        background-color: #cfc8e4;
+        border-radius: 3rem;
+    }
+    .textIn, textarea {
+        width: 100%;
+        padding: 0.5em;
+    }
+    .textIn {
+        height: 2em;
+    }
+
+    .drop {
+        width: 100%;
+        padding: 0.25em;
+        height: 1.75em;
+        box-sizing: content-box;
+    }
+    form div {
+        margin: 1.5rem 0;
+    }
+    form div:first-child {
+        margin: 0;
+    }
+    form p, label {
+        margin-top: 0.5rem;
+    }
+</style>
+
+
+<EditForm Model="@formulario" OnValidSubmit="@HandleValidSubmit" FormName="formulario">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
     <div>
         <label for="curp">1. CURP *</label>
-        <input type="text" class="textIn" id="curp" name="curp" placeholder="Escriba su respuesta" required>
+        <InputText @bind-Value="formulario.Curp" class="textIn" id="curp" placeholder="Escriba su respuesta" @onchange="InfoLookUp" />
+        <ValidationMessage For="@(() => formulario.Curp)" />
     </div>
 
     <div>
         <label for="nombre">2. NOMBRE *</label>
-        <input type="text" class="textIn" id="nombre" name="nombre" placeholder="Escriba su respuesta" required>
+        <InputText @bind-Value="formulario.Nombre" class="textIn" id="nombre" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.Nombre)" />
+    </div>
+    <div>
+        <label for="nombre">3. APELLIDO PATERNO *</label>
+        <InputText @bind-Value="formulario.Paterno" class="textIn" id="paterno" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.Paterno)" />
+    </div>
+    <div>
+        <label for="nombre">4. APELLIDO MATERNO *</label>
+        <InputText @bind-Value="formulario.Materno" class="textIn" id="materno" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.Materno)" />
     </div>
 
     <div>
-        <label>3. GENERO *</label>
-        
+        <label>5. GENERO *</label>
         <br />
-        <input type="radio" id="masculino" name="genero" value="masculino" required>
-        <label for="masculino">MASCULINO</label>
-        
+        <InputRadioGroup @bind-Value="formulario.Genero">
+            <InputRadio Value="@("masculino")" id="masculino" />
+            <label for="masculino">MASCULINO</label>
+            <br />
+            <InputRadio Value="@("femenino")" id="femenino" />
+            <label for="femenino">FEMENINO</label>
+            <br />
+            <InputRadio Value="@("no_binario")" id="no_binario" />
+            <label for="no_binario">NO BINARIO</label>
+        </InputRadioGroup>
+        <ValidationMessage For="@(() => formulario.Genero)" />
+    </div>
+
+    <div>
+        <label for="fecha_nacimiento">6. FECHA DE NACIMIENTO *</label>
         <br />
-        <input type="radio" id="femenino" name="genero" value="femenino" required>
-        <label for="femenino">FEMENINO</label>
-        
+        <InputDate @bind-Value="formulario.FechaNacimiento" id="fecha_nacimiento" />
+        <ValidationMessage For="@(() => formulario.FechaNacimiento)" />
+    </div>
+
+    <div>
+        <label for="lugar_nacimiento">7. LUGAR DE NACIMIENTO *</label>
+        <InputText @bind-Value="formulario.LugarNacimiento" class="textIn" id="lugar_nacimiento" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.LugarNacimiento)" />
+    </div>
+
+    <div>
+        <label>8. ERES EGRESADO DEL PROGRAMA DE JOVENES CONSTRUYENDO EL FUTURO *</label>
         <br />
-        <input type="radio" id="no_binario" name="genero" value="no_binario" required>
-        <label for="no_binario">NO BINARIO</label>
+        <InputRadioGroup @bind-Value="formulario.EgresadoPrograma">
+            <InputRadio Value="@("si")" id="egresado_si" />
+            <label for="egresado_si">SI</label>
+            <br />
+            <InputRadio Value="@("no")" id="egresado_no" />
+            <label for="egresado_no">NO</label>
+        </InputRadioGroup>
+        <ValidationMessage For="@(() => formulario.EgresadoPrograma)" />
     </div>
 
     <div>
-        <label for="fecha_nacimiento">4. FECHA DE NACIMIENTO *</label>
-        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="Especifique la fecha (d/M/yyyy)" required>
+        <label for="telefono">9. TELEFONO *</label>
+        <InputText @bind-Value="formulario.Telefono" class="textIn" id="telefono" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.Telefono)" />
     </div>
 
     <div>
-        <label for="lugar_nacimiento">5. LUGAR DE NACIMIENTO *</label>
-        <input type="text" class="textIn" id="lugar_nacimiento" name="lugar_nacimiento" placeholder="Escriba su respuesta" required>
+        <label for="correo">10. CORREO ELECTRONICO *</label>
+        <InputText @bind-Value="formulario.Correo" class="textIn" id="correo" placeholder="Escriba su respuesta" type="email" />
+        <ValidationMessage For="@(() => formulario.Correo)" />
     </div>
 
     <div>
-        <label>6. ERES EGRESADO DEL PROGRAMA DE JOVENES CONSTRUYENDO EL FUTURO *</label>
-
-        <br />
-        <input type="radio" id="egresado_si" name="egresado_programa" value="si" required>
-        <label for="egresado_si">SI</label>
-
-        <br />
-        <input type="radio" id="egresado_no" name="egresado_programa" value="no" required>
-        <label for="egresado_no">NO</label>
+        <label for="codigo_postal">11. CODIGO POSTAL *</label>
+        <InputText @bind-Value="formulario.CodigoPostal" class="textIn" id="codigo_postal" placeholder="Escriba su respuesta" onchange="PostalLookUP" />
+        <ValidationMessage For="@(() => formulario.CodigoPostal)" />
     </div>
 
     <div>
-        <label for="telefono">7. TELEFONO *</label>
-        <input type="tel" id="telefono" name="telefono" placeholder="Escriba su respuesta" required>
+        <label for="municipio">11.1. MUNICIPIO DONDE VIVES *</label>
+        <InputText @bind-Value="formulario.Municipio" class="textIn" id="" placeholder="" readonly />
+        <ValidationMessage For="@(() => formulario.Municipio)" />
     </div>
 
     <div>
-        <label for="correo">8. CORREO ELECTRONICO *</label>
-        <input type="email" id="correo" name="correo" placeholder="Escriba su respuesta" required>
+        <label for="estado">11.2. ESTADO DONDE VIVES *</label>
+        <InputText @bind-Value="formulario.Estado" class="textIn" id="" placeholder="" readonly />
+        <ValidationMessage For="@(() => formulario.Estado)" />
+    </div>
+    
+    <div>
+        <label for="colonia">11.3. COLONIA *</label>
+        <InputText @bind-Value="formulario.Colonia" class="textIn" id="colonia" placeholder="" readonly />
+        <ValidationMessage For="@(() => formulario.Colonia)" />
     </div>
 
     <div>
-        <label for="municipio_estado">9. MUNICIPIO Y ESTADO DONDE VIVES *</label>
-        <input type="text" class="textIn" id="municipio_estado" name="municipio_estado" placeholder="Escriba su respuesta" required>
-    </div>
-
-    <div>
-        <label for="codigo_postal">10. CODIGO POSTAL *</label>
-        <input type="text" class="textIn" id="codigo_postal" name="codigo_postal" placeholder="Escriba su respuesta" required>
-    </div>
-
-    <div>
-        <label for="colonia">11. COLONIA *</label>
-        <input type="text" class="textIn" id="colonia" name="colonia" placeholder="Escriba su respuesta" required>
+        <label for="pais">11.4. PAÍS DONDE VIVES *</label>
+        <InputText @bind-Value="formulario.Pais" class="textIn" id="" placeholder="" readonly />
+        <ValidationMessage For="@(() => formulario.Pais)" />
     </div>
 
     <div>
         <label for="nivel_estudios">12. NIVEL DE ESTUDIOS *</label>
-        <input type="text" class="textIn" id="nivel_estudios" name="nivel_estudios" placeholder="Escriba su respuesta" required>
+        <InputSelect @bind-Value="formulario.NivelEstudios" class="drop" id="nivel_estudios">
+            <option value="">-- Seleccione su nivel de estudios --</option>
+            <option value="sin_estudios">Sin estudios</option>
+            <option value="primaria_incompleta">Primaria incompleta</option>
+            <option value="primaria_completa">Primaria completa</option>
+            <option value="secundaria_incompleta">Secundaria incompleta</option>
+            <option value="secundaria_completa">Secundaria completa</option>
+            <option value="preparatoria_incompleta">Preparatoria incompleta</option>
+            <option value="preparatoria_completa">Preparatoria completa</option>
+            <option value="tecnico_profesional">Técnico profesional</option>
+            <option value="licenciatura_incompleta">Licenciatura incompleta</option>
+            <option value="licenciatura_completa">Licenciatura completa</option>
+            <option value="especialidad">Especialidad</option>
+            <option value="maestria">Maestría</option>
+            <option value="doctorado">Doctorado</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => formulario.NivelEstudios)" />
     </div>
 
     <div>
         <label for="carrera">13. CARRERA O ESPECIALIDAD *</label>
-        <input type="text" class="textIn" id="carrera" name="carrera" placeholder="Escriba su respuesta" required>
+        <InputText @bind-Value="formulario.Carrera" class="textIn" id="carrera" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.Carrera)" />
     </div>
 
     <div>
         <label for="experiencia_laboral">14. EXPERIENCIA LABORAL *</label>
         <br />
-        <textarea id="experiencia_laboral" name="experiencia_laboral" placeholder="Escriba su respuesta" required></textarea>
+        <InputTextArea @bind-Value="formulario.ExperienciaLaboral" id="experiencia_laboral" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.ExperienciaLaboral)" />
     </div>
 
     <div>
         <label for="puesto_trabajo">15. PUESTO DE TRABAJO QUE HA TENIDO *</label>
         <br />
-        <textarea id="puesto_trabajo" name="puesto_trabajo" placeholder="Escriba su respuesta" required></textarea>
+        <InputTextArea @bind-Value="formulario.PuestoTrabajo" id="puesto_trabajo" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.PuestoTrabajo)" />
     </div>
 
     <div>
         <label for="anos_experiencia">16. AÑOS DE EXPERIENCIA *</label>
-        <input type="text" class="textIn" id="anos_experiencia" name="anos_experiencia" placeholder="Escriba su respuesta" required>
+        <InputSelect @bind-Value="formulario.AnosExperiencia" class="drop" id="anos_experiencia">
+            <option value="">-- Seleccione años de experiencia --</option>
+            <option value="sin_experiencia">Sin experiencia</option>
+            <option value="menos_1_año">Menos de 1 año</option>
+            <option value="1_2_años">1 a 2 años</option>
+            <option value="3_5_años">3 a 5 años</option>
+            <option value="6_10_años">6 a 10 años</option>
+            <option value="11_15_años">11 a 15 años</option>
+            <option value="16_20_años">16 a 20 años</option>
+            <option value="mas_20_años">Más de 20 años</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => formulario.AnosExperiencia)" />
     </div>
 
     <div>
         <label for="dominio_idioma">17. DOMINIO DE OTRO IDIOMA *</label>
-        <input type="text" class="textIn" id="dominio_idioma" name="dominio_idioma" placeholder="Escriba su respuesta" required>
+        <InputText @bind-Value="formulario.DominioIdioma" class="textIn" id="dominio_idioma" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.DominioIdioma)" />
     </div>
 
     <div>
         <label for="puesto_deseado">18. PUESTO QUE DESEADO *</label>
-        <input type="text" class="textIn" id="puesto_deseado" name="puesto_deseado" placeholder="Escriba su respuesta" required>
+        <InputText @bind-Value="formulario.PuestoDeseado" class="textIn" id="puesto_deseado" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.PuestoDeseado)" />
     </div>
 
     <div>
         <label for="salario_pretendido">19. SALARIO PRETENDIDO *</label>
-        <input type="text" class="textIn" id="salario_pretendido" name="salario_pretendido" placeholder="Escriba su respuesta" required>
+        <InputText @bind-Value="formulario.SalarioPretendido" class="textIn" id="salario_pretendido" placeholder="Escriba su respuesta" />
+        <ValidationMessage For="@(() => formulario.SalarioPretendido)" />
     </div>
 
     <div>
         <p>20. DECLARO BAJO POTESTA DE DECIR VERDAD QUE LOS DATOS CONTENIDOS EN ESTE REGISTRO SON VERDADEROS. Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y de conformidad con lo señalado en el artículo 20, ambos de la "LEY GENERAL DE PROTECCION DE DATOS PERSONALES EN POSESION DE SUJETOS OBLIGADOS (LGPDPPSO)" expreso mi voluntad, específica e informada, para que se efectúe el tratamiento de mis datos personales por la OSNE para los fines consistentes en la vinculación laboral, hasta la posible colocación en una actividad productiva; asimismo autorizo a la OSNE para que realice la transferencia de mis datos personales a la Secretaría del Trabajo y Previsión Social (STPS) a través de la Unidad del Servicion Nacional de Empleo (USNE) con el objetivo de llevar a cabo actividades relacionadas con aquellas que originaron la solicitud de dichos datos personales. Asímismo, la OSNE como sujeto Obligado será la encargada de establecer los mecanismos necesarios para la protección de los datos bajo su resguardo, así como de aquellos mecanismos que aseguren la correcta transferencia de estos a otra entidad.</p>
         <p>He sido informado que podré ejercer los derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) de conformidad con la (LGPDPPSO), ante la OSNE. *</p>
 
-        <input type="radio" id="declaracion_si" name="declaracion" value="si" required>
-        <label for="declaracion_si">SI</label>
+        <InputRadioGroup @bind-Value="formulario.Declaracion">
+            <InputRadio Value="@("si")" id="declaracion_si" />
+            <label for="declaracion_si">SI</label>
+        </InputRadioGroup>
+        <ValidationMessage For="@(() => formulario.Declaracion)" />
     </div>
 
     <div>
         <p>LA RECOLECCION DE DATOS PERSONALES SE LLEVA A CABO A TRAVES DE LA PAGINA ELECTRONICA HTTPS://WWW.EMPLEO.GOB.MX/PORTALDIGITAL CUYO ADMINISTRADOR Y RESPONSABLE DEL TRATAMIENTO ES LA UNIDAD DEL SERVICIO NACIONAL DE EMPLEO (USNE) DE LA SECRETARIA DEL TRABAJO Y PREVISION SOCIAL (STPS) LOS DATOS PERSONALES QUE SE RECABAN SERAN UTILIZADOS CON LA FINALIDAD DE PROMOVER PUESTOS VACANTES PARA RECIBIR CANDIDATOS INTERESADOS EN OCUPARLAS. SI DESEAS CONOCER NUESTRO AVISO DE PRIVACIDAD INTEGRAL, LO PODRAS CONSULTAR EN: HTTPS://VUN.EMPLEO.GOB.MX/CONTENIDO/PUBLICO/SEGOB/AVISOPRIVACIDADINTEGRALMPRESA.JSF *</p>
 
-        <input type="radio" id="recoleccion_si" name="recoleccion_datos" value="si" required>
-        <label for="recoleccion_si">SI</label>
+        <InputRadioGroup @bind-Value="formulario.RecoleccionDatos">
+            <InputRadio Value="@("si")" id="recoleccion_si" />
+            <label for="recoleccion_si">SI</label>
+        </InputRadioGroup>
+        <ValidationMessage For="@(() => formulario.RecoleccionDatos)" />
     </div>
 
     <button type="submit">Enviar</button>
-</form>
+</EditForm>
 
 @code {
+    private FormularioEmpleo formulario = new();
 
+    private async Task HandleValidSubmit()
+    {
+        // Aquí procesas el formulario válido
+        // Por ejemplo, llamar a un servicio para guardar los datos
+        Console.WriteLine("Formulario enviado correctamente");
+
+        // Ejemplo de cómo podrías procesar los datos
+        // await EmpleoService.GuardarFormulario(formulario);
+    }
+
+    private async Task InfoLookUp()
+    {
+        // Aquí es donde habría que checar en la API por la información del
+        // Postulado basándose en el CURP
+        if (!string.IsNullOrEmpty(formulario.Curp))
+        {
+            // Llamada a API para obtener información del CURP
+            // var info = await ApiService.BuscarPorCurp(formulario.Curp);
+            // if (info != null)
+            // {
+            //     formulario.Nombre = info.Nombre;
+            //     formulario.FechaNacimiento = info.FechaNacimiento;
+            //     // etc...
+            // }
+        }
+    }
+
+    private async Task PostalLookUP()
+    {
+        // Aquí es donde habría que checar en la API por la información del
+        // Código Postal
+        if (!string.IsNullOrEmpty(formulario.CodigoPostal))
+        {
+            // Llamada a API para obtener información del Código Postal
+            // var info = await ApiService.BuscarPorCodigoPostal(formulario.CodigoPostal);
+            // if (info != null)
+            // {
+            //     formulario.Estado = info.Estado;
+            //     formulario.Municipio = info.MunicipioEstado;
+            //     formulario.Colonia = info.Colonia;
+            //     formulario.Pais    = info.Pais;
+            //     etc...
+            // }
+        }
+    }
+
+
+
+
+
+
+
+
+    // Hay que añadir lógica para cuando haya un perfil registrado, no registrado o //
+    // registrado pero no como usuario (no dado de alta)                            //
+    
 }
+
+
