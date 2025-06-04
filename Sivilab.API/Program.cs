@@ -1,17 +1,41 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using Sivilab.API.Middleware;
 using Sivilab.API.Services;
 using Sivilab.Data.Repositories;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+// Agrega la autenticación y establece JWT como el esquema por defecto
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])
+        )
+    };
+});
 
+// ... Agrega autorización
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
     options.AddPolicy("Usuario", policy => policy.RequireRole("Usuario", "Administrador"));
 });
+
 
 // Registro de servicios del repositorio
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
