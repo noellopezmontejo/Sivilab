@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 <style>
-    form {
+    /*form {
         margin: 2rem auto;
         width: 75%;
         max-width: 960px;
@@ -33,37 +33,199 @@
     }
     form p, label {
         margin-top: 0.5rem;
+    }*/
+
+    :root {
+        --gray-800: #1f2937;
+        --gray-100: #f3f4f6;
+        --gray-300: #d1d5db;
+        --gray-500: #6b7280;
+        --primary-color: #1f2937;
+        --secondary-color: #374151;
+        --bg-light: var(--gray-100);
+        --text-dark: var(--gray-800);
+        --text-light: #ffffff;
+    }
+    
+    
+    .registro-curp {
+        flex: 3;
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 3rem 3rem 2.5rem;
+        box-shadow: 0 8px 20px rgba(0, 64, 128, 0.12), 0 0 12px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        max-width: 700px;
+    }
+
+        .registro-curp h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 0.3rem;
+            letter-spacing: 0.04em;
+        }
+
+    .curp-busqueda {
+        display: flex;
+        gap: 1.2rem;
+        margin-bottom: 2.5rem;
+    }
+
+        .curp-busqueda input {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+            color: var(--text-color);
+        }
+
+            .curp-busqueda input:focus {
+                border-color: var(--secondary-color);
+                outline: none;
+                background-color: var(--accent-color);
+            }
+
+        .curp-busqueda button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 64, 128, 0.3);
+        }
+
+            .curp-busqueda button:hover {
+                background-color: var(--secondary-color);
+                box-shadow: 0 6px 12px rgba(0, 115, 230, 0.5);
+            }
+
+    .formulario-datos {
+        display: none;
+        /* Se activa con JS */
+        background-color: var(--accent-color);
+        border-radius: 10px;
+        padding: 2rem 2.5rem;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+        margin-top: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+        }
+
+            .form-group input:focus {
+                border-color: var(--secondary-color);
+                outline: none;
+                background-color: #eaf4ff;
+                color: var(--text-color);
+            }
+
+    .btn-registrar {
+        margin-top: 2rem;
+        padding: 1rem 2.5rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        background-color: transparent;
+        border: 3px solid var(--primary-color);
+        border-radius: 8px;
+        cursor: pointer;
+        align-self: flex-start;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 64, 128, 0.25);
+        display: none;
+        /* Mostrar vía JS */
+    }
+
+        .btn-registrar:hover {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 115, 230, 0.5);
+        }
+
+    @@media (max-width: 812px) {
+        .registro-curp {
+            padding: 2rem;
+            width: 100%;
+            max-width: 100%;
+        }
+        .curp-busqueda {
+            flex-direction: column;
+        }
+        .curp-busqueda input {
+            width: 100%;
+        }
+        .curp-busqueda button {
+            width: 100%;
+            margin-top: 1rem;
+    }
+
     }
 </style>
 
 
+<section id="registro-curp" class="registro-curp">
+    <div class="curp-busqueda">
+        <input type="text" id="curpInput" placeholder="Ingresa tu CURP" />
+        <button onclick="mostrarFormulario()">Buscar</button>
+    </div>
 <EditForm Model="@formulario" OnValidSubmit="@HandleValidSubmit" FormName="formulario">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
+
+    <div id="formularioDatos" class="formulario-datos">
+    <div class="form-group">
         <label for="curp">1. CURP *</label>
-        <InputText @bind-Value="formulario.Curp" class="textIn" id="curp" placeholder="Escriba su respuesta" @onchange="InfoLookUp" />
+        <InputText @bind-Value="formulario.Curp" class="textIn" id="curp" placeholder="Escriba su respuesta" @onchange="InfoLookUp" readonly />
         <ValidationMessage For="@(() => formulario.Curp)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="nombre">2. NOMBRE *</label>
         <InputText @bind-Value="formulario.Nombre" class="textIn" id="nombre" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.Nombre)" />
     </div>
-    <div>
+    <div class=form-group>
         <label for="nombre">3. APELLIDO PATERNO *</label>
         <InputText @bind-Value="formulario.Paterno" class="textIn" id="paterno" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.Paterno)" />
     </div>
-    <div>
+    <div class=form-group>
         <label for="nombre">4. APELLIDO MATERNO *</label>
         <InputText @bind-Value="formulario.Materno" class="textIn" id="materno" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.Materno)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label>5. GENERO *</label>
         <br />
         <InputRadioGroup @bind-Value="formulario.Genero">
@@ -79,20 +241,20 @@
         <ValidationMessage For="@(() => formulario.Genero)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="fecha_nacimiento">6. FECHA DE NACIMIENTO *</label>
         <br />
         <InputDate @bind-Value="formulario.FechaNacimiento" id="fecha_nacimiento" />
         <ValidationMessage For="@(() => formulario.FechaNacimiento)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="lugar_nacimiento">7. LUGAR DE NACIMIENTO *</label>
         <InputText @bind-Value="formulario.LugarNacimiento" class="textIn" id="lugar_nacimiento" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.LugarNacimiento)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label>8. ERES EGRESADO DEL PROGRAMA DE JOVENES CONSTRUYENDO EL FUTURO *</label>
         <br />
         <InputRadioGroup @bind-Value="formulario.EgresadoPrograma">
@@ -105,49 +267,49 @@
         <ValidationMessage For="@(() => formulario.EgresadoPrograma)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="telefono">9. TELEFONO *</label>
         <InputText @bind-Value="formulario.Telefono" class="textIn" id="telefono" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.Telefono)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="correo">10. CORREO ELECTRONICO *</label>
         <InputText @bind-Value="formulario.Correo" class="textIn" id="correo" placeholder="Escriba su respuesta" type="email" />
         <ValidationMessage For="@(() => formulario.Correo)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="codigo_postal">11. CODIGO POSTAL *</label>
         <InputText @bind-Value="formulario.CodigoPostal" class="textIn" id="codigo_postal" placeholder="Escriba su respuesta" onchange="PostalLookUP" />
         <ValidationMessage For="@(() => formulario.CodigoPostal)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="municipio">11.1. MUNICIPIO DONDE VIVES *</label>
         <InputText @bind-Value="formulario.Municipio" class="textIn" id="" placeholder="" readonly />
         <ValidationMessage For="@(() => formulario.Municipio)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="estado">11.2. ESTADO DONDE VIVES *</label>
         <InputText @bind-Value="formulario.Estado" class="textIn" id="" placeholder="" readonly />
         <ValidationMessage For="@(() => formulario.Estado)" />
     </div>
     
-    <div>
+    <div class=form-group>
         <label for="colonia">11.3. COLONIA *</label>
         <InputText @bind-Value="formulario.Colonia" class="textIn" id="colonia" placeholder="" readonly />
         <ValidationMessage For="@(() => formulario.Colonia)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="pais">11.4. PAÍS DONDE VIVES *</label>
         <InputText @bind-Value="formulario.Pais" class="textIn" id="" placeholder="" readonly />
         <ValidationMessage For="@(() => formulario.Pais)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="nivel_estudios">12. NIVEL DE ESTUDIOS *</label>
         <InputSelect @bind-Value="formulario.NivelEstudios" class="drop" id="nivel_estudios">
             <option value="">-- Seleccione su nivel de estudios --</option>
@@ -168,27 +330,27 @@
         <ValidationMessage For="@(() => formulario.NivelEstudios)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="carrera">13. CARRERA O ESPECIALIDAD *</label>
         <InputText @bind-Value="formulario.Carrera" class="textIn" id="carrera" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.Carrera)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="experiencia_laboral">14. EXPERIENCIA LABORAL *</label>
         <br />
         <InputTextArea @bind-Value="formulario.ExperienciaLaboral" id="experiencia_laboral" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.ExperienciaLaboral)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="puesto_trabajo">15. PUESTO DE TRABAJO QUE HA TENIDO *</label>
         <br />
         <InputTextArea @bind-Value="formulario.PuestoTrabajo" id="puesto_trabajo" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.PuestoTrabajo)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="anos_experiencia">16. AÑOS DE EXPERIENCIA *</label>
         <InputSelect @bind-Value="formulario.AnosExperiencia" class="drop" id="anos_experiencia">
             <option value="">-- Seleccione años de experiencia --</option>
@@ -204,25 +366,25 @@
         <ValidationMessage For="@(() => formulario.AnosExperiencia)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="dominio_idioma">17. DOMINIO DE OTRO IDIOMA *</label>
         <InputText @bind-Value="formulario.DominioIdioma" class="textIn" id="dominio_idioma" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.DominioIdioma)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="puesto_deseado">18. PUESTO QUE DESEADO *</label>
         <InputText @bind-Value="formulario.PuestoDeseado" class="textIn" id="puesto_deseado" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.PuestoDeseado)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <label for="salario_pretendido">19. SALARIO PRETENDIDO *</label>
         <InputText @bind-Value="formulario.SalarioPretendido" class="textIn" id="salario_pretendido" placeholder="Escriba su respuesta" />
         <ValidationMessage For="@(() => formulario.SalarioPretendido)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <p>20. DECLARO BAJO POTESTA DE DECIR VERDAD QUE LOS DATOS CONTENIDOS EN ESTE REGISTRO SON VERDADEROS. Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y de conformidad con lo señalado en el artículo 20, ambos de la "LEY GENERAL DE PROTECCION DE DATOS PERSONALES EN POSESION DE SUJETOS OBLIGADOS (LGPDPPSO)" expreso mi voluntad, específica e informada, para que se efectúe el tratamiento de mis datos personales por la OSNE para los fines consistentes en la vinculación laboral, hasta la posible colocación en una actividad productiva; asimismo autorizo a la OSNE para que realice la transferencia de mis datos personales a la Secretaría del Trabajo y Previsión Social (STPS) a través de la Unidad del Servicion Nacional de Empleo (USNE) con el objetivo de llevar a cabo actividades relacionadas con aquellas que originaron la solicitud de dichos datos personales. Asímismo, la OSNE como sujeto Obligado será la encargada de establecer los mecanismos necesarios para la protección de los datos bajo su resguardo, así como de aquellos mecanismos que aseguren la correcta transferencia de estos a otra entidad.</p>
         <p>He sido informado que podré ejercer los derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) de conformidad con la (LGPDPPSO), ante la OSNE. *</p>
 
@@ -233,7 +395,7 @@
         <ValidationMessage For="@(() => formulario.Declaracion)" />
     </div>
 
-    <div>
+    <div class=form-group>
         <p>LA RECOLECCION DE DATOS PERSONALES SE LLEVA A CABO A TRAVES DE LA PAGINA ELECTRONICA HTTPS://WWW.EMPLEO.GOB.MX/PORTALDIGITAL CUYO ADMINISTRADOR Y RESPONSABLE DEL TRATAMIENTO ES LA UNIDAD DEL SERVICIO NACIONAL DE EMPLEO (USNE) DE LA SECRETARIA DEL TRABAJO Y PREVISION SOCIAL (STPS) LOS DATOS PERSONALES QUE SE RECABAN SERAN UTILIZADOS CON LA FINALIDAD DE PROMOVER PUESTOS VACANTES PARA RECIBIR CANDIDATOS INTERESADOS EN OCUPARLAS. SI DESEAS CONOCER NUESTRO AVISO DE PRIVACIDAD INTEGRAL, LO PODRAS CONSULTAR EN: HTTPS://VUN.EMPLEO.GOB.MX/CONTENIDO/PUBLICO/SEGOB/AVISOPRIVACIDADINTEGRALMPRESA.JSF *</p>
 
         <InputRadioGroup @bind-Value="formulario.RecoleccionDatos">
@@ -244,10 +406,24 @@
     </div>
 
     <button type="submit">Enviar</button>
+    </div>
 </EditForm>
+</section>
+
+<script>
+    function mostrarFormulario() {
+        const curpIngresada = document.getElementById("curpInput").value;
+
+        document.getElementById("curp").value = curpIngresada;
+
+        document.getElementById("formularioDatos").style.display = "block";
+        document.getElementById("registrarBtn").style.display = "inline-block";
+    }
+</script>
 
 @code {
     private FormularioEmpleo formulario = new();
+
 
     private async Task HandleValidSubmit()
     {
