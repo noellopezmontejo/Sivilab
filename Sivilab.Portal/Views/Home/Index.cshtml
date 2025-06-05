@@ -1,8 +1,157 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Eventos";
+    var fechaActual = DateTime.UtcNow.Date; // Fecha actual en formato de solo fecha
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2rem;
+    }
+
+    .event-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+    .event-img {
+        width: 100%;
+        height: 300px;
+        object-fit: contain;
+        object-position: center;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .event-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e1e1e;
+    }
+
+    .event-info {
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    .event-button {
+        border-radius: 25px;
+        font-weight: 600;
+        padding: 6px 18px;
+        width: auto;
+    }
+
+    .past-events-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #555;
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+</style>
+
+<section class="container my-5">
+    <h2 class="text-center section-title">Próximos Eventos</h2>
+
+    @{
+        // Lista de eventos Noel López
+        var eventos = new[] {
+    new { Vigente = 0, Titulo = "Feria de Empleo Escuintla 2025", Imagen = "/Img/FeriaEscuintla.jpeg", Fecha = "2025-05-08", Lugar = "Explanada del Parque Central.", Descripcion = "La Feria de Empleo Escuintla 2025 es un evento estratégico que reúne a las principales empresas e instituciones de la región con ciudadanos en búsqueda de oportunidades laborales.", Liga = "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode" },
+    new { Vigente = 1, Titulo = "Día por el Empleo Tuxtla Gutiérrez", Imagen = "/Img/DiaEmpleoTuxtla.jpeg", Fecha = "2025-05-20", Lugar = "Parque Central de Plan de Ayala.", Descripcion = "En un ambiente dinámico y profesional, los asistentes tendrán acceso a vacantes de diversos sectores económicos representativos de Tuxtla Gutiérrez y sus alrededores.", Liga = "https://forms.office.com/r/iVqHujs1CB" },
+    new { Vigente = 1, Titulo = "Feria Virtual de Empleo 2025", Imagen = "/Img/FeriaVirtual2025.jpeg", Fecha = "2025-05-22", Lugar = "Online", Descripcion = "La Feria Virtual de Empleo 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en el estado.", Liga = "https://forms.office.com/r/4KmxE1xsjW" },
+    new { Vigente = 1, Titulo = "Feria de Empleo Tonalá 2025", Imagen = "/Img/FeriaTonala.jpeg", Fecha = "2025-05-23", Lugar = "Explanada del Parque Central", Descripcion = "La Feria de Empleo Tonalá 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en este municipio emblemático.", Liga = "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode" },
+    new { Vigente = 1, Titulo = "Feria Nacional de Empleo Tapachula 2025", Imagen = "/Img/FeriaTapachulaJunio2025.png", Fecha = "2025-06-09", Lugar = "Hotel Holiday Inn Ctra. a Puerto Madero, KM 3.5 Col. Las Hortensias, C.P. 30797", Descripcion = "La Feria Nacional de Empleo Tapachula 2025 consolida la vocación de esta ciudad como centro neurálgico del desarrollo económico del sur-sureste mexicano, ofreciendo perspectivas laborales que contribuyen al crecimiento integral de la zona fronteriza más dinámica del país.", Liga = "https://forms.office.com/r/vfGDSxF7eC" },
+    new { Vigente = 1, Titulo = "Feria Nacional de Empleo Las Margaritas 2025", Imagen = "/Img/FeriaLasMargaritasJunioi2025.png", Fecha = "2025-06-18", Lugar = "Explanada del Parque Central de las Margaritas", Descripcion = "La Feria Nacional de Empleo Las Margaritas Chiapas 2025 constituye una oportunidad histórica para el desarrollo laboral en esta región fronteriza de gran importancia estratégica. Este evento lleva por primera vez oportunidades de empleo de alcance estatal y nacional a una comunidad que ha sido pilar fundamental en la economía agrícola y ganadera del estado de Chiapas.", Liga = "https://forms.office.com/r/stG2V2Sm0u?origin=lprLink" },
+    new { Vigente = 1, Titulo = "Feria Nacional de Empleo Ocosiongo 2025", Imagen = "/Img/FeriaOcosingoJunio2025.png", Fecha = "2025-06-19", Lugar = "Universidad Tecnológica de la Selva, Ctra Ocosingo - Altamirano entronque Tonina km 0.5,  Col. Predio Laltic", Descripcion = "La Feria Nacional de Empleo Ocosingo Chiapas 2025 representa una iniciativa transformadora que lleva oportunidades laborales de nivel estatal y nacional al corazón de la Selva Lacandona. Este evento pionero reconoce el potencial humano y la riqueza cultural de esta región estratégica, conectando a la población local con empresas estatales y nacionales interesadas en el desarrollo sostenible y la responsabilidad social.", Liga = "https://forms.office.com/r/DCK0i3wC4j?origin=lprLink" },
+    };
+
+        // Filtrar eventos futuros y el evento más próximo
+        var eventosFuturos = eventos.Where(e => DateTime.Parse(e.Fecha) >= fechaActual).OrderBy(e => DateTime.Parse(e.Fecha)).ToList();
+        var eventoPrincipal = eventosFuturos.FirstOrDefault(); // El evento más cercano a la fecha actual
+        var eventosRestantesFuturos = eventosFuturos.Skip(1).OrderBy(e => DateTime.Parse(e.Fecha)).ToList(); // Resto en orden descendente
+
+        // Filtrar eventos pasados
+        var eventosPasados = eventos.Where(e => DateTime.Parse(e.Fecha) < fechaActual).OrderByDescending(e => DateTime.Parse(e.Fecha)).ToList(); // Pasados en orden descendente
+    }
+
+    <div class="row gy-4">
+        @if (eventoPrincipal != null)
+        {
+            // Agregar el evento más próximo primero
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="@eventoPrincipal.Imagen" alt="@eventoPrincipal.Titulo" class="event-img" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="event-title">@eventoPrincipal.Titulo</h5>
+                        <p class="event-info flex-grow-1">@eventoPrincipal.Descripcion</p>
+                        <p class="event-info"><strong>Fecha:</strong> @eventoPrincipal.Fecha</p>
+                        <p class="event-info"><strong>Lugar:</strong> @eventoPrincipal.Lugar</p>
+                        @if (eventoPrincipal.Vigente == 1)
+                        {
+                            <div class="d-flex justify-content-center mt-auto">
+                                <a href="@eventoPrincipal.Liga" target="_blank" class="btn btn-sm btn-primary event-button">Registrate</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @foreach (var evento in eventosRestantesFuturos)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="event-title">@evento.Titulo</h5>
+                        <p class="event-info flex-grow-1">@evento.Descripcion</p>
+                        <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
+                        <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
+                        @if (evento.Vigente == 1)
+                        {
+                            <div class="d-flex justify-content-center mt-auto">
+                                <a href="@evento.Liga" target="_blank" class="btn btn-sm btn-primary event-button">Registrate</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h3 class="past-events-title">Eventos Pasados</h3>
+    <div class="row gy-4">
+        @foreach (var evento in eventosPasados)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card event-card">
+                    <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="event-title">@evento.Titulo</h5>
+                        <p class="event-info flex-grow-1">@evento.Descripcion</p>
+                        <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
+                        <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
