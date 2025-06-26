@@ -42,6 +42,33 @@ namespace Sivilab.API.Controllers
             return Ok(usuario);
         }
 
+        // NUEVO: Actualizar usuario
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarUsuario(int id, [FromBody] Usuario usuario)
+        {
+            if (usuario == null || id != usuario.Id)
+                return BadRequest("Datos de usuario inválidos.");
+
+            var usuarioExistente = await _usuarioRepository.ObtenerUsuarioPorId(id);
+            if (usuarioExistente == null)
+                return NotFound();
+
+            await _usuarioRepository.ActualizarUsuario(usuario);
+            return NoContent();
+        }
+
+        // NUEVO: Eliminar usuario
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarUsuario(int id)
+        {
+            var usuarioExistente = await _usuarioRepository.ObtenerUsuarioPorId(id);
+            if (usuarioExistente == null)
+                return NotFound();
+
+            await _usuarioRepository.EliminarUsuario(id);
+            return NoContent();
+        }
+
         [HttpPost("Registrar")]
         public async Task<IActionResult> RegistrarUsuario([FromBody] Usuario usuario)
         {

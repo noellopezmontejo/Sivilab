@@ -72,6 +72,26 @@ namespace Sivilab.Data.Repositories
             return await _db.QueryFirstOrDefaultAsync<Usuario>(query, new { Email = email, Contrasena = contrasena });
         }
 
-      
+        // NUEVO: Actualizar usuario
+        public async Task ActualizarUsuario(Usuario usuario)
+        {
+            var query = @"UPDATE Usuarios
+                          SET Nombre = @Nombre,
+                              Email = @Email,
+                              Contrasena = @Contrasena,
+                              Rol = @Rol,
+                              Validado = @Validado
+                          WHERE Id = @Id";
+            await _db.ExecuteAsync(query, usuario);
+        }
+
+        // NUEVO: Eliminar usuario
+        public async Task EliminarUsuario(int id)
+        {
+            var query = "DELETE FROM Usuarios WHERE Id = @Id";
+            await _db.ExecuteAsync(query, new { Id = id });
+        }
+
+
     }
 }
