@@ -1,0 +1,53 @@
+﻿@page "/validar-correo"
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+
+<h3>Validar Correo Electrónico</h3>
+
+@if (mensaje != null)
+{
+    <div>@mensaje</div>
+}
+
+<EditForm Model="modelo" OnValidSubmit="Validar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Código de validación:</label>
+        <InputText @bind-Value="modelo.Codigo" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Validar</button>
+</EditForm>
+
+@code {
+    class ValidarCorreoModel
+    {
+        [Required]
+        public string Codigo { get; set; } = string.Empty;
+    }
+
+    ValidarCorreoModel modelo = new();
+    string? mensaje;
+
+    private async Task Validar()
+    {
+        try
+        {
+            // Cambia la URL base por la de tu API real
+            var response = await Http.GetAsync($"api/Usuario/ValidarCorreo?codigo={modelo.Codigo}");
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "¡Correo validado correctamente! Ya puedes iniciar sesión.";
+            }
+            else
+            {
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                mensaje = $"Error: {errorMsg}";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error de red: {ex.Message}";
+        }
+    }
+}
