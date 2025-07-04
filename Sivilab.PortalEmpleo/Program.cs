@@ -8,6 +8,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<ApiService>();
+builder.Services.AddHttpClient<ApiService>();
 
 var app = builder.Build();
 

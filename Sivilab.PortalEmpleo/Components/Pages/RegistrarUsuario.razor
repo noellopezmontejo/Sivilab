@@ -1,60 +1,60 @@
-﻿@page "/registro"
-@using System.Net.Http.Json
+﻿@page "/registro"  
+@using System.Net.Http.Json  
 
-<h3>Registro de Usuario</h3>
+<h3>Registro de Usuario</h3>  
 
-@if (mensaje != null)
-{
-    <div>@mensaje</div>
-}
+@if (mensaje != null)  
+{  
+    <div>@mensaje</div>  
+}  
 
-<EditForm Model="usuario" OnValidSubmit="RegistrarUsuario">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<EditForm Model="usuario" OnValidSubmit="RegistrarUsuarioHandler">  
+    <DataAnnotationsValidator />  
+    <ValidationSummary />  
 
-    <div>
-        <label>Nombre:</label>
-        <InputText @bind-Value="usuario.Nombre" class="form-control" />
-    </div>
-    <div>
-        <label>Email:</label>
-        <InputText @bind-Value="usuario.Email" class="form-control" />
-    </div>
-    <div>
-        <label>Contraseña:</label>
-        <InputText @bind-Value="usuario.Contrasena" type="password" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Registrar</button>
-</EditForm>
+    <div>  
+        <label>Nombre:</label>  
+        <InputText @bind-Value="usuario.Nombre" class="form-control" />  
+    </div>  
+    <div>  
+        <label>Email:</label>  
+        <InputText @bind-Value="usuario.Email" class="form-control" />  
+    </div>  
+    <div>  
+        <label>Contraseña:</label>  
+        <InputText @bind-Value="usuario.Contrasena" type="password" class="form-control" />  
+    </div>  
+    <button type="submit" class="btn btn-primary">Registrar</button>  
+</EditForm>  
 
-@code {
-    Usuario usuario = new Usuario();
-    string? mensaje;
+@code {  
+    Usuario usuario = new Usuario();  
+    string? mensaje;  
 
-    private async Task RegistrarUsuario()
-    {
-        try
-        {
-            // Cambia la URL por la de tu API real
-            var response = await Http.PostAsJsonAsync("https://TUSERVIDOR/api/Usuario", usuario);
+    private async Task RegistrarUsuarioHandler()  
+    {  
+        try  
+        {  
+            // Cambia la URL por la de tu API real  
+            var response = await Http.PostAsJsonAsync("https://TUSERVIDOR/api/Usuario", usuario);  
 
-            if (response.IsSuccessStatusCode)
-            {
-                mensaje = "¡Usuario registrado exitosamente!";
-                usuario = new Usuario();
-            }
-            else
-            {
-                var errorMsg = await response.Content.ReadAsStringAsync();
-                mensaje = $"Error: {errorMsg}";
-            }
-        }
-        catch (Exception ex)
-        {
-            mensaje = $"Error de conexión: {ex.Message}";
-        }
-    }
+            if (response.IsSuccessStatusCode)  
+            {  
+                mensaje = "¡Usuario registrado exitosamente!";  
+                usuario = new Usuario();  
+            }  
+            else  
+            {  
+                var errorMsg = await response.Content.ReadAsStringAsync();  
+                mensaje = $"Error: {errorMsg}";  
+            }  
+        }  
+        catch (Exception ex)  
+        {  
+            mensaje = $"Error de conexión: {ex.Message}";  
+        }  
+    }  
 
-    [Inject]
-    public HttpClient Http { get; set; } = default!;
+    [Inject]  
+    public HttpClient Http { get; set; } = default!;  
 }
