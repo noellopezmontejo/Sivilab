@@ -2,21 +2,27 @@
 @using System.ComponentModel.DataAnnotations
 @inject HttpClient Http
 
-<h3>Validar Correo Electrónico</h3>
+<div style="text-align:center; margin-top:2rem;">
+    <img src="img/sne-emblema.png" alt="Emblema Servicio Nacional de Empleo" style="height:80px; margin-bottom:1rem;" />
+    <h2 style="color:#006837">Servicio Nacional de Empleo</h2>
+    <h3>Validación de Correo Electrónico</h3>
+</div>
 
 @if (mensaje != null)
 {
-    <div>@mensaje</div>
+    <div class="alert @alertClass" style="max-width: 500px; margin: 2rem auto; text-align:center;">
+        <strong>@mensaje</strong>
+    </div>
 }
 
-<EditForm Model="modelo" OnValidSubmit="Validar">
+<EditForm Model="modelo" OnValidSubmit="Validar" style="max-width: 400px; margin: 0 auto;">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <div>
-        <label>Código de validación:</label>
+    <div class="mb-3">
+        <label class="form-label">Por favor, ingresa el código de validación que recibiste en tu correo electrónico:</label>
         <InputText @bind-Value="modelo.Codigo" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-success">Validar</button>
+    <button type="submit" class="btn btn-success w-100">Validar Correo</button>
 </EditForm>
 
 @code {
@@ -28,25 +34,28 @@
 
     ValidarCorreoModel modelo = new();
     string? mensaje;
+    string alertClass = "alert-info";
 
     private async Task Validar()
     {
         try
         {
-            // Cambia la URL base por la de tu API real
             var response = await Http.GetAsync($"api/Usuario/ValidarCorreo?codigo={modelo.Codigo}");
             if (response.IsSuccessStatusCode)
             {
-                mensaje = "¡Correo validado correctamente! Ya puedes iniciar sesión.";
+                alertClass = "alert-success";
+                mensaje = "¡Tu correo ha sido validado correctamente! Gracias por registrarte en el Servicio Nacional de Empleo. Ahora puedes iniciar sesión y aprovechar todos nuestros servicios.";
             }
             else
             {
+                alertClass = "alert-danger";
                 var errorMsg = await response.Content.ReadAsStringAsync();
-                mensaje = $"Error: {errorMsg}";
+                mensaje = $"Ocurrió un problema: {errorMsg}";
             }
         }
         catch (Exception ex)
         {
+            alertClass = "alert-warning";
             mensaje = $"Error de red: {ex.Message}";
         }
     }
