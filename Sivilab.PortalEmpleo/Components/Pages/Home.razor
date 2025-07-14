@@ -1,260 +1,6 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
-
-
-@*<PageTitle>Portal de Empleo</PageTitle>
-
-<div class="nav-links">
-    <a href="#ofertas">Ofertas</a>
-    <a href="#eventos">Eventos</a>
-    <a href="#programas">Programas</a>
-</div>
-    <section class="main-banner">
-        <h2>PORTAL DEL EMPLEO</h2>
-        <p>Encuentra empleo o candidatos.</p>
-
-        <form class="search-form">
-            <div class="fields">
-                <input type="text" placeholder="¿Qué? - Trabajo, profesión, oficio o habilidad" />
-                <input type="text" placeholder="¿Dónde? - Ciudad o código postal" />
-            </div>
-            <div class="captcha">
-                <input type="checkbox" id="captcha" />
-                <label for="captcha">Soy humano</label>
-            </div>
-            <button type="submit">Buscar</button>
-        </form>
-    </section>
-
-    <div class="divider"></div>
-
-<!-- Solución más simple usando solo CSS y Blazor -->
-<section id="ofertas" class="slide-in-right">
-    <h3>Ofertas de empleo actuales</h3>
-    <div class="simple-carousel-container">
-        @if (ofertas.Any())
-        {
-            <div class="simple-carousel-track">
-                @foreach (var oferta in ofertas)
-                {
-                    <div class="simple-carousel-item">
-                        <Sivilab.PortalEmpleo.Components.Portal.Ofertas description="@oferta.Description"
-                                                                        imageURL="@oferta.ImageURL"
-                                                                        experience="@oferta.Experience"
-                                                                        salary="@oferta.Salary"
-                                                                        offerName="@oferta.OfferName" />
-                    </div>
-                }
-            </div>
-        }
-    </div>
-</section>
-
-    <div class="divider"></div>
-
-    <section id="eventos" style="padding-top: 40px;" class="slide-in-left">
-        <h3 style="margin-bottom: 30px;">Próximos Eventos</h3>
-
-        @if (eventos.Any())
-        {
-            <div class="cards">
-                @foreach (var evento in eventos)
-                {
-                        <Sivilab.PortalEmpleo.Components.Portal.Evento  nombreEvento=   "@evento.EventName"
-                                                                        descripcion=    "@evento.Description"
-                                                                        fecha=          "@evento.EventDate"
-                                                                        imagenURL=      "@evento.ImageURL"
-                        />
-                }
-            </div>
-        }
-        
-        <!--div class="cards">
-            <Sivilab.PortalEmpleo.Components.Portal.Evento
-            nombreEvento="Feria del empleo"
-            descripcion="Conoce a empresas líderes y presenta tu currículum en este gran evento."
-            fecha="15/Nov/2025"
-            imagenURL="https://images.unsplash.com/photo-1522071820081-009f0129c71c" />
-
-            <Sivilab.PortalEmpleo.Components.Portal.Evento
-            nombreEvento="Taller de Entrevistas"
-            descripcion="Aprende a destacar en entrevistas laborales con consejos de expertos."
-            fecha="19/Ago/2025"
-            imagenURL="https://images.unsplash.com/photo-1543269865-cbf427effbad" />
-
-            <Sivilab.PortalEmpleo.Components.Portal.Evento
-            imagenURL="https://images.unsplash.com/photo-1533750349088-cd871a92f312"
-            nombreEvento="Webinar de emprendimiento"
-            descripcion="Inspírate con historias de éxito y consejos para emprender tu propio negocio."
-            fecha="01/Dic/2025" />
-
-
-            < El Componente tiene la misma síntaxis que el bloque siguiente.
-            <div class="card" style="margin-bottom: 40px;">
-                <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312" alt="Evento 3"
-                    style="margin-top: 20px; width: 100%; min-height: 300px; object-fit: contain; display: block;">
-                <div class="card-content" style="margin-top: 20px;">
-                    <h4 style="margin-bottom: 15px;">Webinar de Emprendimiento</h4>
-                    <p style="margin-bottom: 20px;">Inspírate con historias de éxito y consejos para emprender tu propio
-                        negocio.</p>
-                    <div style="text-align: center; margin-top: 10px;">
-                        <a href="#registro" class="btn"
-                            style="padding: 8px 16px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                            Regístrarse
-                        </a>
-                    </div>
-                </div>
-            </div> --
-        </div-->
-    </section>
-
-    <div class="divider"></div>
-
-    <section id="programas" class="slide-in-up">
-        <h3>Programas de Formación</h3>
-        <div class="cards">
-            <div class="card">
-                <img src="https://marketingdigitalexperience.com/wp-content/uploads/2021/09/curso-de-marketing-digital-MDE.jpg"
-                    alt="Programa 1">
-                <div class="card-content">
-                    <h4>Curso de Marketing Digital</h4>
-                    <p>Domina herramientas y estrategias clave para destacar en marketing online.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216" alt="Programa 2">
-                <div class="card-content">
-                    <h4>Bootcamp de Programación</h4>
-                    <p>Aprende a desarrollar aplicaciones web desde cero en pocos meses.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095" alt="Programa 3">
-                <div class="card-content">
-                    <h4>Programa de Liderazgo</h4>
-                    <p>Mejora tus habilidades directivas para liderar equipos exitosos.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        &copy; 2025 Portal de Empleo - Todos los derechos reservados.
-    </footer>
-
-    <script>
-        const animatedEls = document.querySelectorAll('.slide-in-right, .slide-in-left, .slide-in-up');
-
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // solo animar una vez
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-
-        animatedEls.forEach(el => observer.observe(el));
-    </script>
-
-    <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-slide');
-
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.remove('active');
-                if (i === index) slide.classList.add('active');
-            });
-        }
-
-        function changeSlide(direction) {
-            currentSlide += direction;
-            if (currentSlide < 0) currentSlide = slides.length - 1;
-            if (currentSlide >= slides.length) currentSlide = 0;
-            showSlide(currentSlide);
-        }
-
-        // Mostrar el primer slide al cargar
-        showSlide(currentSlide);
-    </script>
-
-
-
-
-
-@code {
-    private List<EventoModel> eventos = new();
-    private List<OfertaModel> ofertas = new();
-
-    protected override void OnInitialized()
-    {
-        InicializarEventos();
-        InicializarOfertas();
-    }
-
-    private void InicializarEventos()
-    {
-        eventos = new List<EventoModel>
-        {
-            new EventoModel
-            {
-                EventName="Feria del empleo",
-                Description="Conoce a empresas líderes y presenta tu currículum en este gran evento.",
-                EventDate="15/Nov/2025",
-                ImageURL="https://images.unsplash.com/photo-1522071820081-009f0129c71c"
-            },
-            new EventoModel
-            {
-                EventName="Taller de Entrevistas",
-                Description="Aprende a destacar en entrevistas laborales con consejos de expertos.",
-                EventDate="19/Ago/2025",
-                ImageURL="https://images.unsplash.com/photo-1543269865-cbf427effbad"
-            },
-            new EventoModel {
-                EventName="Webinar de Emprendimiento",
-                Description="Inspírate con historias de éxito y consejos para emprender tu propio negocio.",
-                EventDate="01/Dic/2025",
-                ImageURL="https://images.unsplash.com/photo-1533750349088-cd871a92f312"
-            }
-        };
-    }
-
-    private void InicializarOfertas()
-    {
-        ofertas = new List<OfertaModel>
-        {
-            new OfertaModel
-            {
-                OfferName = "Desarrollador Web",
-                Description = "Empresa ABC busca desarrollador Frontend con experiencia en HTML, CSS y JavaScript.",
-                ImageURL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
-                Experience = 3,
-                Salary = 5000.00
-            },
-            new OfertaModel
-            {
-                OfferName = "Diseñador Gráfico",
-                Description = "Agencia Creativa necesita diseñador con buen manejo de Illustrator y Photoshop.",
-                ImageURL = "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
-                Experience = 2,
-                Salary = 4500.00
-            },
-            new OfertaModel
-            {
-                OfferName = "Analista de Datos",
-                Description = "Empresa de tecnología busca experto en análisis de datos para su equipo.",
-                ImageURL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
-                Experience = 4,
-                Salary = 6000.00
-            }
-        };
-    }
-}
-*@
-
+@inject NavigationManager Navigation
 
 <style>
     :root {
@@ -468,19 +214,25 @@
     <h2>PORTAL DEL EMPLEO</h2>
     <p>Encuentra empleo o candidatos.</p>
 
-    <EditForm Model="@searchModel" OnValidSubmit="HandleValidSubmit">
-        <div class="search-form">
-            <div class="fields">
-                <InputText @bind-Value="searchModel.Que" placeholder="¿Qué? - Trabajo, profesión, oficio o habilidad" />
-                <InputText @bind-Value="searchModel.Donde" placeholder="¿Dónde? - Ciudad o código postal" />
-            </div>
-            <div class="captcha">
-                <InputCheckbox @bind-Value="searchModel.CaptchaChecked" />
-                <label>Soy humano</label>
-            </div>
-            <button type="submit">Buscar</button>
-        </div>
-    </EditForm>
+    <EditForm Model="@searchModel" OnValidSubmit="HandleValidSubmit" FormName="formularioBusqueda">
+     <DataAnnotationsValidator />
+     <ValidationSummary />
+     <div class="search-form">
+         <div class="fields">
+             <InputText @bind-Value="searchModel.Que" placeholder="¿Qué? - Trabajo, profesión, oficio o habilidad" />
+             <ValidationMessage For="@(() => searchModel.Que)" class="validation-message" />
+
+             <InputText @bind-Value="searchModel.Donde" placeholder="¿Dónde? - Ciudad o código postal" />
+             <ValidationMessage For="@(() => searchModel.Donde)" class="validation-message" />
+         </div>
+         <div class="captcha">
+             <InputCheckbox @bind-Value="searchModel.CaptchaChecked" />
+             <label>Soy humano</label>
+             <ValidationMessage For="@(() => searchModel.CaptchaChecked)" class="validation-message" />
+         </div>
+         <button type="submit">Buscar</button>
+     </div>
+ </EditForm>
 </section>
 
 <section id="ofertas" class="slide-in-right">
@@ -567,7 +319,10 @@
 
     private void HandleValidSubmit()
     {
-        // Aquí iría la lógica de búsqueda
+        var que = Uri.EscapeDataString(searchModel.Que);
+        var donde = Uri.EscapeDataString(searchModel.Donde);
+        Navigation.NavigateTo($"/portal-empleo?que={que}&donde={donde}");
+
     }
 
     private void InicializarEventos()
