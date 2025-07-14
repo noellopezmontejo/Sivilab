@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
+
 :root {
     --gray-800: #235B4E;
     --gray-100: #f3f4f6;
@@ -14,7 +16,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+h1, h2, h3 {
+    font-family: 'Patria', sans-serif;
 }
 
 body {
@@ -33,7 +39,6 @@ header {
 }
 
     header h1 {
-        font-family: 'Montserrat', sans-serif;
         font-size: 1.8rem;
     }
 

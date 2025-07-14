@@ -3,6 +3,8 @@
 @inject NavigationManager Navigation
 
 <style>
+    @@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
+
     :root {
         --gray-800: #235B4E;
         --gray-100: #f3f4f6;
@@ -19,7 +21,11 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Noto Sans', sans-serif;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Patria', sans-serif;
     }
 
     body {
@@ -35,23 +41,6 @@
         align-items: center;
         padding: 1rem 2rem;
     }
-
-        header h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
-        }
-
-        header nav a {
-            color: var(--text-light);
-            text-decoration: none;
-            margin-left: 1rem;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-            header nav a:hover {
-                color: var(--secondary-color);
-            }
 
     .nav-links {
         background-color: #BC955C;
@@ -79,10 +68,20 @@
         padding: 5rem 1rem 3rem;
     }
 
+        .main-banner h2 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .main-banner p {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
     .search-form {
         background-color: #fff;
         max-width: 900px;
-        margin: 0 auto;
+        margin: 2rem auto;
         padding: 1.5rem;
         border-radius: 10px;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -119,15 +118,18 @@
     }
 
     .search-form button {
-        background-color: white;
-        border: 2px solid var(--primary-color);
-        color: var(--primary-color);
+        background-color: var(--secondary-color);
+        color: white;
         padding: 0.8rem 1.5rem;
+        border: none;
         border-radius: 6px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
         transition: background 0.3s, transform 0.2s, color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
         .search-form button:hover {
@@ -200,11 +202,158 @@
         padding: 1rem;
         font-size: 0.85rem;
     }
+
+    .categoria-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        padding: 2rem 1rem;
+    }
+
+    .categoria-card {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .categoria-card:hover {
+            transform: translateY(-4px);
+            background-color: #1d4e45;
+        }
+
+    @@media (max-width: 600px) {
+        .categoria-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .categoria-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+    }
+
+    .categoria-box {
+        background-color: #fff;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.2s ease-in-out;
+        padding: 1rem;
+    }
+
+        .categoria-box:hover {
+            transform: translateY(-4px);
+        }
+
+    .categoria-img img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .categoria-text h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .categoria-text p {
+        margin: 0.25rem 0;
+        color: var(--gray-500);
+        font-size: 0.95rem;
+    }
+
+    .explora-link {
+        color: #BC955C;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+        .explora-link:hover {
+            text-decoration: underline;
+        }
+
+    .search-box-wrapper {
+        max-width: 800px;
+        margin: 2rem auto;
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-box {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.3s, box-shadow 0.3s;
+    }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(35, 91, 78, 0.3);
+        }
+
+    .search-button {
+        background-color: #235B4E;
+        color: white;
+        border: none;
+        padding: 0.9rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+
+        .search-button:hover {
+            background-color: #BC955C;
+        }
+
+    .search-icon {
+        font-size: 1.2rem;
+    }
+
+    .captcha-check {
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--gray-500);
+    }
+
 </style>
 
-
 <div class="nav-links">
-    <a href="./portal.html">Inicio</a>
+    <a href="#">Inicio</a>
     <a href="#ofertas">Ofertas</a>
     <a href="#eventos">Eventos</a>
     <a href="#programas">Programas</a>
@@ -212,31 +361,52 @@
 
 <section class="main-banner">
     <h2>PORTAL DEL EMPLEO</h2>
-    <p>Encuentra empleo o candidatos.</p>
+    <p>Encuentra empleo, cursos o participa en eventos laborales. ¡Elige tu futuro hoy!</p>
 
-    <EditForm Model="@searchModel" OnValidSubmit="HandleValidSubmit" FormName="formularioBusqueda">
-     <DataAnnotationsValidator />
-     <ValidationSummary />
-     <div class="search-form">
-         <div class="fields">
-             <InputText @bind-Value="searchModel.Que" placeholder="¿Qué? - Trabajo, profesión, oficio o habilidad" />
-             <ValidationMessage For="@(() => searchModel.Que)" class="validation-message" />
+    <EditForm Model="@searchModel" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="search-box-wrapper">
+            <div class="search-box">
+                <InputText @bind-Value="searchModel.SearchTerm"
+                           class="search-input"
+                           placeholder="Buscar empleos por palabra clave, categoría o lugar..." />
+                <button type="submit" class="search-button">
+                    <span class="search-icon"></span>
+                    Buscar
+                </button>
+            </div>
+            <div class="captcha-check">
+                <InputCheckbox @bind-Value="searchModel.CaptchaChecked" />
+                <label>Soy humano</label>
+                <ValidationMessage For="@(() => searchModel.CaptchaChecked)" />
+            </div>
+        </div>
 
-             <InputText @bind-Value="searchModel.Donde" placeholder="¿Dónde? - Ciudad o código postal" />
-             <ValidationMessage For="@(() => searchModel.Donde)" class="validation-message" />
-         </div>
-         <div class="captcha">
-             <InputCheckbox @bind-Value="searchModel.CaptchaChecked" />
-             <label>Soy humano</label>
-             <ValidationMessage For="@(() => searchModel.CaptchaChecked)" class="validation-message" />
-         </div>
-         <button type="submit">Buscar</button>
-     </div>
- </EditForm>
+    </EditForm>
 </section>
 
-<section id="ofertas" class="slide-in-right">
-    <h3>Ofertas de empleo actuales</h3>
+<section id="categorias">
+    <h3 style="text-align: center; margin-top: 2rem;">Buscar trabajos por categorías principales</h3>
+    <div class="categoria-grid-modern">
+        @foreach (var categoria in categorias)
+        {
+            <div class="categoria-box">
+                <div class="categoria-img">
+                    <img src="@categoria.ImageUrl" alt="@categoria.Titulo" />
+                </div>
+                <div class="categoria-text">
+                    <h4>@categoria.Titulo</h4>
+                    <p><strong>@categoria.Puestos</strong> Puestos de Trabajo Disponibles</p>
+                    <a href="#" class="explora-link">Explora los trabajos &gt;</a>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section id="ofertas">
+    <h3 style="text-align: center; margin-top: 2rem;">Ofertas de empleo actuales</h3>
     <div class="carousel-container">
         <div class="carousel-slide">
             @foreach (var oferta in ofertas)
@@ -255,8 +425,8 @@
     </div>
 </section>
 
-<section id="eventos" style="padding-top: 40px;" class="slide-in-left">
-    <h3 style="margin-bottom: 30px;">Próximos Eventos</h3>
+<section id="eventos">
+    <h3 style="text-align: center; margin-top: 2rem;">Próximos eventos</h3>
     <div class="cards">
         @foreach (var evento in eventos)
         {
@@ -266,17 +436,14 @@
                     <h4>@evento.EventName</h4>
                     <p>@evento.Description</p>
                     <p><strong>Fecha:</strong> @evento.EventDate</p>
-                    <div style="text-align: center; margin-top: 10px;">
-                        <a href="#registro" class="btn">Registrarse</a>
-                    </div>
                 </div>
             </div>
         }
     </div>
 </section>
 
-<section id="programas" class="slide-in-up">
-    <h3>Programas de Formación</h3>
+<section id="programas">
+    <h3 style="text-align: center; margin-top: 2rem;">Programas de formación</h3>
     <div class="cards">
         <div class="card">
             <img src="https://marketingdigitalexperience.com/wp-content/uploads/2021/09/curso-de-marketing-digital-MDE.jpg" alt="Programa 1">
@@ -307,74 +474,51 @@
 </footer>
 
 @code {
-    private SearchModel searchModel = new SearchModel();
+    private SearchModel searchModel = new();
     private List<EventoModel> eventos = new();
     private List<OfertaModel> ofertas = new();
 
     protected override void OnInitialized()
     {
-        InicializarEventos();
-        InicializarOfertas();
-    }
-
-    private void HandleValidSubmit()
-    {
-        var que = Uri.EscapeDataString(searchModel.Que);
-        var donde = Uri.EscapeDataString(searchModel.Donde);
-        Navigation.NavigateTo($"/portal-empleo?que={que}&donde={donde}");
-
-    }
-
-    private void InicializarEventos()
-    {
         eventos = new List<EventoModel>
         {
-            new EventoModel
-            {
-                EventName = "Feria del empleo",
+            new EventoModel {
+                EventName = "Feria del Empleo",
                 Description = "Conoce a empresas líderes y presenta tu currículum en este gran evento.",
                 EventDate = "15/Nov/2025",
                 ImageURL = "https://images.unsplash.com/photo-1522071820081-009f0129c71c"
             },
-            new EventoModel
-            {
+            new EventoModel {
                 EventName = "Taller de Entrevistas",
                 Description = "Aprende a destacar en entrevistas laborales con consejos de expertos.",
                 EventDate = "19/Ago/2025",
                 ImageURL = "https://images.unsplash.com/photo-1543269865-cbf427effbad"
             },
-            new EventoModel
-            {
+            new EventoModel {
                 EventName = "Webinar de Emprendimiento",
                 Description = "Inspírate con historias de éxito y consejos para emprender tu propio negocio.",
                 EventDate = "01/Dic/2025",
                 ImageURL = "https://images.unsplash.com/photo-1533750349088-cd871a92f312"
             }
         };
-    }
 
-    private void InicializarOfertas()
-    {
         ofertas = new List<OfertaModel>
         {
-            new OfertaModel
-            {
+            new OfertaModel {
                 OfferName = "Desarrollador Web",
                 Description = "Empresa ABC busca desarrollador Frontend con experiencia en HTML, CSS y JavaScript.",
                 ImageURL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
                 Experience = 3,
                 Salary = 5000.00
             },
-            new OfertaModel
-            {
+            new OfertaModel {
                 OfferName = "Diseñador Gráfico",
                 Description = "Agencia Creativa necesita diseñador con buen manejo de Illustrator y Photoshop.",
                 ImageURL = "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
                 Experience = 2,
                 Salary = 4500.00
             },
-            new OfertaModel
-            {
+            new OfertaModel {
                 OfferName = "Analista de Datos",
                 Description = "Empresa de tecnología busca experto en análisis de datos para su equipo.",
                 ImageURL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
@@ -384,14 +528,21 @@
         };
     }
 
+    private void HandleValidSubmit()
+    {
+        if (!string.IsNullOrWhiteSpace(searchModel.SearchTerm) && searchModel.CaptchaChecked)
+        {
+            var url = $"/portal-empleo?busqueda={Uri.EscapeDataString(searchModel.SearchTerm)}";
+            Navigation.NavigateTo(url);
+        }
+    }
+
     public class SearchModel
     {
         [Required(ErrorMessage = "Este campo es obligatorio")]
-        public string Que { get; set; } = string.Empty;
+        public string SearchTerm { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Este campo es obligatorio")]
-        public string Donde { get; set; } = string.Empty;
-
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Debes confirmar que eres humano")]
         public bool CaptchaChecked { get; set; }
     }
 
@@ -410,5 +561,22 @@
         public string ImageURL { get; set; } = string.Empty;
         public int Experience { get; set; }
         public double Salary { get; set; }
+    }
+
+    private List<CategoriaModel> categorias = new()
+{
+    new CategoriaModel { Titulo = "Desarrollo de Negocios", Puestos = 120, ImageUrl = "https://i.pinimg.com/1200x/1a/c9/25/1ac9253ba4768ccb45a1ef2d33ceb729.jpg" },
+    new CategoriaModel { Titulo = "Atención al Cliente", Puestos = 370, ImageUrl = "https://i.pinimg.com/1200x/63/81/0d/63810d6fa154fbc0619ed63a804be28e.jpg" },
+    new CategoriaModel { Titulo = "Marketing", Puestos = 743, ImageUrl = "https://i.pinimg.com/736x/f9/47/45/f94745921e7e5690f8de02aca6a353b7.jpg" },
+    new CategoriaModel { Titulo = "Gestión de Producto", Puestos = 156, ImageUrl = "https://i.pinimg.com/736x/8b/6f/d1/8b6fd1da7cb3f0b7e9f7bceb5dd3a05d.jpg" },
+    new CategoriaModel { Titulo = "Contabilidad", Puestos = 67, ImageUrl = "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" },
+    new CategoriaModel { Titulo = "Soporte Técnico", Puestos = 140, ImageUrl = "https://i.pinimg.com/736x/2d/e8/ee/2de8eee50ae28888289fd67b920895a0.jpg" }
+};
+
+    public class CategoriaModel
+    {
+        public string Titulo { get; set; } = string.Empty;
+        public int Puestos { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
     }
 }
