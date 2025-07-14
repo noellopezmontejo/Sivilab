@@ -5,586 +5,76 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portal de Empleo Profesional</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap"
-        rel="stylesheet">
-    <style>
-        :root {
-            --gray-800: #235B4E;
-            --gray-100: #f3f4f6;
-            --gray-300: #d1d5db;
-            --gray-500: #6b7280;
-            --primary-color: #235B4E;
-            --secondary-color: #BC955C;
-            --bg-light: var(--gray-100);
-            --text-dark: var(--gray-800);
-            --text-light: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-        }
-
-        header {
-            background-color: var(--gray-800);
-            color: var(--text-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            animation: fadeDown 0.8s ease-out;
-        }
-
-        header h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
-        }
-
-        header nav a {
-            color: var(--text-light);
-            text-decoration: none;
-            margin-left: 1rem;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        header nav a:hover {
-            color: var(--secondary-color);
-        }
-
-        .nav-links {
-            background-color: #BC955C;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            padding: 0.5rem 0;
-        }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        .main-banner {
-            background: linear-gradient(135deg, var(--gray-800), #235B4E);
-            color: var(--text-light);
-            text-align: center;
-            padding: 5rem 1rem 3rem;
-        }
-
-        .main-banner h2,
-        .main-banner p,
-        .search-form {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeUp 1s ease-out forwards;
-        }
-
-        .main-banner h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.7rem;
-            animation-delay: 0.2s;
-        }
-
-        .main-banner p {
-            font-size: 1.1rem;
-            color: #d1d5db;
-            margin-bottom: 2rem;
-            animation-delay: 0.4s;
-        }
-
-        .search-form {
-            background-color: #fff;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            animation-delay: 0.6s;
-        }
-
-        .search-form .fields {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-form input[type="text"] {
-            padding: 1rem;
-            border: 1px solid var(--gray-300);
-            border-radius: 6px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .search-form input[type="text"]:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
-        }
-
-        .captcha {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            color: var(--gray-500);
-        }
-
-        .captcha input[type="checkbox"] {
-            margin-right: 0.5rem;
-        }
-
-        .search-form button {
-            background-color: white;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s, color 0.3s;
-        }
-
-        .search-form button:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .divider {
-            height: 3px;
-            width: 80px;
-            background-color: var(--secondary-color);
-            margin: 3rem auto;
-            border-radius: 2px;
-        }
-
-        section {
-            width: 100%;
-            margin-bottom: 4rem;
-            padding: 0 1rem;
-        }
-
-        section h3 {
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-            color: var(--gray-800);
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .card {
-            background-color: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            margin-bottom: 40px;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            max-height: 160px;
-        }
-
-        .card-content {
-            padding: 1rem;
-            margin-top: 20px;
-        }
-
-        .card-content h4 {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: var(--gray-800);
-        }
-
-        .card-content p {
-            color: var(--gray-500);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        footer {
-            background-color: var(--gray-800);
-            color: #ccc;
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.85rem;
-        }
-
-        @media (min-width: 600px) {
-            .search-form .fields {
-                flex-direction: row;
-            }
-
-            .search-form .fields input[type="text"] {
-                flex: 1;
-            }
-        }
-
-        .carousel-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .carousel-slide {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-            width: 100%;
-            animation: slideShow 30s infinite;
-        }
-
-        .carousel-item {
-            min-width: 100%;
-            display: flex;
-            height: 400px;
-        }
-
-        .carousel-item.reverse {
-            flex-direction: row-reverse;
-        }
-
-        .carousel-image {
-            flex: 7;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .carousel-content {
-            flex: 3;
-            background-color: #fff;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .carousel-content h4 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--gray-800);
-        }
-
-        .carousel-content p {
-            color: var(--gray-500);
-            font-size: 1rem;
-            line-height: 1.4;
-        }
-
-        @keyframes slideShow {
-
-            0%,
-            20% {
-                transform: translateX(0%);
-            }
-
-            25%,
-            45% {
-                transform: translateX(-100%);
-            }
-
-            50%,
-            70% {
-                transform: translateX(-200%);
-            }
-
-            80% {
-                transform: translateX(-100%);
-            }
-
-            90%,
-            100% {
-                transform: translateX(0%);
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            .carousel-item,
-            .carousel-item.reverse {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .carousel-image,
-            .carousel-content {
-                flex: none;
-                width: 100%;
-                height: 200px;
-            }
-
-            .carousel-content {
-                height: auto;
-                padding: 1.5rem;
-            }
-        }
-
-        #eventos {
-            background-color: var(--gray-800);
-            /* Fondo oscuro para la sección */
-            padding: 2rem 1rem 0 1rem;
-            position: relative;
-            color: var(--text-light);
-            /* Texto claro sobre el fondo oscuro */
-        }
-
-        #eventos::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 8px;
-            height: 100%;
-            background-color: var(--secondary-color);
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-        }
-
-        #eventos h3 {
-            color: var(--secondary-color);
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        #eventos .card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 2px solid #BC955C;
-        }
-
-        #eventos .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        #eventos .card-content h4 {
-            color: var(--secondary-color);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        #eventos .card-content p {
-            color: gray;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-
-        .bordered-link {
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .bordered-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--secondary-color);
-        }
-
-        .btn {
-            padding: 8px 16px;
-            background-color: white;
-            /* Fondo blanco */
-            color: #691C32;
-            /* Letra de color #691C32 */
-            text-decoration: none;
-            border: 2px solid #691C32;
-            /* Contorno de color #691C32 */
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-            /* Para un cambio suave al hover */
-        }
-
-        .btn:hover {
-            background-color: #691C32;
-            /* Fondo de color #691C32 en hover */
-            color: white;
-            /* Letra blanca en hover */
-        }
-
-        /* === Animaciones Generales === */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-100px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(100px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide-in-right,
-        .slide-in-left,
-        .slide-in-up {
-            opacity: 0;
-        }
-
-        .slide-in-right.visible {
-            animation: slideInRight 0.8s ease forwards;
-        }
-
-        .slide-in-left.visible {
-            animation: slideInLeft 0.8s ease forwards;
-        }
-
-        .slide-in-up.visible {
-            animation: slideInUp 0.8s ease forwards;
-        }
-
-        .boton-verificar {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: white;
-            color: #235B4E;
-            border: 2px solid #235B4E;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 10px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .boton-verificar:hover {
-            background-color: #235B4E;
-            color: white;
-        }
-
-        .boton-cancelar {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: white;
-            color: #BC955C;
-            border: 2px solid #BC955C;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .boton-cancelar:hover {
-            background-color: #BC955C;
-            color: white;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap"rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style/style.css" />
 
 </head>
 
 <body>
 
-    <header style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center;">
-            <a href="portal.html" style="margin-right: 20px;">
-                <img src="https://capacitacionsne.stps.gob.mx/pluginfile.php/1/theme_mb2nl/logo/1751054528/LogoSNE.png" alt="Logo" style="height: 40px;">
-            </a>
-            <h1 style="margin: 0;">Portal de Empleo</h1>
-        </div>
-        <nav>
-            <a href="./registro.html">Regístrate</a>
-            <a href="#" class="bordered-link">Iniciar sesión</a>
-        </nav>
-    </header>
+<header style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center;">
+        <a href="portal.html" style="margin-right: 20px;">
+            <img src="https://capacitacionsne.stps.gob.mx/pluginfile.php/1/theme_mb2nl/logo/1751054528/LogoSNE.png" alt="Logo" style="height: 40px;">
+        </a>
+        <h1 style="margin: 0;">Portal de Empleo</h1>
+    </div>
+    <nav>
+        <a href="./registro.html">Regístrate</a>
+        <a href="#" class="bordered-link" id="open-login">Iniciar sesión</a>
 
-    <div class="nav-links">
-        <a href="./portal.html">Inicio</a>
-        <a href="#ofertas">Ofertas</a>
-        <a href="#eventos">Eventos</a>
-        <a href="#programas">Programas</a>
+    <!-- Modal de inicio de sesión Bootstrap personalizado -->
+    <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+        <div class="login-panel">
+            <div class="header">
+                <a href="javascript:void(0)" id="close-login-modal">
+                    <i class="bi bi-arrow-left"></i> <span class="ms-2">Regresar</span>
+                </a>
+            </div>
+
+    <h5 class="text-center mb-3 text-black">Inicia sesión en el Portal del Empleo</h5>
+
+            <form id="login-form">
+        <div class="mb-3">
+            <input type="email" class="form-control" placeholder="Correo" required />
+        </div>
+        <div class="mb-3 input-group">
+            <input type="password" class="form-control" placeholder="Contraseña" required />
+                <span class="input-group-text"><i class="bi bi-eye-slash"></i></span>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="mantenerme" />
+                <label class="form-check-label text-black" for="mantenerme">Mantenerme registrado</label>
+        </div>
+            <button type="submit" class="btn btn-login w-100 mb-3 text-white">Ingresar</button>
+            </form>
+
+        <div class="text-center text-muted my-3">O inicia sesión con:</div>
+            <button class="btn social-btn facebook">Facebook</button>
+            <button class="btn social-btn google">Google</button>
+            <button class="btn social-btn linkedin">LinkedIn</button>
+
+        <div class="footer-links text-center mt-3">
+           <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+           <p class="text-black">¿Eres nuevo en el Portal del Empleo?
+           <a  href ="#">Regístrate aquí</a></p>
+        </div>
+        </div>
     </div>
 
-    <section class="main-banner">
+    </nav>
+</header>
+
+<div class="nav-links">
+    <a href="./portal.html">Inicio</a>
+    <a href="#ofertas">Ofertas</a>
+    <a href="#eventos">Eventos</a>
+    <a href="#programas">Programas</a>
+</div>
+
+<section class="main-banner">
         <h2>PORTAL DEL EMPLEO</h2>
         <p>Encuentra empleo o candidatos.</p>
 
@@ -628,15 +118,15 @@
                 </div>
             </div>
         </div>
-    </section>
+</section>
 
-    <div class="divider"></div>
+<div class="divider"></div>
 
-    <section id="ofertas" class="slide-in-right">
+<section id="ofertas" class="slide-in-right">
         <h3>Ofertas de empleo actuales</h3>
         <div class="carousel-container">
             <div class="carousel-slide">
-                <div class="carousel-item">
+                <div class="carousel-item active">
                     <div class="carousel-image"
                         style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d');">
                     </div>
@@ -645,7 +135,7 @@
                         <p>Empresa ABC busca desarrollador Frontend con experiencia en HTML, CSS y JavaScript.</p>
                     </div>
                 </div>
-                <div class="carousel-item reverse">
+                <div class="carousel-item">
                     <div class="carousel-image"
                         style="background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df');">
                     </div>
@@ -656,7 +146,7 @@
                 </div>
                 <div class="carousel-item">
                     <div class="carousel-image"
-                        style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d');">
+                        style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c');">
                     </div>
                     <div class="carousel-content">
                         <h4>Analista de Datos</h4>
@@ -664,12 +154,19 @@
                     </div>
                 </div>
             </div>
+            <button class="carousel-control prev">❮</button>
+            <button class="carousel-control next">❯</button>
+            <div class="carousel-indicators">
+                <span class="active"></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-    </section>
+</section>
 
-    <div class="divider"></div>
+<div class="divider"></div>
 
-    <section id="eventos" style="padding-top: 40px;" class="slide-in-left">
+<section id="eventos" style="padding-top: 40px;" class="slide-in-left">
         <h3 style="margin-bottom: 30px;">Próximos Eventos</h3>
         <div class="cards">
             <div class="card" style="margin-bottom: 40px;">
@@ -715,11 +212,11 @@
                 </div>
             </div>
         </div>
-    </section>
+</section>
 
-    <div class="divider"></div>
+<div class="divider"></div>
 
-    <section id="programas" class="slide-in-up">
+<section id="programas" class="slide-in-up">
         <h3>Programas de Formación</h3>
         <div class="cards">
             <div class="card">
@@ -745,176 +242,18 @@
                 </div>
             </div>
         </div>
-    </section>
+</section>
 
-    <footer>
-        &copy; 2025 Portal de Empleo - Todos los derechos reservados.
-    </footer>
+<footer>
+    &copy; 2025 Portal de Empleo - Todos los derechos reservados.
+    <div class="footer-links" style="margin-top: 10px;">
+        <a href="#">Politicas y Condiciones</a> &nbsp;|&nbsp;
+        <a href="#">Aviso de Privacidad</a> &nbsp;|&nbsp;
+        <a href="#">Ayuda</a>
+    </div>
+</footer>
 
-    <script>
-        const animatedEls = document.querySelectorAll('.slide-in-right, .slide-in-left, .slide-in-up');
-
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // solo animar una vez
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-
-        animatedEls.forEach(el => observer.observe(el));
-    </script>
-
-    <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-slide');
-
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.remove('active');
-                if (i === index) slide.classList.add('active');
-            });
-        }
-
-        function changeSlide(direction) {
-            currentSlide += direction;
-            if (currentSlide < 0) currentSlide = slides.length - 1;
-            if (currentSlide >= slides.length) currentSlide = 0;
-            showSlide(currentSlide);
-        }
-
-        // Mostrar el primer slide al cargar
-        showSlide(currentSlide);
-    </script>
-
-    <script>
-        document.getElementById("job-search-form").addEventListener("submit", function (e) {
-            e.preventDefault(); // Evita que el formulario se envíe normalmente
-
-            const que = document.getElementById("input-que").value.trim();
-            const donde = document.getElementById("input-donde").value.trim();
-            const captchaChecked = document.getElementById("captcha").checked;
-
-            // Si el captcha no está marcado, mostrar un mensaje de advertencia con estilo
-            if (!captchaChecked) {
-                // Crear el mensaje de advertencia
-                const messageElement = document.createElement('div');
-                messageElement.style.cssText = `
-                position: fixed;
-                top: 62.2%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: #f8c6d1; /* Fondo verde pastel */
-                color: #000;
-                border: 2px solid #e64a19; /* Contorno verde */
-                padding: 10px 20px;
-                font-weight: bold;
-                font-size: 16px;
-                border-radius: 5px;
-                z-index: 9999; /* Asegura que se vea encima de otros elementos */
-                text-align: center;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            `;
-                messageElement.textContent = "Por favor, marca la casilla de 'Soy humano'.";
-
-                // Insertar el mensaje en el DOM
-                document.body.appendChild(messageElement);
-
-                // Opcional: Cerrar el mensaje después de 3 segundos
-                setTimeout(() => {
-                    messageElement.remove();
-                }, 3000); // El mensaje se eliminará después de 3 segundos
-
-                return;
-            }
-
-            // Si todo está bien, se construye la URL y se redirige
-            if (que && donde) {
-                // Codificamos los valores para incluirlos en la URL de forma segura
-                const queryString = `?que=${encodeURIComponent(que)}&donde=${encodeURIComponent(donde)}`;
-                window.location.href = `empleos.html${queryString}`;
-            } else {
-                // Mostrar el mensaje con estilo si los campos no están completos
-                const messageElement = document.createElement('div');
-                messageElement.style.cssText = `
-                position: fixed;
-                top: 62.2%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: #d4f8d4; /* Fondo verde pastel */
-                color: #000;
-                border: 2px solid #388e3c; /* Contorno verde */
-                padding: 10px 20px;
-                font-weight: bold;
-                font-size: 16px;
-                border-radius: 5px;
-                z-index: 9999;
-                text-align: center;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            `;
-                messageElement.textContent = "Por favor, completa ambos campos.";
-
-                // Insertar el mensaje en el DOM
-                document.body.appendChild(messageElement);
-
-                // Opcional: Cerrar el mensaje después de 3 segundos
-                setTimeout(() => {
-                    messageElement.remove();
-                }, 3000); // El mensaje se eliminará después de 3 segundos
-            }
-        });
-    </script>
-
-    <script>
-        const captchaCheckbox = document.getElementById("captcha");
-        const modal = document.getElementById("captcha-modal");
-        const questionEl = document.getElementById("captcha-question");
-        const answerInput = document.getElementById("captcha-answer");
-        const submitBtn = document.getElementById("captcha-submit");
-        const cancelBtn = document.getElementById("captcha-cancel");
-
-        let correctAnswer = 0;
-
-        // Mostrar el modal al hacer clic en el checkbox
-        captchaCheckbox.addEventListener("click", function (e) {
-            // Evita que se marque directamente
-            e.preventDefault();
-
-            // Generar dos números aleatorios
-            const num1 = Math.floor(Math.random() * 10) + 1;
-            const num2 = Math.floor(Math.random() * 10) + 1;
-            correctAnswer = num1 + num2;
-
-            // Mostrar la pregunta
-            questionEl.textContent = `¿Cuánto es ${num1} + ${num2}?`;
-
-            // Limpiar respuesta anterior
-            answerInput.value = "";
-
-            // Mostrar modal
-            modal.style.display = "flex";
-        });
-
-        // Verificar la respuesta
-        submitBtn.addEventListener("click", function () {
-            const userAnswer = parseInt(answerInput.value, 10);
-            if (userAnswer === correctAnswer) {
-                captchaCheckbox.checked = true;
-                modal.style.display = "none";
-            } else {
-                alert("Respuesta incorrecta. Intenta de nuevo.");
-            }
-        });
-
-        // Cancelar y cerrar modal
-        cancelBtn.addEventListener("click", function () {
-            modal.style.display = "none";
-        });
-    </script>
+<script src ="../scrip/script.js"></script>
 
 </body>
-
 </html>

@@ -1,736 +1,238 @@
 <!DOCTYPE html>
 <html lang="es">
-
+    
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portal de Empleo Profesional</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <style>
-        :root {
-            --gray-800: #235B4E;
-            --gray-100: #f3f4f6;
-            --gray-300: #d1d5db;
-            --gray-500: #6b7280;
-            --primary-color: #235B4E;
-            --secondary-color: #BC955C;
-            --bg-light: var(--gray-100);
-            --text-dark: var(--gray-800);
-            --text-light: #ffffff;
-            --registrar: #691C32;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-        }
-
-        header {
-            background-color: var(--gray-800);
-            color: var(--text-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            animation: fadeDown 0.8s ease-out;
-        }
-
-        header h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
-        }
-
-        header nav a {
-            color: var(--text-light);
-            text-decoration: none;
-            margin-left: 1rem;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        header nav a:hover {
-            color: var(--secondary-color);
-        }
-
-        .nav-links {
-            background-color: #235B4E;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            padding: 0.5rem 0;
-            border-top: 2px solid #BC955C;
-        }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--secondary-color);
-        }
-
-        .main-content {
-            display: flex;
-            gap: 2rem;
-            padding: 2rem 3rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: 80vh;
-        }
-
-        .sidebar {
-            background-color: #ffffff;
-            padding: 2rem 1.5rem;
-            box-shadow:
-                0 4px 8px rgba(0, 64, 128, 0.15),
-                0 0 10px rgba(0, 0, 0, 0.05);
-            border-left: 6px solid var(--primary-color);
-            flex-shrink: 0;
-            height: fit-content;
-            align-self: flex-start;
-        }
-
-
-        .sidebar h3 {
-            margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-            color: var(--primary-color);
-            font-weight: 700;
-            letter-spacing: 0.03em;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .sidebar li {
-            margin-bottom: 1.1rem;
-        }
-
-        .sidebar a {
-            text-decoration: none;
-            color: var(--secondary-color);
-            font-weight: 600;
-            font-size: 1rem;
-            transition: color 0.3s ease;
-        }
-
-        .sidebar a:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-
-        .registro-curp {
-            flex: 3;
-            background-color: #ffffff;
-            padding: 3rem 3rem 2.5rem;
-            box-shadow:
-                0 8px 20px rgba(0, 64, 128, 0.12),
-                0 0 12px rgba(0, 0, 0, 0.04);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            max-width: 900px;
-        }
-
-        .registro-curp h2 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--secondary-color);
-            padding-bottom: 0.3rem;
-            letter-spacing: 0.04em;
-        }
-
-        .curp-busqueda {
-            display: flex;
-            gap: 1.2rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .curp-busqueda input {
-            flex: 1;
-            padding: 0.85rem 1rem;
-            font-size: 1.1rem;
-            border: 1px solid var(--primary-color);
-            transition: border-color 0.3s ease;
-            color: var(--text-color);
-        }
-
-        .curp-busqueda input:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-            background-color: var(--accent-color);
-        }
-
-        .curp-busqueda button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 1rem;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-weight: 200;
-        }
-
-        .curp-busqueda button:hover {
-            background-color: var(--secondary-color);
-        }
-
-        #formularioDatos {
-            display: none;
-            background-color: #fefefe;
-            padding: 2rem;
-            border: 1px solid var(--primary-color);
-            border-radius: 8px;
-            margin-top: 1rem;
-            position: relative;
-            overflow: hidden;
-            max-width: 800px;
-            min-height: 400px;
-        }
-
-        /* Pasos del formulario: 2 columnas */
-        .form-step {
-            display: none;
-            opacity: 0;
-            transition: all 0.4s ease;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem 2rem;
-            /* Inicia desplazado a la derecha */
-            transform: translateX(50px);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-
-        .form-step.active {
-            display: grid;
-            opacity: 1;
-            transform: translateX(0);
-            position: relative;
-        }
-
-        .form-step.slide-out-left {
-            transform: translateX(-50px);
-            opacity: 0;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-
-        .form-step.slide-out-right {
-            transform: translateX(50px);
-            opacity: 0;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            margin-bottom: 0.4rem;
-            font-weight: bold;
-            color: var(--gray-800);
-        }
-
-        .form-group input {
-            padding: 0.7rem;
-            font-size: 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-
-        .form-group input:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-            background-color: #eaf4ff;
-        }
-
-        .step-buttons {
-            grid-column: span 2;
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .step-buttons button {
-            padding: 0.8rem 1.6em;
-            /* alto y ancho */
-            font-size: 1.100rem;
-            /* tamaño de texto conservado */
-            background-color: var(--primary-color);
-            color: #fff;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        .step-buttons button:hover {
-            background-color: var(--secondary-color);
-        }
-
-        #registrarBtn {
-            background-color: white;
-            border: 2px solid #691C32;
-            color: #691C32;
-        }
-
-        #registrarBtn:hover {
-            background-color: #691C32;
-            color: white;
-        }
-
-        footer {
-            background-color: var(--gray-800);
-            color: #ccc;
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.85rem;
-        }
-
-        @keyframes slideShow {
-
-            0%,
-            20% {
-                transform: translateX(0%);
-            }
-
-            25%,
-            45% {
-                transform: translateX(-100%);
-            }
-
-            50%,
-            70% {
-                transform: translateX(-200%);
-            }
-
-            80% {
-                transform: translateX(-100%);
-            }
-
-            90%,
-            100% {
-                transform: translateX(0%);
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            .carousel-item,
-            .carousel-item.reverse {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .carousel-image,
-            .carousel-content {
-                flex: none;
-                width: 100%;
-                height: 200px;
-            }
-
-            .carousel-content {
-                height: auto;
-                padding: 1.5rem;
-            }
-        }
-
-        .bordered-link {
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .bordered-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--secondary-color);
-        }
-
-        /* === Animaciones Generales === */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-100px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(100px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide-in-right,
-        .slide-in-left,
-        .slide-in-up {
-            opacity: 0;
-        }
-
-        .slide-in-right.visible {
-            animation: slideInRight 0.8s ease forwards;
-        }
-
-        .slide-in-left.visible {
-            animation: slideInLeft 0.8s ease forwards;
-        }
-
-        .slide-in-up.visible {
-            animation: slideInUp 0.8s ease forwards;
-        }
-
-        .form-group select {
-            padding: 0.7rem;
-            font-size: 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            background-color: #fff;
-            width: 100%;
-            /* opcional: para que sea del mismo ancho que un input */
-        }
-
-        .form-group select:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-            background-color: #eaf4ff;
-        }
-
-        /* Estilo para que Select2 se parezca a tu input */
-        .form-group .select2-container--default .select2-selection--multiple {
-            padding: 0.7rem;
-            font-size: 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            background-color: #fff;
-            min-height: 40px;
-            /* para que tenga buen tamaño */
-            cursor: text;
-        }
-
-        .form-group .select2-container--default.select2-container--focus .select2-selection--multiple {
-            border-color: var(--secondary-color);
-            outline: none;
-            background-color: #eaf4ff;
-        }
-
-        /* Para que las "etiquetas" (chips) se vean bonitas */
-        .form-group .select2-selection__choice {
-            background-color: #3b82f6;
-            /* azul */
-            border: none;
-            border-radius: 2px;
-            color: #235B4E;
-            padding: 0 6px;
-            margin-top: 4px;
-            margin-right: 4px;
-            font-size: 0.9rem;
-        }
-
-        /* El icono para quitar etiqueta */
-        .form-group .select2-selection__choice__remove {
-            color: #235B4E;
-            margin-left: 4px;
-            cursor: pointer;
-        }
-
-        /* INDICADORES Stepper */
-        .stepper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            user-select: none;
-        }
-
-        .stepper .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stepper .circle {
-            width: 50px;
-            height: 30px;
-            background: #bbb;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%);
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-        .stepper .step.completed .circle,
-        .stepper .step.active .circle {
-            background: #235B4E;
-        }
-
-        .stepper .label {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .stepper .arrow {
-            width: 30px;
-            height: 30px;
-            color: #bbb;
-            transition: color 0.3s;
-        }
-
-        .stepper .arrow.active {
-            color: #235B4E;
-
-        }
-
-        #stepper {
-            display: none;
-            max-width: 700px;
-            /* Oculto por defecto */
-        }
-    </style>
-
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
 
 <body>
 
-    <header style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center;">
-            <a href="portal.html" style="margin-right: 20px;">
-                <img src="https://capacitacionsne.stps.gob.mx/pluginfile.php/1/theme_mb2nl/logo/1751054528/LogoSNE.png"
-                    alt="Logo" style="height: 40px;">
-            </a>
-            <h1 style="margin: 0;">Portal de Empleo</h1>
-        </div>
-        <nav>
-            <a href="./registro.html">Regístrate</a>
-            <a href="#" class="bordered-link">Iniciar sesión</a>
-        </nav>
-    </header>
-
-    <div class="nav-links">
-        <a href="./portal.html">Inicio</a>
-        <a href="portal.html#ofertas">Ofertas</a>
-        <a href="portal.html#eventos">Eventos</a>
-        <a href="portal.html#programas">Programas</a>
+<header style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center;">
+        <a href="portal.html" style="margin-right: 20px;">
+            <img src="https://capacitacionsne.stps.gob.mx/pluginfile.php/1/theme_mb2nl/logo/1751054528/LogoSNE.png"
+                alt="Logo" style="height: 40px;">
+        </a>
+        <h1 style="margin: 0;">Portal de Empleo</h1>
     </div>
+    <nav>
+        <a href="./registro.html">Regístrate</a>
+        <a href="#" class="bordered-link" id="open-login">Iniciar sesión</a>
+    </nav>
 
-    <div class="main-content">
-        <!-- SIDEBAR IZQUIERDA -->
-        <aside class="sidebar">
-            <h3>Accesos rápidos</h3>
-            <ul>
-                <li><a href="https://www.gob.mx/curp/">Buscar CURP</a></li>
-                <li><a href="portal.html#ofertas">Ofertas destacadas</a></li>
-                <li><a href="portal.html#eventos">Próximos eventos</a></li>
-                <li><a href="portal.html#programas">Programas de empleo</a></li>
-            </ul>
-        </aside>
-
-        <!-- FORMULARIO PRINCIPAL -->
-        <section id="registro-curp" class="registro-curp">
-            <h2>Buscar CURP</h2>
-            <div class="curp-busqueda">
-                <input type="text" id="curpInput" placeholder="Ingresa tu CURP" />
-                <button onclick="mostrarFormulario()">Buscar</button>
-            </div>
-
-            <div class="stepper" id="stepper">
-                <div class="step" data-step="1">
-                    <div class="circle">1</div>
-                    <div class="label">Datos</div>
+    <!-- Modal de inicio de sesión -->
+    <div id="login-modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+            <div class="login-panel">
+                <div class="header">
+                    <a href="javascript:void(0)" id="close-login-modal">
+                        <i class="bi bi-arrow-left"></i> <span class="ms-2">Regresar</span>
+                    </a>
                 </div>
 
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
+                <h5 class="text-center mb-3" style="color: #000;">Inicia sesión en el Portal del Empleo</h5>
 
-                <div class="step" data-step="2">
-                    <div class="circle">2</div>
-                    <div class="label">Información</div>
-                </div>
+                <form id="login-form">
+                    <div class="mb-3">
+                        <input type="email" class="form-control" placeholder="Correo" required />
+                    </div>
+                    <div class="mb-3 input-group">
+                        <input type="password" class="form-control" placeholder="Contraseña" required />
+                        <span class="input-group-text"><i class="bi bi-eye-slash"></i></span>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="mantenerme" />
+                        <label class="form-check-label" for="mantenerme" style="color: #000;">Mantenerme
+                            registrado</label>
+                    </div>
+                    <button type="submit" class="btn btn-login w-100 mb-3">Ingresar</button>
+                </form>
 
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
-
-                <div class="step" data-step="3">
-                    <div class="circle">3</div>
-                    <div class="label">Ubicación</div>
-                </div>
-
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
-
-                <div class="step" data-step="4">
-                    <div class="circle">4</div>
-                    <div class="label">Estudios</div>
-                </div>
-
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
-
-                <div class="step" data-step="5">
-                    <div class="circle">5</div>
-                    <div class="label">Experiencia</div>
-                </div>
-
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
-
-                <div class="step" data-step="6">
-                    <div class="circle">6</div>
-                    <div class="label">Certificaciones</div>
-                </div>
-
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
-
-                <div class="step" data-step="7">
-                    <div class="circle">7</div>
-                    <div class="label">Dependientes</div>
-                </div>
-
-                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M9 18l6-6-6-6" />
-                </svg>
-
-                <div class="step" data-step="8">
-                    <div class="circle">8</div>
-                    <div class="label">Otros</div>
+                <div class="text-center text-muted my-3">O inicia sesión con:</div>
+                <button class="btn social-btn facebook">Facebook</button>
+                <button class="btn social-btn google">Google</button>
+                <button class="btn social-btn linkedin">LinkedIn</button>
+                <div class="footer-links text-center mt-3">
+                    <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+                    <p><span style="color: #000;">¿Eres nuevo en el Portal del Empleo?</span> <a href="#">Regístrate
+                            aquí</a></p>
                 </div>
             </div>
+        </div>
+</header>
 
-            <div id="formularioDatos" class="formulario-datos">
-                <!-- Paso 1 -->
-                <div class="form-step active" id="paso1">
-                    <div class="form-group">
-                        <label for="curp">CURP:</label>
-                        <input type="text" id="curp" readonly />
-                    </div>
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" />
-                    </div>
-                    <div class="form-group">
-                        <label for="apellidoPaterno">Apellido Paterno:</label>
-                        <input type="text" id="apellidoPaterno" />
-                    </div>
-                    <div class="form-group">
-                        <label for="apellidoMaterno">Apellido Materno:</label>
-                        <input type="text" id="apellidoMaterno" />
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Correo electrónico:</label>
-                        <input type="email" id="email" />
-                    </div>
-                    <div class="step-buttons">
-                        <button onclick="mostrarPaso(2)">Siguiente</button>
-                    </div>
+<div class="nav-links">
+    <a href="./portal.html">Inicio</a>
+    <a href="portal.html#ofertas">Ofertas</a>
+    <a href="portal.html#eventos">Eventos</a>
+    <a href="portal.html#programas">Programas</a>
+</div>
+
+<div class="main-content">
+    <!-- SIDEBAR IZQUIERDA -->
+    <aside class="sidebar">
+        <h3>Accesos rápidos</h3>
+        <ul>
+            <li><a href="https://www.gob.mx/curp/">Buscar CURP</a></li>
+            <li><a href="portal.html#ofertas">Ofertas destacadas</a></li>
+            <li><a href="portal.html#eventos">Próximos eventos</a></li>
+            <li><a href="portal.html#programas">Programas de empleo</a></li>
+        </ul>
+    </aside>
+
+    <!-- FORMULARIO PRINCIPAL -->
+    <section id="registro-curp" class="registro-curp">
+        <h2>Buscar CURP</h2>
+        <div class="curp-busqueda">
+            <input type="text" id="curpInput" placeholder="Ingresa tu CURP" />
+            <button onclick="validarCURP()">Buscar</button>
+        </div>
+
+        <!-- Nuevo div para las opciones de empleo -->
+        <div id="opcionesEmpleo" class="opciones-empleo">
+            <div class="opciones-titulo"><h3>Regístrate en el portal del empleo</h3>
+                <br>
+                Antes que nada: Indícanos qué deseas hacer</div>
+            
+            <a href="#" class="opcion-empleo" id="buscoEmpleoBtn">
+                <img src="https://www.empleo.gob.mx/assets/img/bt.png" alt="Busco Empleo" style="width: 70px; height: 70px; vertical-align: middle; margin-right: 10px;">
+                Busco Empleo
+            </a>
+            <a href="#" class="opcion-empleo" id="ofrezcoEmpleoBtn">
+                <img src="https://www.empleo.gob.mx/assets/img/emp.png" alt="Ofrezco Empleo" style="width: 70px;height: 70px; vertical-align: middle; margin-right: 10px;">
+                Ofrezco Empleo
+                <br>
+            </a>
+        </div>
+
+        <!-- Stepper para buscadores de empleo -->
+        <div class="stepper" id="stepper">
+            <div class="step" data-step="1">
+                <div class="circle">1</div>
+                <div class="label">Datos</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="2">
+                <div class="circle">2</div>
+                <div class="label">Información</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="3">
+                <div class="circle">3</div>
+                <div class="label">Ubicación</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="4">
+                <div class="circle">4</div>
+                <div class="label">Estudios</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="5">
+                <div class="circle">5</div>
+                <div class="label">Experiencia</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="6">
+                <div class="circle">6</div>
+                <div class="label">Certificaciones</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="7">
+                <div class="circle">7</div>
+                <div class="label">Dependientes</div>
+            </div>
+
+            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 18l6-6-6-6" />
+            </svg>
+
+            <div class="step" data-step="8">
+                <div class="circle">8</div>
+                <div class="label">Otros</div>
+            </div>
+        </div>
+
+        <!-- Formulario para buscadores de empleo -->
+        <div id="formularioDatos" class="formulario-datos">
+            <!-- Paso 1 -->
+            <div class="form-step active" id="paso1">
+                <div class="form-group">
+                    <label for="curp">CURP:</label>
+                    <input type="text" id="curp" readonly />
                 </div>
-
-                <!-- Paso 2 -->
-                <div class="form-step" id="paso2">
-                    <div class="form-group">
-                        <label for="nacionalidad">Nacionalidad:</label>
-                        <input type="text" id="nacionalidad" />
-                    </div>
-                    <div class="form-group">
-                        <label for="paisorigen">Pais de Origen:</label>
-                        <input type="text" id="paisorigen" />
-                    </div>
-                    <div class="form-group">
-                        <label for="situacionmigratoria">Situacion Migratoria:</label>
-                        <input type="text" id="situacionmigratoria" />
-                    </div>
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" />
+                </div>
+                <div class="form-group">
+                    <label for="apellidoPaterno">Apellido Paterno:</label>
+                    <input type="text" id="apellidoPaterno" />
+                </div>
+                <div class="form-group">
+                    <label for="apellidoMaterno">Apellido Materno:</label>
+                    <input type="text" id="apellidoMaterno" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico:</label>
+                    <input type="email" id="email" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" />
+                </div>
+                <div class="step-buttons" style="display: flex; justify-content: space-between;">
+                    <button onclick="regresarInicio()">Regresar</button>
+                    <button onclick="mostrarPaso(2)">Siguiente</button>
+                </div>
+            </div>
+            <!-- Paso 2 -->
+            <div class="form-step" id="paso2">
+                <div class="form-group">
+                    <label for="nacionalidad">Nacionalidad:</label>
+                    <input type="text" id="nacionalidad" />
+                </div>
+                <div class="form-group">
+                    <label for="paisorigen">Pais de Origen:</label>
+                    <input type="text" id="paisorigen" />
+                </div>
+                <div class="form-group">
+                    <label for="situacionmigratoria">Situacion Migratoria:</label>
+                    <input type="text" id="situacionmigratoria" />
+                </div>
                     <div class="form-group">
                         <label for="whatsapp">Numero de Whatsapp:</label>
                         <input type="tel" id="whatsapp" />
@@ -859,20 +361,6 @@
                             <option value="calidad-en-el-trabajo">Calidad en el trabajo</option>
                         </select>
                     </div>
-
-                    <!-- jQuery -->
-                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <!-- JS de Select2 -->
-                    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-                    <script>
-                        $(document).ready(function () {
-                            $('#competencias').select2({
-                                placeholder: "Seleccione competencias",
-                                allowClear: true
-                            });
-                        });
-                    </script>
                     <div class="form-group">
                         <label for="habilidades">Habilidades adicionales:</label>
                         <input type="text" id="habilidades" />
@@ -939,139 +427,180 @@
                         <button id="registrarBtn" onclick="registrar()">Registrar</button>
                     </div>
                 </div>
+            </div>
 
+            <!-- Stepper para empleadores -->
+            <div class="stepper" id="stepperEmpleador">
+                <div class="step" data-step="1">
+                    <div class="circle">1</div>
+                    <div class="label">Datos Empresa</div>
+                </div>
+                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M9 18l6-6-6-6" />
+                </svg>
+                <div class="step" data-step="2">
+                    <div class="circle">2</div>
+                    <div class="label">Contacto</div>
+                </div>
+                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M9 18l6-6-6-6" />
+                </svg>
+                <div class="step" data-step="3">
+                    <div class="circle">3</div>
+                    <div class="label">Ubicación</div>
+                </div>
+                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M9 18l6-6-6-6" />
+                </svg>
+                <div class="step" data-step="4">
+                    <div class="circle">4</div>
+                    <div class="label">Oferta</div>
+                </div>
+            </div>
+
+            <!-- Formulario para empleadores -->
+            <div id="formularioEmpleador" class="formulario-datos">
+                <!-- Paso 1 -->
+                <div class="form-step active" id="pasoEmp1">
+                    <div class="form-group">
+                        <label for="rfc">RFC:</label>
+                        <input type="text" id="rfc" />
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreEmpresa">Nombre de la Empresa:</label>
+                        <input type="text" id="nombreEmpresa" />
+                    </div>
+                    <div class="form-group">
+                        <label for="giro">Giro:</label>
+                        <select id="giro">
+                            <option value="">Seleccione un giro</option>
+                            <option value="manufactura">Manufactura</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="comercio">Comercio</option>
+                            <option value="tecnologia">Tecnología</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tamano">Tamaño de la Empresa:</label>
+                        <select id="tamano">
+                            <option value="">Seleccione tamaño</option>
+                            <option value="micro">Micro (1-10 empleados)</option>
+                            <option value="pequena">Pequeña (11-50 empleados)</option>
+                            <option value="mediana">Mediana (51-250 empleados)</option>
+                            <option value="grande">Grande (251+ empleados)</option>
+                        </select>
+                    </div>
+                    <div class="step-buttons" style="display: flex; justify-content: space-between;">
+                        <button onclick="regresarOpcionesEmpleo()">Regresar</button>
+                        <button onclick="mostrarPasoEmp(2)">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="form-step" id="pasoEmp2">
+                    <div class="form-group">
+                        <label for="nombreContacto">Nombre del Contacto:</label>
+                        <input type="text" id="nombreContacto" />
+                    </div>
+                    <div class="form-group">
+                        <label for="puestoContacto">Puesto del Contacto:</label>
+                        <input type="text" id="puestoContacto" />
+                    </div>
+                    <div class="form-group">
+                        <label for="emailEmpresa">Correo Electrónico:</label>
+                        <input type="email" id="emailEmpresa" />
+                    </div>
+                    <div class="form-group">
+                        <label for="telefonoEmpresa">Teléfono:</label>
+                        <input type="tel" id="telefonoEmpresa" />
+                    </div>
+                     <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" />
+                    </div>
+                    <div class="step-buttons">
+                        <button onclick="mostrarPasoEmp(1)">Anterior</button>
+                        <button onclick="mostrarPasoEmp(3)">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="form-step" id="pasoEmp3">
+                    <div class="form-group">
+                        <label for="estadoEmpresa">Estado:</label>
+                        <input type="text" id="estadoEmpresa" />
+                    </div>
+                    <div class="form-group">
+                        <label for="municipioEmpresa">Municipio:</label>
+                        <input type="text" id="municipioEmpresa" />
+                    </div>
+                    <div class="form-group">
+                        <label for="coloniaEmpresa">Colonia:</label>
+                        <input type="text" id="coloniaEmpresa" />
+                    </div>
+                    <div class="form-group">
+                        <label for="direccionEmpresa">Dirección:</label>
+                        <input type="text" id="direccionEmpresa" />
+                    </div>
+                    <div class="step-buttons">
+                        <button onclick="mostrarPasoEmp(2)">Anterior</button>
+                        <button onclick="mostrarPasoEmp(4)">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="form-step" id="pasoEmp4">
+                    <div class="form-group">
+                        <label for="puestoOferta">Puesto Ofrecido:</label>
+                        <input type="text" id="puestoOferta" />
+                    </div>
+                    <div class="form-group">
+                        <label for="salario">Salario Ofrecido:</label>
+                        <input type="text" id="salario" />
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoContrato">Tipo de Contrato:</label>
+                        <select id="tipoContrato">
+                            <option value="">Seleccione tipo</option>
+                            <option value="tiempo-indeterminado">Tiempo indeterminado</option>
+                            <option value="tiempo-determinado">Tiempo determinado</option>
+                            <option value="honorarios">Honorarios</option>
+                            <option value="practicas">Prácticas profesionales</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="requisitos">Requisitos:</label>
+                        <textarea id="requisitos" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="beneficios">Beneficios:</label>
+                        <textarea id="beneficios" rows="4"></textarea>
+                    </div>
+                    <div class="step-buttons">
+                        <button onclick="mostrarPasoEmp(3)">Anterior</button>
+                        <button id="registrarEmpBtn" onclick="registrarEmpleador()">Registrar Oferta</button>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
 
-    <footer>
-        &copy; 2025 Portal de Empleo - Todos los derechos reservados.
-    </footer>
+<footer>
+    &copy; 2025 Portal de Empleo - Todos los derechos reservados.
+    <div class="footer-links" style="margin-top: 10px;">
+        <a href="#">Politicas y Condiciones</a> &nbsp;|&nbsp;
+        <a href="#">Aviso de Privacidad</a> &nbsp;|&nbsp;
+        <a href="#">Ayuda</a>
+    </div>
+</footer>
 
-    <script>
-        let pasoActual = 1;
 
-        function validateCURP(curp) {
-            const regex = /^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$/;
-            return regex.test(curp);
-        }
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- JS de Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        function mostrarFormulario() {
-            const curpInput = document.getElementById('curpInput');
-            const curpValue = curpInput.value.trim();
-
-            // Verificar si el CURP es válido
-            if (!curpValue || !validateCURP(curpValue)) {
-                alert('Por favor ingresa un CURP válido.');
-                return;
-            }
-
-            // Si es válido, asignar el valor al campo oculto
-            document.getElementById('curp').value = curpValue;
-
-            // Mostrar el formulario
-            const formulario = document.getElementById('formularioDatos');
-            formulario.style.display = 'block';
-
-            // Mostrar el stepper
-            const stepper = document.getElementById('stepper');
-            stepper.style.display = 'flex'; // O "block", depende del diseño CSS
-
-            mostrarPaso(1);
-        }
-
-        function mostrarPaso(numero) {
-            const pasos = document.querySelectorAll('.form-step');
-            const anterior = document.getElementById(`paso${pasoActual}`);
-            const nuevo = document.getElementById(`paso${numero}`);
-
-            pasos.forEach(paso => {
-                paso.classList.remove('active', 'slide-out-left', 'slide-out-right');
-                paso.style.display = 'none';
-            });
-
-            if (pasoActual < numero) {
-                anterior.classList.add('slide-out-left');
-            } else if (pasoActual > numero) {
-                anterior.classList.add('slide-out-right');
-            }
-
-            nuevo.style.display = 'grid';
-            // Pequeño retraso para activar la transición
-            setTimeout(() => {
-                nuevo.classList.add('active');
-            }, 10);
-
-            pasoActual = numero;
-
-            // Mostrar el botón registrar solo en el último paso
-            document.getElementById("registrarBtn").style.display = numero === 8 ? "inline-block" : "none";
-        }
-    </script>
-
-    <script>
-        const formSteps = document.querySelectorAll('.form-step');
-
-        let currentStep = 1;
-        const totalSteps = formSteps.length;
-
-        function mostrarPaso(step) {
-            if (step < 1 || step > totalSteps) return;
-
-            formSteps.forEach((fs, idx) => {
-                fs.classList.remove('active', 'slide-out-left', 'slide-out-right');
-
-                if (idx + 1 === currentStep) {
-                    // El paso actual va a salir: animar para salir
-                    if (step > currentStep) {
-                        fs.classList.add('slide-out-left');
-                    } else if (step < currentStep) {
-                        fs.classList.add('slide-out-right');
-                    }
-                }
-            });
-
-            // Un pequeño delay para permitir que la animación de salida termine
-            setTimeout(() => {
-                formSteps.forEach((fs, idx) => {
-                    fs.classList.remove('active', 'slide-out-left', 'slide-out-right');
-                    if (idx + 1 === step) {
-                        fs.classList.add('active');
-                    }
-                });
-                currentStep = step;
-                actualizarStepper(step);
-            }, 300); // coincide con la duración de la transición CSS
-        }
-
-        // Función para actualizar el stepper visual (igual que antes)
-        function actualizarStepper(step) {
-            const steps = document.querySelectorAll('#stepper .step');
-            const arrows = document.querySelectorAll('#stepper .arrow');
-
-            steps.forEach((stepEl, idx) => {
-                stepEl.classList.remove('active', 'completed');
-                if (idx < step - 1) {
-                    stepEl.classList.add('completed');
-                } else if (idx === step - 1) {
-                    stepEl.classList.add('active');
-                }
-            });
-
-            arrows.forEach((arrowEl, idx) => {
-                if (idx < step - 1) {
-                    arrowEl.classList.add('active');
-                } else {
-                    arrowEl.classList.remove('active');
-                }
-            });
-        }
-
-        window.mostrarPaso = mostrarPaso;
-
-        // Inicializa en paso 1
-        mostrarPaso(1);
-    </script>
+<script src ="../scrip/registro.js"></script>
 
 </body>
 
