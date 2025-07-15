@@ -4,9 +4,10 @@
 @using Microsoft.AspNetCore.Components.Web
 @using System.Text.RegularExpressions
 
+@inject HttpClient httpClient
+
 
 <style>
-    @@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
     :root {
         --primary: #235B4E;
         --secondary: #BC955C;
@@ -23,11 +24,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Noto Sans', sans-serif;
-    }
-
-    h1, h2, h3 {
-        font-family: 'Patria', sans-serif;
+        font-family: 'Roboto', sans-serif;
     }
 
     body {
@@ -382,7 +379,16 @@
         <h2>Buscar CURP</h2>
         <div class="curp-busqueda">
             <input type="text" @bind="curpInput" placeholder="Ingresa tu CURP" />
-            <button @onclick="MostrarFormulario">Buscar</button>
+            <button @onclick="MostrarFormulario" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Buscando...</span>
+            }
+            else
+            {
+                <span>Buscar</span>
+            }
+        </button>
         </div>
 
         @if (!string.IsNullOrEmpty(errorMessage))
@@ -390,9 +396,21 @@
             <div class="message error">@errorMessage</div>
         }
 
-<EditForm Model="usuario" OnValidSubmit="RegistrarUsuario">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        @if (mostrarFormulario)
+        {
+            <div class="stepper">
+                @for (int i = 1; i <= 8; i++)
+                {
+                    <div class="step @(currentStep == i ? "active" : "") @(currentStep > i ? "completed" : "")">
+                        <div class="circle">@i</div>
+                        <div class="label">@GetStepLabel(i)</div>
+                    </div>
+                    @if (i < 8)
+                    {
+                        <div class="step-connector @(currentStep > i ? "completed" : "")"></div>
+                    }
+                }
+            </div>
 
             <div class="formulario-datos">
                 @for (int step = 1; step <= 8; step++)
@@ -416,12 +434,35 @@
 </footer>
 
 @code {
+
+        public class CurpApiResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+        public CurpData? Data { get; set; }
+    }
+
+    public class CurpData
+    {
+        public string Nombre { get; set; } = "";
+        public string ApellidoPaterno { get; set; } = "";
+        public string ApellidoMaterno { get; set; } = "";
+        public string FechaNacimiento { get; set; } = "";
+        public string Genero { get; set; } = "";
+        public string Estado { get; set; } = "";
+        public string Municipio { get; set; } = "";
+        public string Nacionalidad { get; set; } = "";
+    }
+
+
+
     // Variables de control
     private string curpInput = "";
     private int currentStep = 1;
     private bool mostrarFormulario = false;
     private string errorMessage = "";
     private string successMessage = "";
+    private bool isLoading = false;
 
     // Datos del formulario - Usando Dictionary para evitar 25+ variables
     private Dictionary<string, string> formData = new Dictionary<string, string>
@@ -542,7 +583,11 @@
         }
     };
 
-    void MostrarFormulario()
+    //private List 
+    //protected override async Task getCurp() {
+    //}
+
+    /*void MostrarFormulario()
     {
         errorMessage = "";
         successMessage = "";
@@ -565,7 +610,109 @@
 
         mostrarFormulario = true;
         currentStep = 1;
+    }*/
+
+    async Task MostrarFormulario()
+{
+    errorMessage = "";
+    successMessage = "";
+
+    if (string.IsNullOrWhiteSpace(curpInput))
+    {
+        errorMessage = "Por favor ingresa una CURP válida.";
+        mostrarFormulario = false;
+        return;
     }
+
+    if (!ValidarCURP(curpInput))
+    {
+        errorMessage = "La CURP ingresada no es válida.";
+        mostrarFormulario = false;
+        return;
+    }
+
+    isLoading = true;
+    StateHasChanged();
+
+    try
+    {
+        // Call the API to get CURP data
+        var curpData = await GetCurpDataFromApi(curpInput);
+        
+        if (curpData != null)
+        {
+            // Pre-fill form data with API response
+            FillFormWithApiData(curpData);
+            successMessage = "Datos obtenidos exitosamente de la base de datos.";
+        }
+        else
+        {
+            // If no data found, show message but still allow form filling
+            successMessage = "No se encontraron datos previos. Puedes llenar el formulario manualmente.";
+        }
+
+        mostrarFormulario = true;
+        currentStep = 1;
+    }
+    catch (Exception ex)
+    {
+        errorMessage = $"Error al consultar los datos: {ex.Message}";
+        mostrarFormulario = false;
+    }
+    finally
+    {
+        isLoading = false;
+        StateHasChanged();
+    }
+}
+
+// Add this new method to call the API
+private async Task<CurpData?> GetCurpDataFromApi(string curp)
+{
+    try
+    {
+        // Example API call - replace with your actual API endpoint
+        var response = await httpClient.GetAsync($"https://localhost:5094/api/UsuarioCurp/{curp}");
+        
+        if (response.IsSuccessStatusCode)
+        {
+            var apiResponse = await response.Content.ReadFromJsonAsync<CurpApiResponse>();
+            return apiResponse?.Success == true ? apiResponse.Data : null;
+        }
+        
+        // If API returns 404 or other error, return null (no existing data)
+        Console.WriteLine("404");
+        return null;
+    }
+    catch (HttpRequestException)
+    {
+        // Network error - return null and continue with manual form
+        Console.WriteLine("500");
+        return null;
+    }
+    catch (Exception)
+    {
+        // Other errors - re-throw to show error message
+        throw;
+    }
+}
+
+// Add this method to fill form data with API response
+private void FillFormWithApiData(CurpData data)
+{
+    Console.WriteLine(data);
+    formData["nombre"] = data.Nombre ?? "";
+    formData["apellidoPaterno"] = data.ApellidoPaterno ?? "";
+    formData["apellidoMaterno"] = data.ApellidoMaterno ?? "";
+    formData["fechaNacimiento"] = data.FechaNacimiento ?? "";
+    formData["genero"] = data.Genero ?? "";
+    formData["estado"] = data.Estado ?? "";
+    formData["municipio"] = data.Municipio ?? "";
+    formData["nacionalidad"] = data.Nacionalidad ?? "";
+}
+
+// Update your search button in the HTML to show loading state
+// Replace the existing search button with this:
 
     bool ValidarCURP(string curp)
     {
@@ -616,13 +763,18 @@
         _ => builder => { }
     };
 
-    private async Task RegistrarUsuario()
+    RenderFragment RenderStepFields(int step) => builder =>
     {
         int seq = 0;
         foreach (var (key, label, type, required, options) in stepFields[step])
         {
-            // Cambia la URL por la de tu API real
-            var response = await Http.PostAsJsonAsync("https://TUSERVIDOR/api/Usuario", usuario);
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "form-group " + (type == "textarea" || type == "select" ? "full-width" : ""));
+
+            builder.OpenElement(seq++, "label");
+            builder.AddAttribute(seq++, "for", key);
+            builder.AddContent(seq++, label);
+            builder.CloseElement();
 
             if (type == "select" && options != null)
             {
