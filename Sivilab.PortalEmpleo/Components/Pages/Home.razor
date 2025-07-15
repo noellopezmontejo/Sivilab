@@ -398,7 +398,9 @@
                 <div class="categoria-text">
                     <h4>@categoria.Titulo</h4>
                     <p><strong>@categoria.Puestos</strong> Puestos de Trabajo Disponibles</p>
-                    <a href="#" class="explora-link">Explora los trabajos &gt;</a>
+                    <NavLink class="explora-link" href="@($"/categoria/{Uri.EscapeDataString(categoria.Titulo)}")">
+                        Explora los trabajos &gt;
+                    </NavLink>
                 </div>
             </div>
         }
