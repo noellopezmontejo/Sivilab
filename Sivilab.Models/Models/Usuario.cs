@@ -12,11 +12,11 @@ namespace Sivilab.Models.Models
         public int Id { get; set; }
 
         [Required]
-        public string Nombre { get; set; }=string.Empty;
+        public string Nombre { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }= string.Empty;
+        public string Email { get; set; }
 
         [Required]
         public string Contrasena { get; set; }
@@ -24,7 +24,7 @@ namespace Sivilab.Models.Models
         [Required]
         public string Rol { get; set; }
         public bool Validado { get; set; }
-        public string CodigoValidacion { get; set; } = string.Empty;
+        public string CodigoValidacion { get; set; } 
 
     }
 }

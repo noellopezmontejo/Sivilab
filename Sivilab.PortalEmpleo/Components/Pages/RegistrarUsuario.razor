@@ -390,21 +390,9 @@
             <div class="message error">@errorMessage</div>
         }
 
-        @if (mostrarFormulario)
-        {
-            <div class="stepper">
-                @for (int i = 1; i <= 8; i++)
-                {
-                    <div class="step @(currentStep == i ? "active" : "") @(currentStep > i ? "completed" : "")">
-                        <div class="circle">@i</div>
-                        <div class="label">@GetStepLabel(i)</div>
-                    </div>
-                    @if (i < 8)
-                    {
-                        <div class="step-connector @(currentStep > i ? "completed" : "")"></div>
-                    }
-                }
-            </div>
+<EditForm Model="usuario" OnValidSubmit="RegistrarUsuario">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
             <div class="formulario-datos">
                 @for (int step = 1; step <= 8; step++)
@@ -628,18 +616,13 @@
         _ => builder => { }
     };
 
-    RenderFragment RenderStepFields(int step) => builder =>
+    private async Task RegistrarUsuario()
     {
         int seq = 0;
         foreach (var (key, label, type, required, options) in stepFields[step])
         {
-            builder.OpenElement(seq++, "div");
-            builder.AddAttribute(seq++, "class", "form-group " + (type == "textarea" || type == "select" ? "full-width" : ""));
-
-            builder.OpenElement(seq++, "label");
-            builder.AddAttribute(seq++, "for", key);
-            builder.AddContent(seq++, label);
-            builder.CloseElement();
+            // Cambia la URL por la de tu API real
+            var response = await Http.PostAsJsonAsync("https://TUSERVIDOR/api/Usuario", usuario);
 
             if (type == "select" && options != null)
             {
