@@ -9,7 +9,7 @@
     <div>@mensaje</div>
 }
 
-<EditForm Model="usuario" OnValidSubmit="Registrar_Usuario" FormName="registroUsuarioForm">
+<EditForm Model="@usuario" OnValidSubmit="@Registrar_Usuario" FormName="registroUsuarioForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
