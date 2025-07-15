@@ -4,9 +4,10 @@
 @using Microsoft.AspNetCore.Components.Web
 @using System.Text.RegularExpressions
 
-
 <style>
     @@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
+
+
     :root {
         --primary: #235B4E;
         --secondary: #BC955C;
@@ -29,6 +30,7 @@
     h1, h2, h3 {
         font-family: 'Patria', sans-serif;
     }
+
 
     body {
         background-color: var(--bg-light);
@@ -170,7 +172,7 @@
 
     .success {
         background: #d4edda;
-        color: var(--success);   
+        color: var(--success);
         border: 1px solid #c3e6cb;
     }
 
@@ -359,13 +361,12 @@
     }
 </style>
 
-
 <div class="nav-links">
-    <a href="/">Inicio</a>
-    <a href="/#ofertas">Ofertas</a>
-    <a href="/#eventos">Eventos</a>
-    <a href="/#programas">Programas</a>
-</div>
+    <a href="#">Inicio</a>
+    <a href="#ofertas">Ofertas</a>
+    <a href="#eventos">Eventos</a>
+    <a href="#programas">Programas</a>
+</div> 
 
 <div class="main-content">
     <aside class="sidebar">
@@ -390,9 +391,21 @@
             <div class="message error">@errorMessage</div>
         }
 
-<EditForm Model="usuario" OnValidSubmit="RegistrarUsuario">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        @if (mostrarFormulario)
+        {
+            <div class="stepper">
+                @for (int i = 1; i <= 8; i++)
+                {
+                    <div class="step @(currentStep == i ? "active" : "") @(currentStep > i ? "completed" : "")">
+                        <div class="circle">@i</div>
+                        <div class="label">@GetStepLabel(i)</div>
+                    </div>
+                    @if (i < 8)
+                    {
+                        <div class="step-connector @(currentStep > i ? "completed" : "")"></div>
+                    }
+                }
+            </div>
 
             <div class="formulario-datos">
                 @for (int step = 1; step <= 8; step++)
@@ -616,13 +629,18 @@
         _ => builder => { }
     };
 
-    private async Task RegistrarUsuario()
+    RenderFragment RenderStepFields(int step) => builder =>
     {
         int seq = 0;
         foreach (var (key, label, type, required, options) in stepFields[step])
         {
-            // Cambia la URL por la de tu API real
-            var response = await Http.PostAsJsonAsync("https://TUSERVIDOR/api/Usuario", usuario);
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "form-group " + (type == "textarea" || type == "select" ? "full-width" : ""));
+
+            builder.OpenElement(seq++, "label");
+            builder.AddAttribute(seq++, "for", key);
+            builder.AddContent(seq++, label);
+            builder.CloseElement();
 
             if (type == "select" && options != null)
             {
@@ -715,5 +733,4 @@
 
         builder.CloseElement();
     };
-} 
-     
+}
