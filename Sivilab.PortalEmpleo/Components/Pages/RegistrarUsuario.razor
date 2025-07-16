@@ -1,11 +1,14 @@
 ﻿@page "/registro"  
+@rendermode InteractiveServer
 @using System.Net.Http.Json 
 @using Microsoft.AspNetCore.Components.Web
 @using System.Text.RegularExpressions
 
+@inject HttpClient httpClient
+
 
 <style>
-    .registro-container {
+    :root {
         --primary: #235B4E;
         --secondary: #BC955C;
         --bg-light: #f3f4f6;
@@ -13,371 +16,566 @@
         --text-light: #ffffff;
         --error: #dc3545;
         --success: #28a745;
-        --gray-300: #d1d5db;  
+        --gray-300: #d1d5db;
         --gray-500: #6b7280;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         font-family: 'Roboto', sans-serif;
     }
 
-        .registro-container * {
-            box-sizing: border-box;
-        }
+    body {
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+    }
 
-        .registro-container .nav-links {
-            background-color: var(--primary);
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            padding: 0.5rem 0;
-            border-top: 2px solid var(--secondary);
-        }
+    header {
+        background-color: var(--primary);
+        color: var(--text-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+    }
 
-            .registro-container .nav-links a {
-                color: var(--text-light);
-                text-decoration: none;
-            }
+    header h1 {
+        font-size: 1.8rem;
+    }
 
-                .registro-container .nav-links a:hover {
-                    color: var(--secondary);
-                }
+    header nav a {
+        color: var(--text-light);
+        text-decoration: none;
+        margin-left: 1rem;
+        font-weight: 600;
+    }
 
-        .registro-container .main-content {
-            display: flex;
-            gap: 2rem;
-            padding: 2rem 3rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    header nav a:hover {
+        color: var(--secondary);
+    }
 
-        .registro-container .sidebar {
-            background: white;
-            padding: 2rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 250px;
-        }
+    .nav-links {
+        background-color: var(--primary);
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        border-top: 2px solid var(--secondary);
+    }
 
-            .registro-container .sidebar h3 {
-                color: var(--primary);
-                margin-bottom: 1rem;
-            }
+    .nav-links a {
+        color: var(--text-light);
+        text-decoration: none;
+    }
 
-            .registro-container .sidebar a {
-                color: var(--secondary);
-                text-decoration: none;
-                font-weight: 600;
-            }
+    .nav-links a:hover {
+        color: var(--secondary);
+    }
 
-        .registro-container .registro-curp {
-            flex: 1;
-            background: white;
-            padding: 3rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
+    .main-content {
+        display: flex;
+        gap: 2rem;
+        padding: 2rem 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-        .registro-container .curp-busqueda {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
+    .sidebar {
+        background: white;
+        padding: 2rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        height: fit-content;
+        width: 250px;
+    }
 
-            .registro-container .curp-busqueda input {
-                flex: 1;
-                padding: 0.85rem;
-                border: 1px solid var(--primary);
-            }
+    .sidebar h3 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
 
-            .registro-container .curp-busqueda button {
-                background: var(--primary);
-                color: white;
-                border: none;
-                padding: 0 1rem;
-                cursor: pointer;
-            }
+    .sidebar ul {
+        list-style: none;
+    }
 
-        .registro-container .message {
-            padding: 0.75rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
+    .sidebar li {
+        margin-bottom: 1rem;
+    }
 
-        .registro-container .error {
-            background: #f8d7da;
-            color: var(--error);
-            border: 1px solid #f5c6cb;
-        }
+    .sidebar a {
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 600;
+    }
 
-        .registro-container .success {
-            background: #d4edda;
-            color: var(--success);
-            border: 1px solid #c3e6cb;
-        }
+    .sidebar a:hover {
+        color: var(--primary);
+    }
 
-        .registro-container .stepper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 2rem 0;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            flex-wrap: wrap;
-        }
+    .registro-curp {
+        flex: 1;
+        background: white;
+        padding: 3rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        max-width: 900px;
+    }
 
-        .registro-container .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            min-width: 80px;
-        }
+    .registro-curp h2 {
+        font-size: 2.2rem;
+        color: var(--primary);
+        border-bottom: 3px solid var(--secondary);
+        padding-bottom: 0.3rem;
+        margin-bottom: 2rem;
+    }
 
-            .registro-container .step .circle {
-                width: 35px;
-                height: 35px;
-                border-radius: 50%;
-                background: var(--gray-300);
-                color: var(--gray-500);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-            }
+    .curp-busqueda {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
 
-            .registro-container .step.active .circle {
-                background: var(--primary);
-                color: white;
-            }
+    .curp-busqueda input {
+        flex: 1;
+        padding: 0.85rem;
+        border: 1px solid var(--primary);
+    }
 
-            .registro-container .step.completed .circle {
-                background: var(--secondary);
-                color: white;
-            }
+    .curp-busqueda button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0 1rem;
+        cursor: pointer;
+    }
 
-            .registro-container .step .label {
-                margin-top: 0.5rem;
-                font-size: 0.8rem;
-                text-align: center;
-            }
+    .curp-busqueda button:hover {
+        background: var(--secondary);
+    }
 
-        .registro-container .formulario-datos {
-            background: #fefefe;
-            padding: 2rem;
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            position: relative;
-        }
+    .message {
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
 
-        .registro-container .form-step {
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
+    .error {
+        background: #f8d7da;
+        color: var(--error);
+        border: 1px solid #f5c6cb;
+    }
 
-            .registro-container .form-step.active {
-                display: grid;
-            }
+    .success {
+        background: #d4edda;
+        color: var(--success);   
+        border: 1px solid #c3e6cb;
+    }
 
-        .registro-container .form-group {
-            display: flex;
-            flex-direction: column;
-        }
+    .stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 2rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        flex-wrap: wrap;
+    }
 
-            .registro-container .form-group.full-width {
-                grid-column: 1 / -1;
-            }
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        min-width: 80px;
+    }
 
-            .registro-container .form-group label {
-                margin-bottom: 0.4rem;
-                font-weight: bold;
-                color: var(--text-dark);
-            }
+    .step .circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--gray-300);
+        color: var(--gray-500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
 
-            .registro-container .form-group input,
-            .registro-container .form-group select,
-            .registro-container .form-group textarea {
-                padding: 0.7rem;
-                border: 1px solid var(--gray-300);
-                border-radius: 4px;
-            }
+    .step.active .circle {
+        background: var(--primary);
+        color: white;
+    }
 
-        .registro-container .step-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-            grid-column: 1 / -1;
-        }
+    .step.completed .circle {
+        background: var(--secondary);
+        color: white;
+    }
 
-        .registro-container .btn {
-            padding: 0.8rem 1.6rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+    .step .label {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        text-align: center;
+    }
 
-        .registro-container .btn-anterior {
-            background: var(--gray-300);
-            color: var(--text-dark);
-        }
+    .step-connector {
+        height: 2px;
+        background: var(--gray-300);
+        flex: 1;
+        margin: 0 0.5rem;
+        margin-top: -17px;
+    }
 
-        .registro-container .btn-siguiente {
-            background: var(--primary);
-            color: white;
-        }
+    .step-connector.completed {
+        background: var(--secondary);
+    }
 
-        .registro-container .btn-registrar {
-            background: white;
-            border: 2px solid #691C32;
-            color: #691C32;
-        }
+    /* NUEVO: Estilo para campos tipo imagen adjunta */
+    .formulario-datos {
+        position: relative;
+        background: #fff;
+        padding: 2rem;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        width: 100%;
+        min-height: 500px; /* opcional para evitar cambio de tamaño brusco */
+    }
+
+    .form-step {
+        display: none;
+        opacity: 0;
+        transition: all 0.4s ease;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        /* Inicia desplazado a la derecha */
+        transform: translateX(50px);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .form-step.active {
+        display: grid;
+        opacity: 1;
+        transform: translateX(0);
+        position: relative;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1f2937;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.75rem 1rem;
+        border: 2px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: var(--secondary);
+        outline: none;
+        background-color: #f0fdf4;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .step-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+        grid-column: 1 / -1;
+    }
+
+    .btn {
+        padding: 0.8rem 1.6rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-anterior {
+        background: var(--gray-300);
+        color: var(--text-dark);
+    }
+
+    .btn-anterior:hover {
+        background: var(--gray-500);
+        color: white;
+    }
+
+    .btn-siguiente {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-siguiente:hover {
+        background: var(--secondary);
+    }
+
+    .btn-registrar {
+        background: white;
+        border: 2px solid #691C32;
+        color: #691C32;
+    }
+
+    .btn-registrar:hover {
+        background: #691C32;
+        color: white;
+    }
+
+    footer {
+        background: var(--primary);
+        color: #ccc;
+        text-align: center;
+        padding: 1rem;
+    }
 </style>
 
-<div class="registro-container">
-    <div class="nav-links">
-        <a href="/">Inicio</a>
-        <a href="/#ofertas">Ofertas</a>
-        <a href="/#eventos">Eventos</a>
-        <a href="/#programas">Programas</a>
-    </div>
 
-    <div class="main-content">
-        <aside class="sidebar">
-            <h3>Accesos rápidos</h3>
-            <ul>
-                <li><a href="https://www.gob.mx/curp/" target="_blank">Buscar CURP</a></li>
-                <li><a href="/#ofertas">Ofertas destacadas</a></li>
-                <li><a href="/#eventos">Próximos eventos</a></li>
-                <li><a href="/#programas">Programas de empleo</a></li>
-            </ul>
-        </aside>
-
-        <section class="registro-curp">
-            <h2>Buscar CURP</h2>
-            
-            <div class="curp-busqueda">
-                <input type="text" @bind="curpInput" @bind:event="oninput" placeholder="Ingresa tu CURP" />
-                
-               
-                <button type="button" id="btnBuscar" @onclick="(()=>BuscarCurp())">
-                    Buscar
-                </button>
-
-
-                <p style="color:red;">Debug: CURP = '@curpInput'</p>
-                <p style="color:red;">Debug: mostrarFormulario = @mostrarFormulario</p>
-                <p style="color:red;">Debug: Error = @errorMessage</p>
-            </div>
-
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div class="message error">@errorMessage</div>
-            }
-
-            @if (mostrarFormulario)
-            {
-                <div class="stepper">
-                    @for (int i = 1; i <= 8; i++)
-                    {
-                        <div class="step @(currentStep == i ? "active" : "") @(currentStep > i ? "completed" : "")">
-                            <div class="circle">@i</div>
-                            <div class="label">@GetStepLabel(i)</div>
-                        </div>
-                    }
-                </div>
-
-                <div class="formulario-datos">
-                    @for (int step = 1; step <= 8; step++)
-                    {
-                        <div class="form-step @(currentStep == step ? "active" : "")">
-                            @RenderStepContent(step)
-                        </div>
-                    }
-                </div>
-            }
-
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                <div class="message success">@successMessage</div>
-            }
-        </section>
-    </div>
+<div class="nav-links">
+    <a href="/">Inicio</a>
+    <a href="/#ofertas">Ofertas</a>
+    <a href="/#eventos">Eventos</a>
+    <a href="/#programas">Programas</a>
 </div>
 
+<div class="main-content">
+    <aside class="sidebar">
+        <h3>Accesos rápidos</h3>
+        <ul>
+            <li><a href="https://www.gob.mx/curp/">Buscar CURP</a></li>
+            <li><a href="portal.html#ofertas">Ofertas destacadas</a></li>
+            <li><a href="portal.html#eventos">Próximos eventos</a></li>
+            <li><a href="portal.html#programas">Programas de empleo</a></li>
+        </ul>
+    </aside>
+
+    <section class="registro-curp">
+        <h2>Buscar CURP</h2>
+        <div class="curp-busqueda">
+            <input type="text" @bind="curpInput" placeholder="Ingresa tu CURP" />
+            <button @onclick="MostrarFormulario" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Buscando...</span>
+            }
+            else
+            {
+                <span>Buscar</span>
+            }
+        </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="message error">@errorMessage</div>
+        }
+
+        @if (mostrarFormulario)
+        {
+            <div class="stepper">
+                @for (int i = 1; i <= 8; i++)
+                {
+                    <div class="step @(currentStep == i ? "active" : "") @(currentStep > i ? "completed" : "")">
+                        <div class="circle">@i</div>
+                        <div class="label">@GetStepLabel(i)</div>
+                    </div>
+                    @if (i < 8)
+                    {
+                        <div class="step-connector @(currentStep > i ? "completed" : "")"></div>
+                    }
+                }
+            </div>
+
+            <div class="formulario-datos">
+                @for (int step = 1; step <= 8; step++)
+                {
+                    <div class="form-step @(currentStep == step ? "active" : "")">
+                        @RenderStepContent(step)
+                    </div>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="message success">@successMessage</div>
+        }
+    </section>
+</div>
+
+<footer>
+    &copy; 2025 Portal de Empleo - Todos los derechos reservados.
+</footer>
 
 @code {
 
-    private async Task BuscarCurp()
+        public class CurpApiResponse
     {
-        Console.WriteLine("BuscarCurp() fue llamado");
-        Console.WriteLine($" CURP ingresado: {curpInput}");
-        await MostrarFormulario();
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+        public CurpData? Data { get; set; }
     }
 
+    public class CurpData
+    {
+        public string Nombre { get; set; } = "";
+        public string ApellidoPaterno { get; set; } = "";
+        public string ApellidoMaterno { get; set; } = "";
+        public string FechaNacimiento { get; set; } = "";
+        public string Genero { get; set; } = "";
+        public string Estado { get; set; } = "";
+        public string Municipio { get; set; } = "";
+        public string Nacionalidad { get; set; } = "";
+    }
+
+
+
+    // Variables de control
     private string curpInput = "";
     private int currentStep = 1;
     private bool mostrarFormulario = false;
     private string errorMessage = "";
     private string successMessage = "";
+    private bool isLoading = false;
 
+    // Datos del formulario - Usando Dictionary para evitar 25+ variables
     private Dictionary<string, string> formData = new Dictionary<string, string>
     {
-        ["curp"] = "", ["nombre"] = "", ["apellidoPaterno"] = "", ["apellidoMaterno"] = "", ["email"] = "", ["telefono"] = "",
-        ["fechaNacimiento"] = "", ["genero"] = "", ["estadoCivil"] = "", ["nacionalidad"] = "Mexicana",
-        ["estado"] = "", ["municipio"] = "", ["colonia"] = "", ["codigoPostal"] = "", ["direccion"] = "",
-        ["nivelEstudios"] = "", ["carrera"] = "", ["institucion"] = "", ["añoEgreso"] = "", ["cedulaProfesional"] = "",
-        ["empresaAnterior"] = "", ["puestoAnterior"] = "", ["tiempoExperiencia"] = "", ["sectorExperiencia"] = "", ["descripcionExperiencia"] = "",
-        ["certificaciones"] = "", ["habilidades"] = "", ["idiomas"] = "", ["nivelIngles"] = "",
-        ["tieneDependientes"] = "No", ["numeroDependientes"] = "0", ["tiposDependientes"] = "",
-        ["disponibilidadHoraria"] = "", ["disponibilidadViaje"] = "No", ["salarioDeseado"] = "", ["comentarios"] = ""
+        // Paso 1: Datos Personales
+        ["nombre"] = "",
+        ["apellidoPaterno"] = "",
+        ["apellidoMaterno"] = "",
+        ["email"] = "",
+        ["telefono"] = "",
+        
+        // Paso 2: Información Personal
+        ["fechaNacimiento"] = "",
+        ["genero"] = "",
+        ["estadoCivil"] = "",
+        ["nacionalidad"] = "Mexicana",
+        
+        // Paso 3: Ubicación
+        ["estado"] = "",
+        ["municipio"] = "",
+        ["colonia"] = "",
+        ["codigoPostal"] = "",
+        ["direccion"] = "",
+        
+        // Paso 4: Estudios
+        ["nivelEstudios"] = "",
+        ["carrera"] = "",
+        ["institucion"] = "",
+        ["añoEgreso"] = "",
+        ["cedulaProfesional"] = "",
+        
+        // Paso 5: Experiencia
+        ["empresaAnterior"] = "",
+        ["puestoAnterior"] = "",
+        ["tiempoExperiencia"] = "",
+        ["sectorExperiencia"] = "",
+        ["descripcionExperiencia"] = "",
+        
+        // Paso 6: Certificaciones
+        ["certificaciones"] = "",
+        ["habilidades"] = "",
+        ["idiomas"] = "",
+        ["nivelIngles"] = "",
+        
+        // Paso 7: Dependientes
+        ["tieneDependientes"] = "No",
+        ["numeroDependientes"] = "0",
+        ["tiposDependientes"] = "",
+        
+        // Paso 8: Otros
+        ["disponibilidadHoraria"] = "",
+        ["disponibilidadViaje"] = "No",
+        ["salarioDeseado"] = "",
+        ["comentarios"] = ""
     };
 
+    // Configuración de campos por paso
     private Dictionary<int, List<(string key, string label, string type, bool required, string[]? options)>> stepFields = new()
     {
-        [1] = new() {
+        [1] = new List<(string, string, string, bool, string[]?)>
+        {
             ("nombre", "Nombre", "text", true, null),
             ("apellidoPaterno", "Apellido Paterno", "text", true, null),
             ("apellidoMaterno", "Apellido Materno", "text", false, null),
             ("email", "Correo electrónico", "email", true, null),
             ("telefono", "Teléfono", "tel", false, null)
         },
-        [2] = new() {
+        [2] = new List<(string, string, string, bool, string[]?)>
+        {
             ("fechaNacimiento", "Fecha de Nacimiento", "date", true, null),
             ("genero", "Género", "select", true, new[] { "", "Masculino", "Femenino", "Otro" }),
-            ("estadoCivil", "Estado Civil", "select", false, new[] { "", "Soltero", "Casado", "Divorciado", "Viudo", "Unión Libre" }),
+            ("estadoCivil", "Estado Civil", "select", false, new[] { "", "Soltero", "Casado", "Divorciado", "Viudo", "Union Libre" }),
             ("nacionalidad", "Nacionalidad", "text", false, null)
         },
-        [3] = new() {
+        [3] = new List<(string, string, string, bool, string[]?)>
+        {
             ("estado", "Estado", "text", true, null),
             ("municipio", "Municipio", "text", true, null),
             ("colonia", "Colonia", "text", false, null),
             ("codigoPostal", "Código Postal", "text", false, null),
             ("direccion", "Dirección Completa", "textarea", false, null)
         },
-        [4] = new() {
+        [4] = new List<(string, string, string, bool, string[]?)>
+        {
             ("nivelEstudios", "Nivel de Estudios", "select", false, new[] { "", "Primaria", "Secundaria", "Preparatoria", "Carrera Técnica", "Licenciatura", "Maestría", "Doctorado" }),
             ("carrera", "Carrera/Especialidad", "text", false, null),
             ("institucion", "Institución", "text", false, null),
             ("añoEgreso", "Año de Egreso", "number", false, null),
             ("cedulaProfesional", "Cédula Profesional", "text", false, null)
         },
-        [5] = new() {
+        [5] = new List<(string, string, string, bool, string[]?)>
+        {
             ("empresaAnterior", "Última Empresa", "text", false, null),
             ("puestoAnterior", "Último Puesto", "text", false, null),
             ("tiempoExperiencia", "Años de Experiencia", "select", false, new[] { "", "Sin experiencia", "Menos de 1 año", "1-2 años", "3-5 años", "6-10 años", "Más de 10 años" }),
             ("sectorExperiencia", "Sector de Experiencia", "text", false, null),
             ("descripcionExperiencia", "Descripción de Experiencia", "textarea", false, null)
         },
-        [6] = new() {
+        [6] = new List<(string, string, string, bool, string[]?)>
+        {
             ("certificaciones", "Certificaciones", "textarea", false, null),
             ("habilidades", "Habilidades Técnicas", "textarea", false, null),
             ("idiomas", "Idiomas", "text", false, null),
             ("nivelIngles", "Nivel de Inglés", "select", false, new[] { "", "Sin conocimientos", "Básico", "Intermedio", "Avanzado", "Nativo" })
         },
-        [7] = new() {
+        [7] = new List<(string, string, string, bool, string[]?)>
+        {
             ("tieneDependientes", "¿Tienes dependientes económicos?", "select", false, new[] { "No", "Sí" }),
             ("numeroDependientes", "Número de dependientes", "number", false, null),
             ("tiposDependientes", "Tipos de dependientes", "text", false, null)
         },
-        [8] = new() {
+        [8] = new List<(string, string, string, bool, string[]?)>
+        {
             ("disponibilidadHoraria", "Disponibilidad Horaria", "select", false, new[] { "", "Tiempo completo", "Medio tiempo", "Por horas", "Fines de semana" }),
             ("disponibilidadViaje", "Disponibilidad para viajar", "select", false, new[] { "No", "Sí" }),
             ("salarioDeseado", "Salario Deseado", "text", false, null),
@@ -385,174 +583,289 @@
         }
     };
 
-    private async Task MostrarFormulario()
-    {
-        Console.WriteLine($"Debug: Entrando a MostrarFormulario con CURP = {curpInput}");
+    //private List 
+    //protected override async Task getCurp() {
+    //}
 
+    /*void MostrarFormulario()
+    {
         errorMessage = "";
         successMessage = "";
-        formData["curp"] = curpInput;
 
         if (string.IsNullOrWhiteSpace(curpInput))
         {
-            errorMessage = "Por favor ingresa tu CURP.";
+            errorMessage = "Por favor ingresa una CURP válida.";
             mostrarFormulario = false;
-            await InvokeAsync(StateHasChanged);
             return;
         }
 
-        if (!ValidateCURP(curpInput))
+        if (!ValidarCURP(curpInput))
         {
-            errorMessage = "El formato de CURP ingresado no es válido. Verifica e intenta nuevamente.";
+            errorMessage = "La CURP ingresada no es válida.";
             mostrarFormulario = false;
-            await InvokeAsync(StateHasChanged);
             return;
+        }
+
+        // Aquí podría ir la lógica para buscar en base de datos y llenar datos existentes
+
+        mostrarFormulario = true;
+        currentStep = 1;
+    }*/
+
+    async Task MostrarFormulario()
+{
+    errorMessage = "";
+    successMessage = "";
+
+    if (string.IsNullOrWhiteSpace(curpInput))
+    {
+        errorMessage = "Por favor ingresa una CURP válida.";
+        mostrarFormulario = false;
+        return;
+    }
+
+    if (!ValidarCURP(curpInput))
+    {
+        errorMessage = "La CURP ingresada no es válida.";
+        mostrarFormulario = false;
+        return;
+    }
+
+    isLoading = true;
+    StateHasChanged();
+
+    try
+    {
+        // Call the API to get CURP data
+        var curpData = await GetCurpDataFromApi(curpInput);
+        
+        if (curpData != null)
+        {
+            // Pre-fill form data with API response
+            FillFormWithApiData(curpData);
+            successMessage = "Datos obtenidos exitosamente de la base de datos.";
+        }
+        else
+        {
+            // If no data found, show message but still allow form filling
+            successMessage = "No se encontraron datos previos. Puedes llenar el formulario manualmente.";
         }
 
         mostrarFormulario = true;
         currentStep = 1;
-        await InvokeAsync(StateHasChanged);
     }
-
-
-    private bool ValidateCURP(string curp)
+    catch (Exception ex)
     {
-        var regex = new Regex(@"^[A-Z0-9]{18}$");
-        return regex.IsMatch(curp?.ToUpper() ?? "");
+        errorMessage = $"Error al consultar los datos: {ex.Message}";
+        mostrarFormulario = false;
     }
-
-    private string GetStepLabel(int step) => step switch
+    finally
     {
-        1 => "Datos", 2 => "Información", 3 => "Ubicación", 4 => "Estudios",
-        5 => "Experiencia", 6 => "Certificaciones", 7 => "Dependientes", 8 => "Otros", _ => ""
-    };
-
-    private void ChangeStep(int step)
-    {
-        if (step >= 1 && step <= 8)
-            currentStep = step;
+        isLoading = false;
+        StateHasChanged();
     }
+}
 
-    private void NextStep()
+// Add this new method to call the API
+private async Task<CurpData?> GetCurpDataFromApi(string curp)
+{
+    try
     {
-        if (ValidateCurrentStep())
+        // Example API call - replace with your actual API endpoint
+        var response = await httpClient.GetAsync($"https://localhost:5094/api/UsuarioCurp/{curp}");
+        
+        if (response.IsSuccessStatusCode)
         {
-            if (currentStep < 8)
-                currentStep++;
-            else
-                RegistrarUsuarioOriginal();
+            var apiResponse = await response.Content.ReadFromJsonAsync<CurpApiResponse>();
+            return apiResponse?.Success == true ? apiResponse.Data : null;
         }
+        
+        // If API returns 404 or other error, return null (no existing data)
+        Console.WriteLine("404");
+        return null;
+    }
+    catch (HttpRequestException)
+    {
+        // Network error - return null and continue with manual form
+        Console.WriteLine("500");
+        return null;
+    }
+    catch (Exception)
+    {
+        // Other errors - re-throw to show error message
+        throw;
+    }
+}
+
+// Add this method to fill form data with API response
+private void FillFormWithApiData(CurpData data)
+{
+    Console.WriteLine(data);
+    formData["nombre"] = data.Nombre ?? "";
+    formData["apellidoPaterno"] = data.ApellidoPaterno ?? "";
+    formData["apellidoMaterno"] = data.ApellidoMaterno ?? "";
+    formData["fechaNacimiento"] = data.FechaNacimiento ?? "";
+    formData["genero"] = data.Genero ?? "";
+    formData["estado"] = data.Estado ?? "";
+    formData["municipio"] = data.Municipio ?? "";
+    formData["nacionalidad"] = data.Nacionalidad ?? "";
+}
+
+// Update your search button in the HTML to show loading state
+// Replace the existing search button with this:
+
+    bool ValidarCURP(string curp)
+    {
+        // Expresión regular para validar CURP
+        var regex = new Regex(@"^[A-Z]{1}[AEIOU]{1}[A-Z]{2}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[HM]{1}[A-Z]{2}[B-DF-HJ-NP-TV-Z]{3}[A-Z\d]{1}\d$",
+            RegexOptions.IgnoreCase);
+        return regex.IsMatch(curp);
     }
 
-    private void PreviousStep()
+    void SiguientePaso()
+    {
+        if (currentStep < 8)
+            currentStep++;
+    }
+
+    void PasoAnterior()
     {
         if (currentStep > 1)
             currentStep--;
     }
 
-    private bool ValidateCurrentStep()
+    string GetStepLabel(int step)
     {
-        errorMessage = "";
-        if (stepFields.ContainsKey(currentStep))
+        return step switch
         {
-            var requiredFields = stepFields[currentStep].Where(f => f.required);
-            foreach (var field in requiredFields)
+            1 => "Datos",
+            2 => "Información",
+            3 => "Ubicación",
+            4 => "Estudios",
+            5 => "Experiencia",
+            6 => "Certificaciones",
+            7 => "Dependientes",
+            8 => "Otros",
+            _ => ""
+        };
+    }
+
+    RenderFragment RenderStepContent(int step) => step switch
+    {
+        1 => RenderStepFields(1),
+        2 => RenderStepFields(2),
+        3 => RenderStepFields(3),
+        4 => RenderStepFields(4),
+        5 => RenderStepFields(5),
+        6 => RenderStepFields(6),
+        7 => RenderStepFields(7),
+        8 => RenderStepFields(8),
+        _ => builder => { }
+    };
+
+    RenderFragment RenderStepFields(int step) => builder =>
+    {
+        int seq = 0;
+        foreach (var (key, label, type, required, options) in stepFields[step])
+        {
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "form-group " + (type == "textarea" || type == "select" ? "full-width" : ""));
+
+            builder.OpenElement(seq++, "label");
+            builder.AddAttribute(seq++, "for", key);
+            builder.AddContent(seq++, label);
+            builder.CloseElement();
+
+            if (type == "select" && options != null)
             {
-                if (string.IsNullOrWhiteSpace(formData[field.key]))
+                builder.OpenElement(seq++, "select");
+                builder.AddAttribute(seq++, "id", key);
+                builder.AddAttribute(seq++, "value", formData[key]);
+                builder.AddAttribute(seq++, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
                 {
-                    errorMessage = $"Por favor completa el campo: {field.label}";
-                    return false;
+                    formData[key] = e.Value?.ToString() ?? "";
+                }));
+                if (required)
+                {
+                    builder.AddAttribute(seq++, "required", true);
                 }
+                foreach (var option in options)
+                {
+                    builder.OpenElement(seq++, "option");
+                    builder.AddAttribute(seq++, "value", option);
+                    builder.AddContent(seq++, option);
+                    builder.CloseElement();
+                }
+                builder.CloseElement();
             }
-        }
-        return true;
-    }
-
-    private void RegistrarUsuarioOriginal()
-    {
-        successMessage = "¡Registro completado exitosamente! Te contactaremos pronto.";
-        mostrarFormulario = false;
-        currentStep = 1;
-        curpInput = "";
-
-        foreach (string key in formData.Keys.ToList())
-        {
-            formData[key] = key == "nacionalidad" ? "Mexicana" : (key == "tieneDependientes" || key == "disponibilidadViaje" ? "No" : (key == "numeroDependientes" ? "0" : ""));
-        }
-    }
-
-    private RenderFragment RenderField(string key, string label, string type, bool required, string[]? options) =>
-    @<div class="form-group @(type == "textarea" || key == "direccion" || key == "descripcionExperiencia" || key == "certificaciones" || key == "habilidades" ? "full-width" : "")">
-        <label>@label@(required ? " *" : ""):</label>
-        @if (type == "select")
-        {
-            <select @onchange="@(e => formData[key] = e.Value?.ToString() ?? "")">
-                @foreach (var option in options ?? new string[0])
+            else if (type == "textarea")
+            {
+                builder.OpenElement(seq++, "textarea");
+                builder.AddAttribute(seq++, "id", key);
+                builder.AddAttribute(seq++, "value", formData[key]);
+                builder.AddAttribute(seq++, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
                 {
-                    <option value="@option" selected="@(formData[key] == option)">@option</option>
+                    formData[key] = e.Value?.ToString() ?? "";
+                }));
+                if (required)
+                {
+                    builder.AddAttribute(seq++, "required", true);
                 }
-            </select>
+                builder.CloseElement();
+            }
+            else
+            {
+                builder.OpenElement(seq++, "input");
+                builder.AddAttribute(seq++, "id", key);
+                builder.AddAttribute(seq++, "type", type);
+                builder.AddAttribute(seq++, "value", formData[key]);
+                builder.AddAttribute(seq++, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
+                {
+                    formData[key] = e.Value?.ToString() ?? "";
+                }));
+                if (required)
+                {
+                    builder.AddAttribute(seq++, "required", true);
+                }
+                builder.CloseElement();
+            }
+
+            builder.CloseElement(); // div.form-group
         }
-        else if (type == "textarea")
+
+        // Botones
+        builder.OpenElement(seq++, "div");
+        builder.AddAttribute(seq++, "class", "step-buttons");
+
+        if (step > 1)
         {
-            <textarea @bind="formData[key]" placeholder="@(GetPlaceholder(key))"></textarea>
+            builder.OpenElement(seq++, "button");
+            builder.AddAttribute(seq++, "class", "btn btn-anterior");
+            builder.AddAttribute(seq++, "type", "button");
+            builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, PasoAnterior));
+            builder.AddContent(seq++, "Anterior");
+            builder.CloseElement();
         }
-        else if (type == "number")
+
+        if (step < 8)
         {
-            <input type="number" @bind="formData[key]" min="@(key == "añoEgreso" ? "1980" : "0")" max="@(key == "añoEgreso" ? "2025" : "")" />
+            builder.OpenElement(seq++, "button");
+            builder.AddAttribute(seq++, "class", "btn btn-siguiente");
+            builder.AddAttribute(seq++, "type", "button");
+            builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, SiguientePaso));
+            builder.AddContent(seq++, "Siguiente");
+            builder.CloseElement();
         }
         else
         {
-            <input type="@type" @bind="formData[key]" readonly="@(key == "curp")" placeholder="@(GetPlaceholder(key))" />
+            builder.OpenElement(seq++, "button");
+            builder.AddAttribute(seq++, "class", "btn btn-registrar");
+            builder.AddAttribute(seq++, "type", "submit");
+            builder.AddContent(seq++, "Registrar");
+            builder.CloseElement();
         }
-    </div>;
 
-    private string GetPlaceholder(string key) => key switch
-    {
-        "direccion" => "Calle, número, referencias...",
-        "descripcionExperiencia" => "Describe tus principales logros y responsabilidades...",
-        "certificaciones" => "Lista tus certificaciones separadas por comas...",
-        "habilidades" => "Lista tus habilidades técnicas separadas por comas...",
-        "idiomas" => "Ej: Español, Inglés, Francés",
-        "comentarios" => "Información adicional que consideres relevante...",
-        _ => ""
+        builder.CloseElement();
     };
-
-    private RenderFragment RenderStepContent(int step)
-    {
-        if (!stepFields.ContainsKey(step))
-            return @<div>Paso no encontrado</div>;
-
-        return @<RenderFragment>
-            @if (step == 1)
-            {
-                @RenderField("curp", "CURP", "text", true, null)
-            }
-
-            @foreach (var field in stepFields[step])
-            {
-                @RenderField(field.key, field.label, field.type, field.required, field.options)
-            }
-
-            <div class="step-buttons">
-                @if (step > 1)
-                {
-                    <button class="btn btn-anterior" @onclick="PreviousStep">Anterior</button>
-                }
-                else
-                {
-                    <div></div>
-                }
-
-                @if (step < 8)
-                {
-                    <button class="btn btn-siguiente" @onclick="NextStep">Siguiente</button>
-                }
-                else
-                {
-                    <button class="btn btn-registrar" @onclick="NextStep">Registrar</button>
-                }
-            </div>
-        </RenderFragment>;
-    }
-}
+} 
+     

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
+
 :root {
     --gray-800: #235B4E;
     --gray-100: #f3f4f6;
@@ -14,7 +16,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+h1, h2, h3 {
+    font-family: 'Patria', sans-serif;
 }
 
 body {
@@ -33,7 +39,6 @@ header {
 }
 
     header h1 {
-        font-family: 'Montserrat', sans-serif;
         font-size: 1.8rem;
     }
 
@@ -710,3 +715,77 @@ footer {
     .slide-in-up.visible {
         animation: slideInUp 0.8s ease forwards;
     }
+
+/* === HEADER FLEXIBLE CON LOGO A LA IZQUIERDA Y LINKS A LA DERECHA === */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--gray-800);
+    color: var(--text-light);
+    padding: 1rem 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-link img {
+    height: 40px;
+}
+
+.header-title {
+    font-size: 1.5rem;
+    font-family: 'Patria', sans-serif;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-link,
+.bordered-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+    .nav-link:hover,
+    .bordered-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+/* Responsive para dispositivos pequeños */
+@media (max-width: 768px) {
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-right {
+        justify-content: flex-end;
+        width: 100%;
+    }
+}
+
+.header-title {
+    font-family: 'Patria', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: none !important;
+    outline: none !important;
+    text-decoration: none;
+    box-shadow: none;
+}

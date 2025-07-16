@@ -1,6 +1,7 @@
 ﻿@page "/registro"
 @using System.Net.Http.Json
 @using Sivilab.Models.Models;
+
 <h3>Registro de Usuario</h3>
 
 @if (mensaje != null)
@@ -8,7 +9,7 @@
     <div>@mensaje</div>
 }
 
-<EditForm Model="usuario" OnValidSubmit="RegistrarUsuario">
+<EditForm Model="@usuario" OnValidSubmit="@Registrar_Usuario" FormName="registroUsuarioForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -28,15 +29,23 @@
 </EditForm>
 
 @code {
-    Usuario usuario = new Usuario();
-    string? mensaje;
+    Usuario usuario;
+     protected override async Task OnInitializedAsync()
+    {
+         usuario = new Usuario { Rol = "Usuario" }; // Inicializa con Rol
+    }
+    
 
-    private async Task RegistrarUsuario()
+    string? mensaje;
+    [Inject]
+    public HttpClient Http { get; set; } = default!;
+    
+    private async Task Registrar_Usuario()
     {
         try
         {
             // Cambia la URL por la de tu API real
-            var response = await Http.PostAsJsonAsync("https://TUSERVIDOR/api/Usuario", usuario);
+            var response = await Http.PostAsJsonAsync($"api/Usuario/RegistrarUsuario", usuario);
 
             if (response.IsSuccessStatusCode)
             {
@@ -55,6 +64,5 @@
         }
     }
 
-    [Inject]
-    public HttpClient Http { get; set; } = default!;
+   
 }
