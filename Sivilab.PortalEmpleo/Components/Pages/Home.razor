@@ -350,6 +350,127 @@
         color: var(--gray-500);
     }
 
+    /* Estilos para el modal del captcha */
+    .captcha-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s;
+    }
+
+    .captcha-modal-content {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        min-width: 320px;
+        animation: slideIn 0.3s;
+    }
+
+    .captcha-question {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .captcha-input {
+        padding: 0.8rem;
+        border: 2px solid var(--gray-300);
+        border-radius: 6px;
+        font-size: 1.1rem;
+        width: 120px;
+        text-align: center;
+        margin: 0 0.5rem;
+    }
+
+        .captcha-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+    .captcha-buttons {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .captcha-btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .captcha-btn-verify {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+        .captcha-btn-verify:hover {
+            background-color: #1d4e45;
+        }
+
+    .captcha-btn-cancel {
+        background-color: var(--gray-300);
+        color: var(--gray-800);
+    }
+
+        .captcha-btn-cancel:hover {
+            background-color: var(--gray-500);
+            color: white;
+        }
+
+    .captcha-error {
+        color: #dc3545;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .captcha-success {
+        color: #28a745;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .captcha-verified {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
 </style>
 
 <div class="nav-links">
@@ -372,19 +493,59 @@
                            class="search-input"
                            placeholder="Buscar empleos por palabra clave, categoría o lugar..." />
                 <button type="submit" class="search-button">
-                    <span class="search-icon"></span>
                     Buscar
                 </button>
             </div>
             <div class="captcha-check">
-                <InputCheckbox @bind-Value="searchModel.CaptchaChecked" />
-                <label>Soy humano</label>
+                <input type="checkbox"
+                       @onchange="OnCaptchaCheckChanged"
+                       checked="@searchModel.CaptchaChecked" />
+                <label class="@(captchaVerified ? "captcha-verified" : "")">
+                    @(captchaVerified ? "✓ Verificado como humano" : "Soy humano")
+                </label>
                 <ValidationMessage For="@(() => searchModel.CaptchaChecked)" />
             </div>
         </div>
-
     </EditForm>
 </section>
+
+<!-- Modal del Captcha -->
+@if (showCaptchaModal)
+{
+    <div class="captcha-modal">
+        <div class="captcha-modal-content">
+            <h3>Verificación Humana</h3>
+            <p>Resuelve la siguiente operación para continuar:</p>
+
+            <div class="captcha-question">
+                @num1 + @num2 = ?
+            </div>
+
+            <input type="number"
+       @bind="captchaAnswer"
+       @onkeypress="HandleCaptchaKeyPress"
+       class="captcha-input"
+       placeholder="?"
+       min="0" />
+
+            @if (!string.IsNullOrEmpty(captchaMessage))
+            {
+                <div class="@(captchaError ? "captcha-error" : "captcha-success")">
+                    @captchaMessage
+                </div>
+            }
+
+            <div class="captcha-buttons">
+                <button class="captcha-btn captcha-btn-verify" @onclick="VerifyCaptcha">
+                    Verificar
+                </button>
+                <button class="captcha-btn captcha-btn-cancel" @onclick="CancelCaptcha">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 <section id="categorias">
     <h3 style="text-align: center; margin-top: 2rem;">Buscar trabajos por categorías principales</h3>
@@ -480,6 +641,15 @@
     private List<EventoModel> eventos = new();
     private List<OfertaModel> ofertas = new();
 
+    // Variables para el captcha
+    private bool showCaptchaModal = false;
+    private bool captchaVerified = false;
+    private int num1 = 0;
+    private int num2 = 0;
+    private int captchaAnswer = 0;
+    private string captchaMessage = "";
+    private bool captchaError = false;
+
     protected override void OnInitialized()
     {
         eventos = new List<EventoModel>
@@ -528,11 +698,91 @@
                 Salary = 6000.00
             }
         };
+
+        GenerateCaptcha();
+    }
+
+    private void OnCaptchaCheckChanged(ChangeEventArgs e)
+    {
+        bool isChecked = e.Value as bool? ?? false;
+
+        if (isChecked && !captchaVerified)
+        {
+            // Mostrar modal del captcha
+            GenerateCaptcha();
+            showCaptchaModal = true;
+            captchaMessage = "";
+            captchaAnswer = 0;
+        }
+        else if (!isChecked)
+        {
+            // Si desmarca, resetear verificación
+            captchaVerified = false;
+            searchModel.CaptchaChecked = false;
+        }
+        StateHasChanged();
+    }
+
+    private void GenerateCaptcha()
+    {
+        Random random = new Random();
+        num1 = random.Next(1, 21); // Números del 1 al 20
+        num2 = random.Next(1, 21);
+    }
+
+    private void HandleCaptchaKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            VerifyCaptcha();
+        }
+    }
+
+    private void VerifyCaptcha()
+    {
+        int correctAnswer = num1 + num2;
+
+        if (captchaAnswer == correctAnswer)
+        {
+            captchaVerified = true;
+            searchModel.CaptchaChecked = true;
+            captchaMessage = "¡Correcto! Verificación completada.";
+            captchaError = false;
+
+            // Cerrar modal después de un breve delay
+            Task.Delay(1000).ContinueWith(_ =>
+            {
+                InvokeAsync(() =>
+                {
+                    showCaptchaModal = false;
+                    StateHasChanged();
+                });
+            });
+        }
+        else
+        {
+            captchaError = true;
+            captchaMessage = $"Respuesta incorrecta. {num1} + {num2} = {correctAnswer}";
+            GenerateCaptcha(); // Generar nueva operación
+            captchaAnswer = 0;
+        }
+
+        StateHasChanged();
+    }
+
+    private void CancelCaptcha()
+    {
+        showCaptchaModal = false;
+        captchaVerified = false;
+        searchModel.CaptchaChecked = false;
+        captchaMessage = "";
+        captchaAnswer = 0;
+        StateHasChanged();
     }
 
     private void HandleValidSubmit()
     {
-        if (!string.IsNullOrWhiteSpace(searchModel.SearchTerm) && searchModel.CaptchaChecked)
+        if (!string.IsNullOrWhiteSpace(searchModel.SearchTerm) && searchModel.CaptchaChecked && captchaVerified)
         {
             var url = $"/portal-empleo?busqueda={Uri.EscapeDataString(searchModel.SearchTerm)}";
             Navigation.NavigateTo(url);
@@ -544,7 +794,7 @@
         [Required(ErrorMessage = "Este campo es obligatorio")]
         public string SearchTerm { get; set; } = string.Empty;
 
-        [Range(typeof(bool), "true", "true", ErrorMessage = "Debes confirmar que eres humano")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Debes completar la verificación humana")]
         public bool CaptchaChecked { get; set; }
     }
 

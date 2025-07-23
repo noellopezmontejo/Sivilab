@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using System.Text.RegularExpressions
 
+
 <style>
     @@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
 
@@ -24,13 +25,12 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Noto Sans', sans-serif;
+        font-family: 'Roboto', sans-serif;
     }
 
     h1, h2, h3 {
         font-family: 'Patria', sans-serif;
     }
-
 
     body {
         background-color: var(--bg-light);
@@ -383,7 +383,16 @@
         <h2>Buscar CURP</h2>
         <div class="curp-busqueda">
             <input type="text" @bind="curpInput" placeholder="Ingresa tu CURP" />
-            <button @onclick="MostrarFormulario">Buscar</button>
+            <button @onclick="MostrarFormulario" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span>Buscando...</span>
+            }
+            else
+            {
+                <span>Buscar</span>
+            }
+        </button>
         </div>
 
         @if (!string.IsNullOrEmpty(errorMessage))
@@ -429,12 +438,35 @@
 </footer>
 
 @code {
+
+        public class CurpApiResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+        public CurpData? Data { get; set; }
+    }
+
+    public class CurpData
+    {
+        public string Nombre { get; set; } = "";
+        public string ApellidoPaterno { get; set; } = "";
+        public string ApellidoMaterno { get; set; } = "";
+        public string FechaNacimiento { get; set; } = "";
+        public string Genero { get; set; } = "";
+        public string Estado { get; set; } = "";
+        public string Municipio { get; set; } = "";
+        public string Nacionalidad { get; set; } = "";
+    }
+
+
+
     // Variables de control
     private string curpInput = "";
     private int currentStep = 1;
     private bool mostrarFormulario = false;
     private string errorMessage = "";
     private string successMessage = "";
+    private bool isLoading = false;
 
     // Datos del formulario - Usando Dictionary para evitar 25+ variables
     private Dictionary<string, string> formData = new Dictionary<string, string>
@@ -555,7 +587,11 @@
         }
     };
 
-    void MostrarFormulario()
+    //private List 
+    //protected override async Task getCurp() {
+    //}
+
+    /*void MostrarFormulario()
     {
         errorMessage = "";
         successMessage = "";
@@ -578,7 +614,109 @@
 
         mostrarFormulario = true;
         currentStep = 1;
+    }*/
+
+    async Task MostrarFormulario()
+{
+    errorMessage = "";
+    successMessage = "";
+
+    if (string.IsNullOrWhiteSpace(curpInput))
+    {
+        errorMessage = "Por favor ingresa una CURP válida.";
+        mostrarFormulario = false;
+        return;
     }
+
+    if (!ValidarCURP(curpInput))
+    {
+        errorMessage = "La CURP ingresada no es válida.";
+        mostrarFormulario = false;
+        return;
+    }
+
+    isLoading = true;
+    StateHasChanged();
+
+    try
+    {
+        // Call the API to get CURP data
+        var curpData = await GetCurpDataFromApi(curpInput);
+        
+        if (curpData != null)
+        {
+            // Pre-fill form data with API response
+            FillFormWithApiData(curpData);
+            successMessage = "Datos obtenidos exitosamente de la base de datos.";
+        }
+        else
+        {
+            // If no data found, show message but still allow form filling
+            successMessage = "No se encontraron datos previos. Puedes llenar el formulario manualmente.";
+        }
+
+        mostrarFormulario = true;
+        currentStep = 1;
+    }
+    catch (Exception ex)
+    {
+        errorMessage = $"Error al consultar los datos: {ex.Message}";
+        mostrarFormulario = false;
+    }
+    finally
+    {
+        isLoading = false;
+        StateHasChanged();
+    }
+}
+
+// Add this new method to call the API
+private async Task<CurpData?> GetCurpDataFromApi(string curp)
+{
+    try
+    {
+        // Example API call - replace with your actual API endpoint
+        var response = await httpClient.GetAsync($"https://localhost:5094/api/UsuarioCurp/{curp}");
+        
+        if (response.IsSuccessStatusCode)
+        {
+            var apiResponse = await response.Content.ReadFromJsonAsync<CurpApiResponse>();
+            return apiResponse?.Success == true ? apiResponse.Data : null;
+        }
+        
+        // If API returns 404 or other error, return null (no existing data)
+        Console.WriteLine("404");
+        return null;
+    }
+    catch (HttpRequestException)
+    {
+        // Network error - return null and continue with manual form
+        Console.WriteLine("500");
+        return null;
+    }
+    catch (Exception)
+    {
+        // Other errors - re-throw to show error message
+        throw;
+    }
+}
+
+// Add this method to fill form data with API response
+private void FillFormWithApiData(CurpData data)
+{
+    Console.WriteLine(data);
+    formData["nombre"] = data.Nombre ?? "";
+    formData["apellidoPaterno"] = data.ApellidoPaterno ?? "";
+    formData["apellidoMaterno"] = data.ApellidoMaterno ?? "";
+    formData["fechaNacimiento"] = data.FechaNacimiento ?? "";
+    formData["genero"] = data.Genero ?? "";
+    formData["estado"] = data.Estado ?? "";
+    formData["municipio"] = data.Municipio ?? "";
+    formData["nacionalidad"] = data.Nacionalidad ?? "";
+}
+
+// Update your search button in the HTML to show loading state
+// Replace the existing search button with this:
 
     bool ValidarCURP(string curp)
     {

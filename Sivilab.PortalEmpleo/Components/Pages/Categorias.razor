@@ -10,7 +10,15 @@
     :root {
         --primary: #235B4E;
         --gray-600: #4b5563;
-        --bg-light: #f3f4f6;
+        --gray-800: #235B4E;
+        --gray-100: #f3f4f6;
+        --gray-300: #d1d5db;
+        --gray-500: #6b7280;
+        --primary-color: #235B4E;
+        --secondary-color: #BC955C;
+        --bg-light: var(--gray-100);
+        --text-dark: var(--gray-800);
+        --text-light: #ffffff;
     }
 
     body {
@@ -21,17 +29,17 @@
 
     h1, h2, h3 {
         font-family: 'Patria', sans-serif;
-        color: var(--primary);
+        color: var(--primary-color);
     }
 
     .lista-filtros {
-        background: #fff;
+        background: var(--text-light);
         padding: 1.2rem 1.5rem;
         margin: 1.5rem auto;
-        border: 1.5px solid var(--primary);
+        border: 1.5px solid var(--primary-color);
         border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        color: var(--primary);
+        box-shadow: 0 2px 10px rgba(35, 91, 78, 0.1);
+        color: var(--primary-color);
         max-width: 1080px;
         width: 95%;
         display: flex;
@@ -47,7 +55,7 @@
 
         .filtros label {
             font-weight: 500;
-            color: var(--primary);
+            color: var(--text-dark);
             font-size: 0.9rem;
             margin-bottom: 0.25rem;
             display: block;
@@ -57,35 +65,38 @@
             width: 100%;
             padding: 0.45rem 0.6rem;
             font-size: 0.9rem;
-            border: 1px solid var(--primary);
+            border: 1px solid var(--gray-300);
             border-radius: 8px;
-            color: #111;
-            background-color: #f9f9f9;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
             transition: border-color 0.2s;
         }
 
             .filtros select:focus {
                 outline: none;
-                border-color: #BC955C;
+                border-color: var(--secondary-color);
+                box-shadow: 0 0 0 2px rgba(188, 149, 92, 0.2);
             }
 
     .btn-postular {
-        background-color: var(--primary);
-        color: #fff;
+        background-color: var(--primary-color);
+        color: var(--text-light);
         padding: 0.5rem 1.2rem;
         font-size: 0.9rem;
         border: none;
-        border-radius: 8px;
-        font-weight: 600;
+        border-radius: 6px;
+        font-weight: bold;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
         align-self: flex-end;
         margin-top: 0.5rem;
     }
 
         .btn-postular:hover {
-            background-color: #BC955C;
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(35, 91, 78, 0.2);
         }
 
     .categoria-container {
@@ -98,69 +109,436 @@
     .lista-ofertas {
         flex: 1 1 30%;
         max-width: 400px;
-        background: #f9fafb;
+        background: var(--text-light);
         border-radius: 10px;
         padding: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(35, 91, 78, 0.08);
         overflow-y: auto;
         max-height: 90vh;
+        border: 1px solid var(--gray-300);
     }
 
     .oferta-item {
         padding: 1rem;
-        background-color: #fff;
+        background-color: var(--bg-light);
         border-radius: 10px;
         margin-bottom: 1rem;
-        border-left: 5px solid var(--primary);
+        border-left: 4px solid var(--primary-color);
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s ease;
+        border: 1px solid var(--gray-300);
     }
 
         .oferta-item:hover {
-            background-color: #f3f4f6;
+            background-color: var(--text-light);
+            border-left-color: var(--secondary-color);
+            transform: translateX(2px);
+            box-shadow: 0 4px 12px rgba(35, 91, 78, 0.1);
+        }
+
+        /* Mejoras para el nombre del puesto en la lista */
+        .oferta-item h4 {
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+            font-family: 'Patria', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.3;
+            position: relative;
+            padding-bottom: 0.3rem;
+        }
+
+        .oferta-item h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--secondary-color), transparent);
+            border-radius: 1px;
+        }
+
+        .oferta-item p {
+            color: var(--gray-500);
+        }
+
+    /* Estilo elegante para el nombre de la empresa en la lista */
+    .empresa-nombre {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+        margin: 0.3rem 0;
+        position: relative;
+        display: inline-block;
+    }
+
+    .empresa-nombre::before {
+        content: '🏢';
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+
+    /* Badge elegante para información adicional */
+    .info-badge {
+        background: linear-gradient(135deg, var(--secondary-color), #d4af71);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        margin: 0.2rem 0.3rem 0.2rem 0;
+        box-shadow: 0 2px 4px rgba(188, 149, 92, 0.3);
+        letter-spacing: 0.2px;
         }
 
     .detalle-oferta {
         flex: 1 1 65%;
-        background: #fff;
-        border-radius: 10px;
+        background: var(--text-light);
+        border-radius: 12px;
         padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(35, 91, 78, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        font-family: 'Noto Sans', sans-serif;
+        border: 1px solid var(--gray-300);
+    }
+
+        /* Mejoras para el título principal en el detalle */
+        .detalle-oferta h3 {
+            font-family: 'Patria', serif;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            position: relative;
+            text-shadow: 0 1px 2px rgba(35, 91, 78, 0.1);
+            background: linear-gradient(135deg, var(--primary-color), #2d7068);
+        }
+
+        .detalle-oferta h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(188, 149, 92, 0.3);
+        }
+
+        .detalle-oferta strong {
+            color: var(--text-dark);
+        }
+
+        .detalle-oferta p {
+            color: var(--gray-600);
+        }
+
+    /* Estilo premium para la empresa en el detalle */
+    .empresa-detalle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 0.8rem 1.2rem;
+        border-radius: 25px;
+        border: 1px solid var(--gray-300);
+        box-shadow: 0 2px 8px rgba(35, 91, 78, 0.08);
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .empresa-detalle:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(35, 91, 78, 0.12);
+    }
+
+    .empresa-detalle .icono-empresa {
+        background: var(--primary-color);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 6px rgba(35, 91, 78, 0.3);
+    }
+
+    .empresa-detalle .texto-empresa {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    .empresa-detalle .nombre-empresa {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1.1rem;
+        font-family: 'Patria', serif;
+        letter-spacing: 0.2px;
+    }
+
+    .empresa-detalle .ubicacion-empresa {
+        font-size: 0.85rem;
+        color: var(--gray-500);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    /* Animación sutil para elementos importantes */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .detalle-oferta h3,
+    .empresa-detalle {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Estilo para títulos de sección como en el CV */
+    .seccion-header {
+        background-color: var(--secondary-color);
+        color: var(--text-light);
+        text-align: center;
+        padding: 0.6rem 1rem;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem 0;
+        font-family: 'Patria', sans-serif;
     }
 
     .seccion {
-        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
         .seccion h5 {
-            margin-bottom: 0.5rem;
-            color: var(--primary);
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            border-bottom: 2px solid var(--secondary-color);
+            display: inline-block;
+            padding-bottom: 0.2rem;
         }
 
-    ul {
-        padding-left: 1.2rem;
+    /* Información de contacto estilo CV */
+    .info-contacto {
+        background: linear-gradient(135deg, var(--secondary-color), rgba(188, 149, 92, 0.8));
+        color: var(--text-light);
+        padding: 1rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+        .info-contacto h4 {
+            font-family: 'Patria', sans-serif;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Secciones en dos columnas como el CV */
+    .seccion-dual {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin: 1.5rem 0;
+    }
+
+    .columna {
+        background: var(--bg-light);
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid var(--gray-300);
+    }
+
+        .columna h5 {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-family: 'Patria', sans-serif;
+        }
+
+        .columna p {
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+            color: var(--gray-600);
+            line-height: 1.4;
+        }
+
+        .columna ul {
+            padding-left: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+            .columna ul li {
+                margin-bottom: 0.4rem;
+                font-size: 0.9rem;
+                line-height: 1.4;
+                color: var(--gray-600);
+                position: relative;
+                padding-left: 1rem;
+            }
+
+                .columna ul li::before {
+                    content: "•";
+                    color: var(--primary-color);
+                    font-weight: bold;
+                    position: absolute;
+                    left: 0;
+                }
+
+    /* Sección de experiencia con timeline */
+    .experiencia-item {
+        border-left: 3px solid var(--primary-color);
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+        .experiencia-item::before {
+            content: "";
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+
+        .experiencia-item h6 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .experiencia-item .fecha {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .experiencia-item p {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            line-height: 1.4;
     }
 
     .nav-links {
-        background-color: #BC955C;
+        background-color:#BC955C;
         display: flex;
         justify-content: center;
         gap: 1rem;
         padding: 0.5rem 0;
+        box-shadow: 0 2px 4px rgba(35, 91, 78, 0.1);
     }
 
         .nav-links a {
-            color: white;
+            color: var(--text-light);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
         }
 
             .nav-links a:hover {
-                color: var(--primary);
+                color: var(--text-light);
+                background-color: var(--secondary-color);
+                transform: translateY(-1px);
+            }
+
+    /* Estilos adicionales para mejorar la consistencia */
+    .lista-filtros h4 {
+        color: var(--primary-color);
+        font-family: 'Patria', sans-serif;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .seccion-dual {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .categoria-container {
+            flex-direction: column;
+            margin: 0 1rem 1rem 1rem;
+        }
+
+        .lista-ofertas {
+            max-width: none;
+            max-height: 50vh;
+        }
+
+        .detalle-oferta {
+            padding: 1.5rem;
+        }
+
+        .detalle-oferta h3 {
+            font-size: 1.6rem;
+        }
+        
+        .empresa-detalle {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.4rem;
+            padding: 1rem;
+        }
+        
+        .empresa-detalle .texto-empresa {
+            align-items: center;
+        }
             }
 </style>
-
 <!-- Navegación -->
 <div class="nav-links">
     <a href="/">Inicio</a>
@@ -186,11 +564,11 @@
         <div>
             <label>Tipo de contratación</label>
             <select @bind="contratacionSeleccionada">
-                <option value="Completo">Tiempo Completo</option>
+                <option value="Tiempo Completo">Tiempo Completo</option>
                 <option value="Indeterminado">Indeterminado</option>
                 <option value="Medio tiempo">Medio Tiempo</option>
 				<option value="Temporal">Temporal</option>
-				<option value="Becario">Becario / Practicas</option>
+                <option value="Becario">Becario / Prácticas</option>
 				<option value="Honorarios">Honorarios</option>                                  
             </select>
         </div>
@@ -216,11 +594,14 @@
         @foreach (var oferta in ofertasFiltradas)
         {
             <div class="oferta-item" @onclick="() => SeleccionarOferta(oferta)">
-                <p style="font-size: 0.8rem; color: gray;">Hoy</p>
+                <p style="font-size: 0.8rem; color: var(--gray-500);">Hoy</p>
                 <h4>@oferta.OfferName</h4>
-                <p style="margin: 0;">@oferta.Empresa</p>
-                <p style="font-size: 0.85rem; color: gray;">@oferta.Ubicacion</p>
-                <p style="font-size: 0.85rem; color: gray;">$@oferta.Salario.ToString("N0") MXN</p>
+                <p class="empresa-nombre">@oferta.Empresa</p>
+                <p style="font-size: 0.85rem; color: var(--gray-500);">@oferta.Ubicacion</p>
+                <div style="margin-top: 0.5rem;">
+                    <span class="info-badge">$@oferta.Salario.ToString("N0") MXN</span>
+                    <span class="info-badge">@oferta.Contratacion</span>
+                </div>
             </div>
         }
     </div>
@@ -228,42 +609,89 @@
     @if (ofertaSeleccionada != null)
     {
         <div class="detalle-oferta">
-            <p style="color: gray;">Hoy</p>
+            <p style="color: var(--gray-500); font-size: 0.9rem;">Hoy</p>
             <h3>@ofertaSeleccionada.OfferName</h3>
-            <p><strong>@ofertaSeleccionada.Empresa</strong> en @ofertaSeleccionada.Ubicacion</p>
+            
+            <div class="empresa-detalle">
+                <div class="icono-empresa">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="texto-empresa">
+                    <span class="nombre-empresa">@ofertaSeleccionada.Empresa</span>
+                    <span class="ubicacion-empresa">
+                        <i class="fas fa-map-marker-alt"></i>
+                        @ofertaSeleccionada.Ubicacion
+                    </span>
+                </div>
+            </div>
+            
             <button class="btn-postular">Postularme</button>
 
-            <div class="seccion">
-                <h5>Sobre el empleo</h5>
+            <!-- Información de contacto estilo CV -->
+            <div class="info-contacto">
+                <h4>Información del empleo</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fas fa-building" style="width: 16px;"></i>
+                        <span>@ofertaSeleccionada.Empresa</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt" style="width: 16px;"></i>
+                        <span>@ofertaSeleccionada.Ubicacion</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-dollar-sign" style="width: 16px;"></i>
+                        <span>$@ofertaSeleccionada.Salario.ToString("N0") MXN</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock" style="width: 16px;"></i>
+                        <span>@ofertaSeleccionada.Horario</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secciones duales como el CV -->
+            <div class="seccion-dual">
+                <div class="columna">
+                    <h5>Perfil del puesto</h5>
                 <p><strong>Categoría:</strong> @ofertaSeleccionada.Categoria</p>
                 <p><strong>Subcategoría:</strong> @ofertaSeleccionada.Subcategoria</p>
-                <p><strong>Educación mínima requerida:</strong> @ofertaSeleccionada.Educacion</p>
-            </div>
-
-            <div class="seccion">
-                <h5>Detalles</h5>
+                    <p><strong>Educación mínima:</strong> @ofertaSeleccionada.Educacion</p>
                 <p><strong>Contratación:</strong> @ofertaSeleccionada.Contratacion</p>
-                <p><strong>Horario:</strong> @ofertaSeleccionada.Horario</p>
-                <p><strong>Espacio de trabajo:</strong> @ofertaSeleccionada.Modalidad</p>
-                <p><strong>Salario:</strong> $@ofertaSeleccionada.Salario.ToString("N0") MXN</p>
+                    <p><strong>Modalidad:</strong> @ofertaSeleccionada.Modalidad</p>
             </div>
 
-            <div class="seccion">
-                <h5>Beneficios</h5>
+                <div class="columna">
+                    <h5>Habilidades requeridas</h5>
                 <ul>
-                    @foreach (var beneficio in ofertaSeleccionada.Beneficios)
+                        @foreach (var hab in ofertaSeleccionada.Habilidades)
                     {
-                        <li>@beneficio</li>
+                            <li>@hab</li>
                     }
                 </ul>
             </div>
+            </div>
 
+            <!-- Descripción del empleo -->
             <div class="seccion">
-                <h5>Descripción</h5>
+                <div class="seccion-header">Descripción del puesto</div>
                 <p>@ofertaSeleccionada.Descripcion</p>
             </div>
 
+            <!-- Experiencia/Funciones con timeline -->
             <div class="seccion">
+                <div class="seccion-header">Funciones principales</div>
+                @foreach (var funcion in ofertaSeleccionada.Funciones)
+                {
+                    <div class="experiencia-item">
+                        <h6>@funcion</h6>
+                    </div>
+                }
+            </div>
+
+            <!-- Secciones duales para Requisitos y Beneficios -->
+            <div class="seccion-dual">
+                <div class="columna">
                 <h5>Requisitos</h5>
                 <ul>
                     @foreach (var req in ofertaSeleccionada.Requisitos)
@@ -273,24 +701,15 @@
                 </ul>
             </div>
 
-            <div class="seccion">
-                <h5>Funciones</h5>
+                <div class="columna">
+                    <h5>Beneficios</h5>
                 <ul>
-                    @foreach (var fun in ofertaSeleccionada.Funciones)
+                        @foreach (var beneficio in ofertaSeleccionada.Beneficios)
                     {
-                        <li>@fun</li>
+                            <li>@beneficio</li>
                     }
                 </ul>
             </div>
-
-            <div class="seccion">
-                <h5>Habilidades</h5>
-                <ul>
-                    @foreach (var hab in ofertaSeleccionada.Habilidades)
-                    {
-                        <li>@hab</li>
-                    }
-                </ul>
             </div>
         </div>
     }
@@ -403,7 +822,7 @@
             Categoria = "Desarrollo de Negocios",
             Subcategoria = "Ventas B2B",
             Educacion = "Universitario titulado",
-            Contratacion = "Permanente",
+            Contratacion = "Tiempo Completo",
             Horario = "Tiempo completo",
             Modalidad = "Presencial",
             Salario = 25000,
@@ -450,6 +869,7 @@
             Funciones = new() { "Declaraciones fiscales", "Auditorías" },
             Habilidades = new() { "Organización", "Precisión" }
         }
+
     };  
 }
   

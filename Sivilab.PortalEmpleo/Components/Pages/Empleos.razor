@@ -19,7 +19,8 @@
         <EditForm Model="@filterModel" OnValidSubmit="ApplyFilters">
             <DataAnnotationsValidator />
             <ValidationSummary />
-            <div style="margin-bottom: 0.8rem;">
+            <div style="margin-bottom: 0.8rem;"
+            >
                 <label>Tipo de empleo:</label>
                 <select @bind="filterModel.Tipo" style="width: 100%; padding: 0.3rem;">
                     <option value="">Todos</option>
