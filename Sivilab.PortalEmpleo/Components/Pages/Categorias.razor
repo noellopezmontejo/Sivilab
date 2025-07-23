@@ -193,7 +193,7 @@
         margin: 0.2rem 0.3rem 0.2rem 0;
         box-shadow: 0 2px 4px rgba(188, 149, 92, 0.3);
         letter-spacing: 0.2px;
-        }
+    }
 
     .detalle-oferta {
         flex: 1 1 65%;
@@ -219,6 +219,9 @@
             position: relative;
             text-shadow: 0 1px 2px rgba(35, 91, 78, 0.1);
             background: linear-gradient(135deg, var(--primary-color), #2d7068);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .detalle-oferta h3::after {
@@ -466,7 +469,7 @@
             font-size: 0.9rem;
             color: var(--gray-600);
             line-height: 1.4;
-    }
+        }
 
     .nav-links {
         background-color:#BC955C;
@@ -537,7 +540,7 @@
         .empresa-detalle .texto-empresa {
             align-items: center;
         }
-            }
+    }
 </style>
 <!-- Navegación -->
 <div class="nav-links">
@@ -567,9 +570,9 @@
                 <option value="Tiempo Completo">Tiempo Completo</option>
                 <option value="Indeterminado">Indeterminado</option>
                 <option value="Medio tiempo">Medio Tiempo</option>
-				<option value="Temporal">Temporal</option>
+                <option value="Temporal">Temporal</option>
                 <option value="Becario">Becario / Prácticas</option>
-				<option value="Honorarios">Honorarios</option>                                  
+                <option value="Honorarios">Honorarios</option>
             </select>
         </div>
         <div>
@@ -654,22 +657,22 @@
             <div class="seccion-dual">
                 <div class="columna">
                     <h5>Perfil del puesto</h5>
-                <p><strong>Categoría:</strong> @ofertaSeleccionada.Categoria</p>
-                <p><strong>Subcategoría:</strong> @ofertaSeleccionada.Subcategoria</p>
+                    <p><strong>Categoría:</strong> @ofertaSeleccionada.Categoria</p>
+                    <p><strong>Subcategoría:</strong> @ofertaSeleccionada.Subcategoria</p>
                     <p><strong>Educación mínima:</strong> @ofertaSeleccionada.Educacion</p>
-                <p><strong>Contratación:</strong> @ofertaSeleccionada.Contratacion</p>
+                    <p><strong>Contratación:</strong> @ofertaSeleccionada.Contratacion</p>
                     <p><strong>Modalidad:</strong> @ofertaSeleccionada.Modalidad</p>
-            </div>
+                </div>
 
                 <div class="columna">
                     <h5>Habilidades requeridas</h5>
-                <ul>
+                    <ul>
                         @foreach (var hab in ofertaSeleccionada.Habilidades)
-                    {
+                        {
                             <li>@hab</li>
-                    }
-                </ul>
-            </div>
+                        }
+                    </ul>
+                </div>
             </div>
 
             <!-- Descripción del empleo -->
@@ -692,24 +695,24 @@
             <!-- Secciones duales para Requisitos y Beneficios -->
             <div class="seccion-dual">
                 <div class="columna">
-                <h5>Requisitos</h5>
-                <ul>
-                    @foreach (var req in ofertaSeleccionada.Requisitos)
-                    {
-                        <li>@req</li>
-                    }
-                </ul>
-            </div>
+                    <h5>Requisitos</h5>
+                    <ul>
+                        @foreach (var req in ofertaSeleccionada.Requisitos)
+                        {
+                            <li>@req</li>
+                        }
+                    </ul>
+                </div>
 
                 <div class="columna">
                     <h5>Beneficios</h5>
-                <ul>
+                    <ul>
                         @foreach (var beneficio in ofertaSeleccionada.Beneficios)
-                    {
+                        {
                             <li>@beneficio</li>
-                    }
-                </ul>
-            </div>
+                        }
+                    </ul>
+                </div>
             </div>
         </div>
     }
@@ -868,11 +871,7 @@
             Requisitos = new() { "3 años de experiencia", "Normatividad fiscal" },
             Funciones = new() { "Declaraciones fiscales", "Auditorías" },
             Habilidades = new() { "Organización", "Precisión" }
-        }
+    }
 
-    };  
+    };
 }
-  
-
-
-         

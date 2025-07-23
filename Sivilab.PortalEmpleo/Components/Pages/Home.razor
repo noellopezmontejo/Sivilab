@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Web  
 @inject NavigationManager Navigation
 
 <style>
@@ -816,14 +817,14 @@
     }
 
     private List<CategoriaModel> categorias = new()
-{
-    new CategoriaModel { Titulo = "Desarrollo de Negocios", Puestos = 120, ImageUrl = "https://i.pinimg.com/1200x/1a/c9/25/1ac9253ba4768ccb45a1ef2d33ceb729.jpg" },
-    new CategoriaModel { Titulo = "Atención al Cliente", Puestos = 370, ImageUrl = "https://i.pinimg.com/1200x/63/81/0d/63810d6fa154fbc0619ed63a804be28e.jpg" },
-    new CategoriaModel { Titulo = "Marketing", Puestos = 743, ImageUrl = "https://i.pinimg.com/736x/f9/47/45/f94745921e7e5690f8de02aca6a353b7.jpg" },
-    new CategoriaModel { Titulo = "Gestión de Producto", Puestos = 156, ImageUrl = "https://i.pinimg.com/736x/8b/6f/d1/8b6fd1da7cb3f0b7e9f7bceb5dd3a05d.jpg" },
-    new CategoriaModel { Titulo = "Contabilidad", Puestos = 67, ImageUrl = "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" },
-    new CategoriaModel { Titulo = "Soporte Técnico", Puestos = 140, ImageUrl = "https://i.pinimg.com/736x/2d/e8/ee/2de8eee50ae28888289fd67b920895a0.jpg" }
-};
+    {
+        new CategoriaModel { Titulo = "Desarrollo de Negocios", Puestos = 120, ImageUrl = "https://i.pinimg.com/1200x/1a/c9/25/1ac9253ba4768ccb45a1ef2d33ceb729.jpg" },
+        new CategoriaModel { Titulo = "Atención al Cliente", Puestos = 370, ImageUrl = "https://i.pinimg.com/1200x/63/81/0d/63810d6fa154fbc0619ed63a804be28e.jpg" },
+        new CategoriaModel { Titulo = "Marketing", Puestos = 743, ImageUrl = "https://i.pinimg.com/736x/f9/47/45/f94745921e7e5690f8de02aca6a353b7.jpg" },
+        new CategoriaModel { Titulo = "Gestión de Producto", Puestos = 156, ImageUrl = "https://i.pinimg.com/736x/8b/6f/d1/8b6fd1da7cb3f0b7e9f7bceb5dd3a05d.jpg" },
+        new CategoriaModel { Titulo = "Contabilidad", Puestos = 67, ImageUrl = "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" },
+        new CategoriaModel { Titulo = "Soporte Técnico", Puestos = 140, ImageUrl = "https://i.pinimg.com/736x/2d/e8/ee/2de8eee50ae28888289fd67b920895a0.jpg" }
+    };
 
     public class CategoriaModel
     {

@@ -1,0 +1,73 @@
+{
+  "1 Funcionarios, directores y jefes": [
+    "11 Funcionarios y altas autoridades de los sectores público, privado y social",
+    "12 Directores y gerentes en servicios financieros, legales, administrativos y sociales",
+    "13 Directores y gerentes en producción, tecnología y transporte",
+    "14 Directores y gerentes de ventas, restaurantes, hoteles y otros establecimientos",
+    "15 Coordinadores y jefes de área en servicios financieros, administrativos y sociales",
+    "16 Coordinadores y jefes de área en producción y tecnología",
+    "17 Coordinadores y jefes de área de ventas, restaurantes, hoteles y otros establecimientos",
+    "19 Otros directores, funcionarios, gerentes, coordinadores y jefes de área, no clasificados anteriormente"
+  ],
+  "2 Profesionistas y técnicos": [
+    "21 Profesionistas en ciencias económico-administrativas, ciencias sociales, humanistas y en artes",
+    "22 Investigadores y profesionistas en ciencias exactas, biológicas, ingeniería, informática y en telecomunicaciones",
+    "23 Profesores y especialistas en docencia",
+    "24 Médicos, enfermeras y otros especialistas en salud",
+    "25 Auxiliares y técnicos en ciencias económico-administrativas, ciencias sociales, humanistas y en artes",
+    "26 Auxiliares y técnicos en ciencias exactas, biológicas, ingeniería, informática y en telecomunicaciones",
+    "27 Auxiliares y técnicos en educación, instructores y capacitadores",
+    "28 Enfermeras, técnicos en medicina y trabajadores de apoyo en salud",
+    "29 Otros profesionistas y técnicos no clasificados anteriormente"
+  ],
+  "3 Trabajadores auxiliares en actividades administrativas": [
+    "31 Supervisores de personal de apoyo administrativo, secretarias, capturistas, cajeros y trabajadores de control de archivo y transporte",
+    "32 Supervisores y trabajadores que brindan y manejan información",
+    "39 Otros trabajadores auxiliares en actividades administrativas, no clasificados anteriormente"
+  ],
+  "4 Comerciantes, empleados en ventas y agentes de ventas": [
+    "41 Comerciantes en establecimientos",
+    "42 Empleados de ventas en establecimientos",
+    "43 Trabajadores en servicios de alquiler",
+    "49 Otros comerciantes, empleados en ventas y agentes de ventas en establecimiento, no clasificados anteriormente"
+  ],
+  "5 Trabajadores en servicios personales y de vigilancia": [
+    "51 Trabajadores en la preparación y servicio de alimentos y bebidas, así como en servicios de esparcimiento y de hotelería",
+    "52 Trabajadores en cuidados personales y del hogar",
+    "53 Trabajadores en servicios de protección y vigilancia",
+    "54 Trabajadores de la Armada, Ejército y Fuerza Aérea"
+  ],
+  "6 Trabajadores en actividades agrícolas, ganaderas, forestales, caza y pesca": [
+    "61 Trabajadores en actividades agrícolas y ganaderas",
+    "62 Trabajadores en actividades pesqueras, forestales, caza y similares",
+    "63 Operadores de maquinaria agropecuaria y forestal",
+    "69 Otros trabajadores en actividades agrícolas, ganaderas, forestales, caza y pesca, no clasificados anteriormente"
+  ],
+  "7 Trabajadores artesanales, en la construcción y otros oficios": [
+    "71 Trabajadores en la extracción y la edificación de construcciones",
+    "72 Artesanos y trabajadores en el tratamiento y elaboración de productos de metal",
+    "73 Artesanos y trabajadores en la elaboración de productos de madera, papel, textiles y de cuero y piel",
+    "74 Artesanos y trabajadores en la elaboración de productos de hule, caucho, plásticos y de sustancias químicas",
+    "75 Trabajadores en la elaboración y procesamiento de alimentos, bebidas y productos de tabaco",
+    "76 Artesanos y trabajadores en la elaboración de productos de cerámica, vidrio, azulejo y similares",
+    "79 Otros trabajadores artesanales no clasificados anteriormente"
+  ],
+  "8 Operadores de maquinaria industrial, ensambladores, choferes y conductores de transporte": [
+    "81 Operadores de instalaciones y maquinaria industrial",
+    "82 Ensambladores y montadores de herramientas, maquinaria, productos metálicos y electrónicos",
+    "83 Conductores de transporte y de maquinaria móvil",
+    "89 Otros operadores de maquinaria industrial, ensambladores y conductores de transporte, no clasificados anteriormente"
+  ],
+  "9 Trabajadores en actividades elementales y de apoyo": [
+    "91 Trabajadores de apoyo en actividades agropecuarias, forestales, pesca y caza",
+    "92 Trabajadores de apoyo en la minería, construcción e industria",
+    "93 Ayudantes de conductores de transporte, conductores de transporte de tracción humana y animal y cargadores",
+    "94 Ayudantes en la preparación de alimentos",
+    "95 Vendedores ambulantes",
+    "96 Trabajadores domésticos, de limpieza, planchadores y otros trabajadores de limpieza",
+    "97 Trabajadores de paquetería, de apoyo para espectáculos, mensajeros y repartidores de mercancías",
+    "98 Otros trabajadores en actividades elementales y de apoyo, no clasificados anteriormente",
+    "99 Ocupaciones no especificadas"
+  ]
+}
+
