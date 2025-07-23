@@ -621,6 +621,8 @@ footer {
     background-color: #26a69a;
     border: none;
     font-weight: bold;
+    padding: 0.8rem 1.5rem; /* Aumenta la altura y el ancho */
+    font-size: 1.1rem;      /* Opcional: texto un poco más grande */
 }
 .btn-login:hover {
     background-color: #1e867d;
@@ -655,15 +657,35 @@ footer {
     color: #004d40;
 }
 
+/* Estilos base para botones sociales */
+.social-btn.facebook {
+    background-color: #3b5998 !important;
+    color: white !important;
+}
+
+.social-btn.google {
+    background-color: #dd4b39 !important;
+    color: white !important;
+}
+
+.social-btn.linkedin {
+    background-color: #0077b5 !important;
+    color: white !important;
+}
+
+/* Estilos hover para mantener consistencia */
 .social-btn.facebook:hover {
-    background-color: #2d4373;
+    background-color: #2d4373 !important;
 }
+
 .social-btn.google:hover {
-    background-color: #c23321;
+    background-color: #c23321 !important;
 }
+
 .social-btn.linkedin:hover {
-    background-color: #005983;
+    background-color: #005983 !important;
 }
+
 .footer-links a {
     color: #070707; /* Negro más claro */
     text-decoration: none; /* Opcional: quitar el subrayado por defecto */
