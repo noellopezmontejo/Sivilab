@@ -2,11 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --gray-800: #235B4E;
+    --gray-800: #9d2449;
     --gray-100: #f3f4f6;
     --gray-300: #d1d5db;
     --gray-500: #6b7280;
-    --primary-color: #235B4E;
+    --primary-color: #9d2449;
     --secondary-color: #BC955C;
     --bg-light: var(--gray-100);
     --text-dark: var(--gray-800);
@@ -132,7 +132,7 @@ header {
     }
 
 .main-banner {
-    background: linear-gradient(135deg, var(--gray-800), #235B4E);
+    background: linear-gradient(135deg, var(--gray-800), #9d2449);
     color: var(--text-light);
     text-align: center;
     padding: 5rem 1rem 3rem;
@@ -259,7 +259,7 @@ header {
     }
 
 .search-button {
-    background-color: #235B4E;
+    background-color: #9d2449;
     color: white;
     border: none;
     padding: 0.9rem 1.5rem;
@@ -543,7 +543,7 @@ section {
 }
 
     #ofertas h3 {
-        color: #235B4E;
+        color: #9d2449;
         font-weight: 600;
         margin-bottom: 3rem;
         text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -630,14 +630,14 @@ section {
     flex-direction: column;
     justify-content: center;
     background: #f3f4f6;
-    color: #235B4E;
+    color: #9d2449;
 }
 
     .carousel-right h2 {
         font-size: 2rem;
         font-weight: 700;
         margin-bottom: 20px;
-        color: #235B4E;
+        color: #9d2449;
     }
 
     .carousel-right p {
@@ -660,7 +660,7 @@ section {
     top: 50%;
     transform: translateY(-50%);
     background: none;
-    color: #235B4E;
+    color: #9d2449;
     border: none;
     font-size: 3rem;
     padding: 0;
@@ -699,7 +699,7 @@ section {
     height: 14px;
     border-radius: 50%;
     border: none;
-    background: #235B4E;
+    background: #9d2449;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
