@@ -12,7 +12,7 @@ namespace Sivilab.Models.Models
         public int Id { get; set; }
 
         [Required]
-        public string Nombre { get; set; } = string.Empty;
+        public string Nombre { get; set; } 
 
         [Required]
         [EmailAddress]
