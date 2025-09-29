@@ -32,12 +32,13 @@ namespace Sivilab.Data.Repositories
 
         public async Task<int> AgregarUsuario(Usuario usuario)
         {
-            var query = "EXEC spAgregarUsuario @Nombre, @Email, @Contrasena";
+            var query = "EXEC spAgregarUsuario @Nombre, @Email, @Contrasena, @Rol";
             var parameters = new
             {
                 usuario.Nombre,
                 usuario.Email,
-                usuario.Contrasena
+                usuario.Contrasena,
+                usuario.Rol
             };
 
             return await _db.QuerySingleAsync<int>(query, parameters);
