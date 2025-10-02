@@ -81,6 +81,8 @@
     new { Vigente = 1, Titulo = "Feria Nacional de Empleo Tapachula 2025", Imagen = "/Img/FeriaTapachulaJunio2025.png", Fecha = "2025-06-09", Lugar = "Hotel Holiday Inn Ctra. a Puerto Madero, KM 3.5 Col. Las Hortensias, C.P. 30797", Descripcion = "La Feria Nacional de Empleo Tapachula 2025 consolida la vocación de esta ciudad como centro neurálgico del desarrollo económico del sur-sureste mexicano, ofreciendo perspectivas laborales que contribuyen al crecimiento integral de la zona fronteriza más dinámica del país.", Liga = "https://forms.office.com/r/vfGDSxF7eC" },
     new { Vigente = 1, Titulo = "Feria Nacional de Empleo Las Margaritas 2025", Imagen = "/Img/FeriaLasMargaritasJunioi2025.png", Fecha = "2025-06-18", Lugar = "Explanada del Parque Central de las Margaritas", Descripcion = "La Feria Nacional de Empleo Las Margaritas Chiapas 2025 constituye una oportunidad histórica para el desarrollo laboral en esta región fronteriza de gran importancia estratégica. Este evento lleva por primera vez oportunidades de empleo de alcance estatal y nacional a una comunidad que ha sido pilar fundamental en la economía agrícola y ganadera del estado de Chiapas.", Liga = "https://forms.office.com/r/stG2V2Sm0u?origin=lprLink" },
     new { Vigente = 1, Titulo = "Feria Nacional de Empleo Ocosiongo 2025", Imagen = "/Img/FeriaOcosingoJunio2025.png", Fecha = "2025-06-19", Lugar = "Universidad Tecnológica de la Selva, Ctra Ocosingo - Altamirano entronque Tonina km 0.5,  Col. Predio Laltic", Descripcion = "La Feria Nacional de Empleo Ocosingo Chiapas 2025 representa una iniciativa transformadora que lleva oportunidades laborales de nivel estatal y nacional al corazón de la Selva Lacandona. Este evento pionero reconoce el potencial humano y la riqueza cultural de esta región estratégica, conectando a la población local con empresas estatales y nacionales interesadas en el desarrollo sostenible y la responsabilidad social.", Liga = "https://forms.office.com/r/DCK0i3wC4j?origin=lprLink" },
+    new { Vigente = 1, Titulo = "Feria Nacional de Empleo y del Emprendimiento Berriozábal 2025", Imagen = "/Img/feria_berriozabal.jpeg", Fecha = "2025-07-09", Lugar = "Explanada del Parque Central, Berriozábal, Chiapas.", Descripcion = "Esta innovadora propuesta reconoce la vocación empresarial de Berriozábal y su potencial como centro de desarrollo económico en la región centro del estado.", Liga = "https://forms.office.com/r/g0gcvfhfmE?origin=lprLink" },
+    new { Vigente = 1, Titulo = "Feria Nacional de Empleo San Cristóbal de las Casas 2025", Imagen = "/Img/feria_sclc.jpeg", Fecha = "2025-07-07", Lugar = "Centro de Convenciones el Carmén, Miguel Hidalgo s/n, Barrio de Santa Lucía, San Cristóbal de las Casas, Chiapas.", Descripcion = "La Feria Nacional de Empleo San Cristóbal de las Casas 2025 se consolida como el evento laboral más significativo de Los Altos de Chiapas, aprovechando la relevancia cultural, turística y académica de esta ciudad colonial Pueblo Mágico", Liga = "https://forms.office.com/r/5XqMjknYTr?origin=lprLink" },
     };
 
         // Filtrar eventos futuros y el evento más próximo
@@ -101,7 +103,7 @@
                     <img src="@eventoPrincipal.Imagen" alt="@eventoPrincipal.Titulo" class="event-img" />
                     <div class="card-body d-flex flex-column">
                         <h5 class="event-title">@eventoPrincipal.Titulo</h5>
-                        <p class="event-info flex-grow-1">@eventoPrincipal.Descripcion</p>
+                        <p class="event-info flex-grow-1" style="text-align: justify;">@eventoPrincipal.Descripcion</p>
                         <p class="event-info"><strong>Fecha:</strong> @eventoPrincipal.Fecha</p>
                         <p class="event-info"><strong>Lugar:</strong> @eventoPrincipal.Lugar</p>
                         @if (eventoPrincipal.Vigente == 1)
@@ -122,7 +124,7 @@
                     <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
                     <div class="card-body d-flex flex-column">
                         <h5 class="event-title">@evento.Titulo</h5>
-                        <p class="event-info flex-grow-1">@evento.Descripcion</p>
+                        <p class="event-info flex-grow-1" style="text-align: justify;">@evento.Descripcion</p>
                         <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
                         <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
                         @if (evento.Vigente == 1)
@@ -146,7 +148,7 @@
                     <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
                     <div class="card-body d-flex flex-column">
                         <h5 class="event-title">@evento.Titulo</h5>
-                        <p class="event-info flex-grow-1">@evento.Descripcion</p>
+                        <p class="event-info flex-grow-1" style="text-align: justify;">@evento.Descripcion</p>
                         <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
                         <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
                     </div>
