@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sivilab.Models.Models
 {
-    public class UsuarioCrp
+    public class CandidatoCrp
     {
         public string? Curp { get; set; }
         public string? Nombre { get; set; }
