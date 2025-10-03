@@ -8,6 +8,7 @@ namespace Sivilab.Models.Models
 {
     public class CandidatoCrp
     {
+        public int CandidatoId { get; set; }
         public string? Curp { get; set; }
         public string? Nombre { get; set; }
         public string? ApellidoPaterno { get; set; }
