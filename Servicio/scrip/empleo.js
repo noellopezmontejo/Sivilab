@@ -49,11 +49,11 @@
                         ${empleo.titulo} 
                         <a href="#guardar" title="Guardar en favoritos" style="text-decoration: none; margin-left: 200px;">
                             <i class="fa-bookmark fa ${isFavorito ? 'fas' : 'far'} favorito-icon" 
-                            style="cursor: pointer; color: #235B4E; font-size: 16px;"></i>
+                            style="cursor: pointer; color: #9d2449; font-size: 16px;"></i>
                         </a>
                         <a href="#ubicacion" title="Ubicación" style="text-decoration: none; margin-left: 50px;">
                             <i class="fas fa-map-marker-alt" 
-                            style="cursor: pointer; color: #235B4E; font-size: 16px;"></i>
+                            style="cursor: pointer; color: #9d2449; font-size: 16px;"></i>
                         </a>
                     </h3>
                     <p><strong>${empleo.empresa}</strong></p>
