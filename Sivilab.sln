@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivilab.Portal", "Sivilab.P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivilab.PortalEmpleo", "Sivilab.PortalEmpleo\Sivilab.PortalEmpleo.csproj", "{729A2224-A390-4508-A383-0A271C41E407}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Registro_Evento", "..\Registro_Evento\Registro_Evento\Registro_Evento.csproj", "{818ED9DE-C20B-50DE-69E6-391353F12334}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{729A2224-A390-4508-A383-0A271C41E407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{729A2224-A390-4508-A383-0A271C41E407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{729A2224-A390-4508-A383-0A271C41E407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{818ED9DE-C20B-50DE-69E6-391353F12334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{818ED9DE-C20B-50DE-69E6-391353F12334}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{818ED9DE-C20B-50DE-69E6-391353F12334}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{818ED9DE-C20B-50DE-69E6-391353F12334}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
