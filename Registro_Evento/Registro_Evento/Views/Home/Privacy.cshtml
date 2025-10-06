@@ -1,0 +1,535 @@
+﻿@{
+    ViewData["Title"] = "EMPLEOTÓN CHIAPAS 2025";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                    <h1 class="mb-0 text-center">
+                        <i class="fas fa-briefcase me-3"></i>
+                        EMPLEOTÓN CHIAPAS 2025
+                    </h1>
+                    <p class="text-center mb-0 mt-3 opacity-90 fs-6">
+                        Sistema de Registro para Buscadores de Empleo - Servicio Nacional de Empleo Chiapas
+                    </p>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Mensaje de bienvenida -->
+                    <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Estimado buscador de empleo,</strong> la Secretaría de Economía y del Trabajo a través del Servicio Nacional de Empleo Chiapas,
+                        te invita a postularte en el EMPLEOTÓN 2025. ¡Regístrate! Todos nuestros servicios son gratuitos.
+                    </div>
+
+                    <!-- Nota de privacidad -->
+                    <div class="alert alert-warning border-0 mb-4" style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <small>
+                            <strong>Aviso de Privacidad:</strong> Cuando envíe este formulario, no recopilará automáticamente sus detalles,
+                            como el nombre y la dirección de correo electrónico, a menos que lo proporcione usted mismo.
+                        </small>
+                    </div>
+
+                    <!-- Mensaje de éxito/error -->
+                    <div id="alertMessage" class="alert alert-dismissible fade" role="alert" style="display: none;">
+                        <i id="alertIcon" class="me-2"></i>
+                        <span id="alertText"></span>
+                        <button type="button" class="btn-close" onclick="closeAlert()"></button>
+                    </div>
+
+                    <form id="empleotonForm" class="needs-validation" novalidate>
+
+                        <!-- Sección 1: Datos Personales Básicos -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-user me-2"></i>Datos Personales Básicos
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- CURP -->
+                            <div class="col-md-6">
+                                <label for="curp" class="form-label fw-bold">
+                                    <i class="fas fa-id-card me-2 text-primary"></i>1. CURP <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="curp" name="curp" class="form-control text-uppercase"
+                                       placeholder="Ingrese su CURP"
+                                       maxlength="18"
+                                       style="font-family: 'Courier New', monospace; letter-spacing: 1px;"
+                                       required />
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>18 caracteres alfanuméricos
+                                </div>
+                                <div class="invalid-feedback">Por favor ingrese una CURP válida de 18 caracteres.</div>
+                            </div>
+
+                            <!-- Nombre Completo -->
+                            <div class="col-md-6">
+                                <label for="nombreCompleto" class="form-label fw-bold">
+                                    <i class="fas fa-user-tag me-2 text-primary"></i>2. NOMBRE COMPLETO <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="nombreCompleto" name="nombreCompleto" class="form-control"
+                                       placeholder="Nombre completo"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese su nombre completo.</div>
+                            </div>
+
+                            <!-- Género -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-venus-mars me-2 text-primary"></i>3. GÉNERO <span class="text-danger">*</span>
+                                </label>
+                                <div class="mt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="genero" value="Masculino" id="generoM" required />
+                                        <label class="form-check-label" for="generoM">MASCULINO</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="genero" value="Femenino" id="generoF" required />
+                                        <label class="form-check-label" for="generoF">FEMENINO</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="genero" value="No Binario" id="generoNB" required />
+                                        <label class="form-check-label" for="generoNB">NO BINARIO</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">Por favor seleccione un género.</div>
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="col-md-4">
+                                <label for="fechaNacimiento" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-2 text-primary"></i>4. FECHA DE NACIMIENTO <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" required />
+                                <div class="invalid-feedback">Por favor ingrese su fecha de nacimiento.</div>
+                            </div>
+
+                            <!-- Lugar de Nacimiento -->
+                            <div class="col-md-4">
+                                <label for="lugarNacimiento" class="form-label fw-bold">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>5. LUGAR DE NACIMIENTO <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="lugarNacimiento" name="lugarNacimiento" class="form-control"
+                                       placeholder="Ciudad, Estado"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese su lugar de nacimiento.</div>
+                            </div>
+                        </div>
+
+                        <!-- Programa Jóvenes Construyendo el Futuro -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                                    6. ¿ERES EGRESADO DEL PROGRAMA DE JÓVENES CONSTRUYENDO EL FUTURO? <span class="text-danger">*</span>
+                                </label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="esEgresadoJovenes" value="Si" id="jovenesS" required />
+                                        <label class="form-check-label" for="jovenesS">SÍ</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="esEgresadoJovenes" value="No" id="jovenesN" required />
+                                        <label class="form-check-label" for="jovenesN">NO</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Datos de Contacto -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-address-book me-2"></i>Datos de Contacto
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Teléfono -->
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label fw-bold">
+                                    <i class="fas fa-phone me-2 text-primary"></i>7. TELÉFONO <span class="text-danger">*</span>
+                                </label>
+                                <input type="tel" id="telefono" name="telefono" class="form-control"
+                                       placeholder="Ej: 961-123-4567"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese un teléfono válido.</div>
+                            </div>
+
+                            <!-- Correo Electrónico -->
+                            <div class="col-md-6">
+                                <label for="correoElectronico" class="form-label fw-bold">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>8. CORREO ELECTRÓNICO <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" id="correoElectronico" name="correoElectronico" class="form-control"
+                                       placeholder="ejemplo@correo.com"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese un correo electrónico válido.</div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 3: Dirección -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-home me-2"></i>Dirección
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Municipio y Estado -->
+                            <div class="col-md-4">
+                                <label for="municipioEstado" class="form-label fw-bold">
+                                    <i class="fas fa-city me-2 text-primary"></i>9. MUNICIPIO Y ESTADO <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="municipioEstado" name="municipioEstado" class="form-control"
+                                       placeholder="Municipio, Estado"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese su municipio y estado.</div>
+                            </div>
+
+                            <!-- Código Postal -->
+                            <div class="col-md-4">
+                                <label for="codigoPostal" class="form-label fw-bold">
+                                    <i class="fas fa-mail-bulk me-2 text-primary"></i>10. CÓDIGO POSTAL <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="codigoPostal" name="codigoPostal" class="form-control"
+                                       placeholder="00000"
+                                       maxlength="5"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese un código postal válido.</div>
+                            </div>
+
+                            <!-- Colonia -->
+                            <div class="col-md-4">
+                                <label for="colonia" class="form-label fw-bold">
+                                    <i class="fas fa-map-signs me-2 text-primary"></i>11. COLONIA <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="colonia" name="colonia" class="form-control"
+                                       placeholder="Nombre de la colonia"
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese su colonia.</div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 4: Formación Académica -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-graduation-cap me-2"></i>Formación Académica
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Nivel de Estudios -->
+                            <div class="col-md-6">
+                                <label for="nivelEstudios" class="form-label fw-bold">
+                                    <i class="fas fa-school me-2 text-primary"></i>12. NIVEL DE ESTUDIOS <span class="text-danger">*</span>
+                                </label>
+                                <select id="nivelEstudios" name="nivelEstudios" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Primaria">Primaria</option>
+                                    <option value="Secundaria">Secundaria</option>
+                                    <option value="Preparatoria">Preparatoria</option>
+                                    <option value="Técnico">Técnico</option>
+                                    <option value="Licenciatura">Licenciatura</option>
+                                    <option value="Maestría">Maestría</option>
+                                    <option value="Doctorado">Doctorado</option>
+                                </select>
+                                <div class="invalid-feedback">Por favor seleccione su nivel de estudios.</div>
+                            </div>
+
+                            <!-- Carrera o Especialidad -->
+                            <div class="col-md-6">
+                                <label for="carreraEspecialidad" class="form-label fw-bold">
+                                    <i class="fas fa-certificate me-2 text-primary"></i>13. CARRERA O ESPECIALIDAD <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="carreraEspecialidad" name="carreraEspecialidad" class="form-control"
+                                       placeholder="Ej: Ing. en Sistemas, Contabilidad..."
+                                       required />
+                                <div class="invalid-feedback">Por favor ingrese su carrera o especialidad.</div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 5: Experiencia Laboral -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-briefcase me-2"></i>Experiencia Laboral
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Experiencia Laboral -->
+                            <div class="col-12">
+                                <label for="experienciaLaboral" class="form-label fw-bold">
+                                    <i class="fas fa-history me-2 text-primary"></i>14. EXPERIENCIA LABORAL <span class="text-danger">*</span>
+                                </label>
+                                <textarea id="experienciaLaboral" name="experienciaLaboral" class="form-control"
+                                          rows="3"
+                                          placeholder="Describa brevemente su experiencia laboral..."
+                                          required></textarea>
+                                <div class="invalid-feedback">Por favor describa su experiencia laboral.</div>
+                            </div>
+
+                            <!-- Puestos de Trabajo -->
+                            <div class="col-md-6">
+                                <label for="puestosTrabajo" class="form-label fw-bold">
+                                    <i class="fas fa-user-tie me-2 text-primary"></i>15. PUESTOS DE TRABAJO QUE HA TENIDO <span class="text-danger">*</span>
+                                </label>
+                                <textarea id="puestosTrabajo" name="puestosTrabajo" class="form-control"
+                                          rows="3"
+                                          placeholder="Liste los puestos que ha desempeñado..."
+                                          required></textarea>
+                                <div class="invalid-feedback">Por favor liste los puestos que ha tenido.</div>
+                            </div>
+
+                            <!-- Años de Experiencia -->
+                            <div class="col-md-6">
+                                <label for="aniosExperiencia" class="form-label fw-bold">
+                                    <i class="fas fa-clock me-2 text-primary"></i>16. AÑOS DE EXPERIENCIA <span class="text-danger">*</span>
+                                </label>
+                                <select id="aniosExperiencia" name="aniosExperiencia" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Sin experiencia">Sin experiencia</option>
+                                    <option value="Menos de 1 año">Menos de 1 año</option>
+                                    <option value="1-2 años">1-2 años</option>
+                                    <option value="3-5 años">3-5 años</option>
+                                    <option value="6-10 años">6-10 años</option>
+                                    <option value="Más de 10 años">Más de 10 años</option>
+                                </select>
+
+                                <div class="mt-3">
+                                    <label for="dominioIdioma" class="form-label fw-bold">
+                                        <i class="fas fa-language me-2 text-primary"></i>17. DOMINIO DE OTRO IDIOMA <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" id="dominioIdioma" name="dominioIdioma" class="form-control"
+                                           placeholder="Ej: Inglés - Intermedio, Ninguno"
+                                           required />
+                                    <div class="invalid-feedback">Por favor indique su dominio de idiomas.</div>
+                                </div>
+                                <div class="invalid-feedback">Por favor seleccione sus años de experiencia.</div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 6: Aspiraciones Laborales -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-target me-2"></i>Aspiraciones Laborales
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Puesto Deseado -->
+                            <div class="col-md-8">
+                                <label for="puestoDeseado" class="form-label fw-bold">
+                                    <i class="fas fa-star me-2 text-primary"></i>18. PUESTO DESEADO <span class="text-danger">*</span>
+                                </label>
+                                <textarea id="puestoDeseado" name="puestoDeseado" class="form-control"
+                                          rows="3"
+                                          placeholder="Describa el puesto o área en la que le gustaría trabajar..."
+                                          required></textarea>
+                                <div class="invalid-feedback">Por favor describa el puesto deseado.</div>
+                            </div>
+
+                            <!-- Salario Pretendido -->
+                            <div class="col-md-4">
+                                <label for="salarioPretendido" class="form-label fw-bold">
+                                    <i class="fas fa-dollar-sign me-2 text-primary"></i>19. SALARIO PRETENDIDO <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" id="salarioPretendido" name="salarioPretendido" class="form-control"
+                                           placeholder="0.00"
+                                           step="0.01"
+                                           min="1"
+                                           required />
+                                    <span class="input-group-text">MXN</span>
+                                </div>
+                                <div class="form-text">Salario mensual deseado</div>
+                                <div class="invalid-feedback">Por favor ingrese el salario pretendido.</div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 7: Términos y Condiciones -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-file-contract me-2"></i>Términos y Condiciones
+                            </h4>
+                        </div>
+
+                        <div class="card border-warning mb-4">
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="aceptaTerminos" name="aceptaTerminos" required />
+                                    <label class="form-check-label" for="aceptaTerminos">
+                                        <strong>20. DECLARO BAJO PROTESTA DE DECIR VERDAD</strong> que los datos contenidos en este registro son verdaderos.
+                                        Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y de conformidad con lo señalado en el artículo 20,
+                                        ambos de la "LEY GENERAL DE PROTECCIÓN DE DATOS PERSONALES EN POSESIÓN DE SUJETOS OBLIGADOS (LGPDPPSO)"
+                                        expreso mi voluntad, específica e informada, para que se efectúe el tratamiento de mis datos personales por la OSNE.
+                                    </label>
+                                    <div class="invalid-feedback">Debe aceptar los términos y condiciones.</div>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="aceptaPrivacidad" name="aceptaPrivacidad" required />
+                                    <label class="form-check-label" for="aceptaPrivacidad">
+                                        <strong>21. ACEPTO</strong> que la recolección de datos personales se lleva a cabo a través de la página electrónica
+                                        del portal digital gubernamental cuyo administrador es la UNIDAD DEL SERVICIO NACIONAL DE EMPLEO (USNE).
+                                    </label>
+                                    <div class="invalid-feedback">Debe aceptar el tratamiento de datos personales.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de Envío -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;">
+                                <i class="fas fa-paper-plane me-2"></i>ENVIAR REGISTRO
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información adicional -->
+<div class="mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>¿Qué es el EMPLEOTÓN?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        El <strong>EMPLEOTÓN CHIAPAS 2025</strong> es una iniciativa del Servicio Nacional de Empleo
+                        que conecta a buscadores de empleo con oportunidades laborales en todo el estado de Chiapas.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Servicios gratuitos</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Vinculación laboral directa</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Oportunidades en diversos sectores</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Protección de Datos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        Tus datos personales están protegidos bajo la <strong>LGPDPPSO</strong> y serán utilizados
+                        exclusivamente para fines de vinculación laboral.
+                    </p>
+                    <p class="mb-0">
+                        <a href="/Home/Privacy" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>Ver Aviso de Privacidad Integral
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Funciones básicas para el formulario
+        function showAlert(type, message) {
+            var alertDiv = document.getElementById('alertMessage');
+            var alertIcon = document.getElementById('alertIcon');
+            var alertText = document.getElementById('alertText');
+
+            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+
+            if (type === 'success') {
+                alertIcon.className = 'fas fa-check-circle me-2';
+            } else if (type === 'danger') {
+                alertIcon.className = 'fas fa-exclamation-triangle me-2';
+            } else if (type === 'warning') {
+                alertIcon.className = 'fas fa-exclamation-circle me-2';
+            } else {
+                alertIcon.className = 'fas fa-info-circle me-2';
+            }
+
+            alertText.textContent = message;
+            alertDiv.style.display = 'block';
+
+            setTimeout(function() {
+                closeAlert();
+            }, 5000);
+        }
+
+        function closeAlert() {
+            document.getElementById('alertMessage').style.display = 'none';
+        }
+
+        // Auto uppercase para CURP
+        document.getElementById('curp').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        // Validación básica de CURP
+        document.getElementById('curp').addEventListener('blur', function(e) {
+            var curp = e.target.value;
+            if (curp.length === 18) {
+                var patron = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$/;
+                if (patron.test(curp)) {
+                    showAlert('success', 'CURP válida');
+
+                    // Auto-llenar género
+                    if (curp[10] === 'H') {
+                        document.getElementById('generoM').checked = true;
+                    } else if (curp[10] === 'M') {
+                        document.getElementById('generoF').checked = true;
+                    }
+                } else {
+                    showAlert('danger', 'CURP no válida. Verifique el formato.');
+                }
+            }
+        });
+
+        // Solo números en código postal
+        document.getElementById('codigoPostal').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Validación del formulario
+        document.getElementById('empleotonForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (this.checkValidity() === false) {
+                showAlert('danger', 'Por favor, complete todos los campos requeridos correctamente.');
+            } else {
+                // Simular envío exitoso
+                var folio = 'EMP-2025-' + Math.floor(Math.random() * 900000 + 100000);
+                var nombre = document.getElementById('nombreCompleto').value;
+                var email = document.getElementById('correoElectronico').value;
+
+                showAlert('success', 'Registro exitoso para ' + nombre + '. Folio: ' + folio + '. Confirmación enviada a ' + email);
+
+                // Opcional: limpiar formulario
+                setTimeout(function() {
+                    if (confirm('¿Desea registrar otra persona?')) {
+                        document.getElementById('empleotonForm').reset();
+                        document.getElementById('empleotonForm').classList.remove('was-validated');
+                    }
+                }, 2000);
+            }
+
+            this.classList.add('was-validated');
+        });
+    </script>
+}

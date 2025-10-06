@@ -1,0 +1,144 @@
+﻿@model Registro_Evento.Models.CurpModel
+@{
+    ViewData["Title"] = "Validador de CURP";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0 text-center">
+                        <i class="fas fa-id-card me-2"></i>
+                        Validador de CURP
+                    </h2>
+                    <p class="text-center mb-0 mt-2 opacity-75">
+                        Sistema profesional de validación de Clave Única de Registro de Población
+                    </p>
+                </div>
+                <div class="card-body">
+
+                    @if (!string.IsNullOrEmpty(ViewBag.Mensaje))
+                    {
+                        <div class="alert @(ViewBag.TipoMensaje == "success" ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                            <i class="fas @(ViewBag.TipoMensaje == "success" ? "fa-check-circle" : "fa-exclamation-triangle") me-2"></i>
+                            @ViewBag.Mensaje
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="ValidarCurp" method="post">
+                        <div class="mb-4">
+                            <label asp-for="Curp" class="form-label fw-bold">
+                                <i class="fas fa-user-tag me-2 text-primary"></i>Ingrese su CURP:
+                            </label>
+                            <input asp-for="Curp" class="form-control form-control-lg text-uppercase"
+                                   placeholder="Ej: ABCD123456HDFGHI09"
+                                   maxlength="18"
+                                   style="letter-spacing: 2px; font-family: 'Courier New', monospace;"
+                                   autocomplete="off" />
+                            <span asp-validation-for="Curp" class="text-danger"></span>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                La CURP debe tener exactamente 18 caracteres alfanuméricos
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Validar CURP
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (Model != null && Model.EsValida)
+                    {
+                        <div class="mt-5">
+                            <h4 class="text-success mb-4">
+                                <i class="fas fa-check-circle me-2"></i>Información Extraída de la CURP
+                            </h4>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-venus-mars fa-2x text-primary mb-3"></i>
+                                            <h6 class="card-title text-muted">Sexo</h6>
+                                            <p class="card-text fw-bold fs-5 text-dark">@Model.Sexo</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                                            <h6 class="card-title text-muted">Estado de Nacimiento</h6>
+                                            <p class="card-text fw-bold fs-5 text-dark">@Model.EstadoNacimiento</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.FechaNacimiento.HasValue)
+                                {
+                                    <div class="col-12">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-calendar-alt fa-2x text-primary mb-3"></i>
+                                                <h6 class="card-title text-muted">Fecha de Nacimiento</h6>
+                                                <p class="card-text fw-bold fs-4 text-dark">
+                                                    @Model.FechaNacimiento.Value.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX"))
+                                                </p>
+                                                <small class="text-muted">
+                                                    @{
+                                                        var edad = DateTime.Now.Year - Model.FechaNacimiento.Value.Year;
+                                                        if (DateTime.Now.DayOfYear < Model.FechaNacimiento.Value.DayOfYear) edad--;
+                                                    }
+                                                    <i class="fas fa-birthday-cake me-1"></i>
+                                                    Edad aproximada: @edad años
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-question-circle me-2"></i>¿Qué es la CURP?
+            </h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-2">
+                La <strong>Clave Única de Registro de Población (CURP)</strong> es un código alfanumérico único
+                de identidad de 18 caracteres que identifica oficialmente tanto a residentes como
+                a ciudadanos mexicanos en todo el país.
+            </p>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        // Convertir automáticamente a mayúsculas mientras escribe
+        document.getElementById('Curp').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+}
