@@ -1,159 +1,728 @@
-﻿@{
+﻿@using System.IO
+@using System.Text.Json
+@{
     ViewData["Title"] = "Eventos";
-    var fechaActual = DateTime.UtcNow.Date; // Fecha actual en formato de solo fecha
+    var fechaActual = DateTime.UtcNow.Date;
+
+    // Leer el archivo JSON - usando ruta completa con encoding UTF-8
+    var wwwrootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+    var jsonPath = System.IO.Path.Combine(wwwrootPath, "Data", "eventos.json");
+    var jsonString = System.IO.File.ReadAllText(jsonPath, System.Text.Encoding.UTF8);
+
+    // Deserializar el JSON a una lista de objetos
+    var eventos = JsonSerializer.Deserialize<List<Evento>>(jsonString);
+
+    // Filtrar eventos futuros
+    var eventosFuturos = eventos.Where(e => DateTime.Parse(e.fecha) >= fechaActual)
+                                .OrderBy(e => DateTime.Parse(e.fecha))
+                                .ToList();
+
+    var eventoPrincipal = eventosFuturos.FirstOrDefault();
+    var eventosRestantesFuturos = eventosFuturos.Skip(1).ToList();
+
+    // Filtrar eventos pasados
+    var eventosPasados = eventos.Where(e => DateTime.Parse(e.fecha) < fechaActual)
+                                .OrderByDescending(e => DateTime.Parse(e.fecha))
+                                .ToList();
 }
 
 <style>
+    /* Reset y configuración base */
     body {
-        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
     }
 
-    .section-title {
-        font-size: 2rem;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 2rem;
-    }
-
-    .event-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: none;
-        border-radius: 16px;
+    .main-content {
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
         overflow: hidden;
-        height: 100%;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
     }
 
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        /* Efectos de fondo animados con movimiento */
+        .main-content::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            animation: float 20s ease-in-out infinite;
         }
 
-    .event-img {
+        .main-content::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+
+        25% {
+            transform: translate(50px, 50px) rotate(90deg);
+        }
+
+        50% {
+            transform: translate(0, 100px) rotate(180deg);
+        }
+
+        75% {
+            transform: translate(-50px, 50px) rotate(270deg);
+        }
+    }
+
+    /* Container con efecto glassmorphism */
+    .events-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Header con diseño moderno y animación */
+    .events-header {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        animation: slideDown 0.8s ease-out;
+        transition: all 0.3s ease;
+    }
+
+        .events-header:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Títulos de sección con efectos */
+    .section-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        text-align: center;
+        animation: fadeIn 1s ease-out;
+        letter-spacing: -1px;
+        position: relative;
+        display: inline-block;
         width: 100%;
-        height: 300px;
-        object-fit: contain;
-        object-position: center;
-        background-color: #f9f9f9;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
     }
 
-    .event-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1e1e1e;
+    .section-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 300;
+        margin-bottom: 0;
+        animation: fadeIn 1.2s ease-out;
     }
 
-    .event-info {
-        font-size: 0.95rem;
-        color: #555;
+    .divider {
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, #fff, transparent);
+        margin: 2rem auto;
+        border-radius: 2px;
+        animation: expand 1s ease-out;
     }
 
-    .event-button {
-        border-radius: 25px;
-        font-weight: 600;
-        padding: 6px 18px;
-        width: auto;
+    @@keyframes expand {
+        from {
+            width: 0;
+        }
+
+        to {
+            width: 100px;
+        }
     }
 
     .past-events-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #555;
-        margin-top: 3rem;
-        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-top: 5rem;
+        margin-bottom: 3rem;
         text-align: center;
+        letter-spacing: -1px;
+    }
+
+    /* Cards de eventos con animaciones direccionales */
+    .event-card {
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: none;
+        border-radius: 25px;
+        overflow: hidden;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        position: relative;
+        opacity: 0;
+    }
+
+        /* Animaciones de entrada desde diferentes direcciones */
+        .event-card.from-left {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+
+        .event-card.from-right {
+            animation: slideInRight 0.8s ease-out forwards;
+        }
+
+        .event-card.from-bottom {
+            animation: slideInBottom 0.8s ease-out forwards;
+        }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-100px) rotate(-5deg);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0) rotate(0);
+        }
+    }
+
+    @@keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px) rotate(5deg);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0) rotate(0);
+        }
+    }
+
+    @@keyframes slideInBottom {
+        from {
+            opacity: 0;
+            transform: translateY(100px) scale(0.8);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Delays para animaciones escalonadas */
+    .event-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .event-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .event-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .event-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .event-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .event-card:nth-child(6) {
+        animation-delay: 0.6s;
+    }
+
+    /* Línea superior de la card */
+    .event-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .event-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    /* Efectos hover complejos */
+    .event-card:hover {
+        transform: translateY(-20px) scale(1.03) rotate(2deg);
+        box-shadow: 0 35px 90px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Contenedor de imagen con efectos */
+    .event-img-container {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        height: 280px;
+        transition: all 0.5s ease;
+    }
+
+    .event-card:hover .event-img-container {
+        background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    }
+
+    .event-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        padding: 20px;
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        filter: grayscale(0%);
+    }
+
+    /* Efectos de hover en imagen */
+    .event-card:hover .event-img {
+        transform: scale(1.15) rotate(3deg);
+        filter: grayscale(0%) brightness(1.1);
+    }
+
+    /* Overlay en hover */
+    .event-img-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .event-card:hover .event-img-container::after {
+        opacity: 1;
+    }
+
+    .event-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover .event-title {
+        color: #667eea;
+        transform: translateX(5px);
+    }
+
+    .event-info {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover .event-info {
+        color: #333;
+    }
+
+    .event-info strong {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .event-info i {
+        width: 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover .event-info i {
+        transform: scale(1.2) rotate(360deg);
+    }
+
+    .card-body {
+        padding: 2rem;
+        position: relative;
+    }
+
+    /* Badge con efecto brillante y movimiento */
+    .badge-proximo {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover .badge-proximo {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 10px 30px rgba(46, 204, 113, 0.6);
+    }
+
+    .badge-proximo::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+
+    @@keyframes shine {
+        0% {
+            transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+
+        100% {
+            transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+    }
+
+    .badge-pasado {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 20px rgba(149, 165, 166, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover .badge-pasado {
+        transform: scale(1.1) translateY(-5px);
+    }
+
+    /* Botón con efectos avanzados */
+    .event-button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 2.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .event-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .event-button:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .event-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.6);
+            color: white;
+        }
+
+        .event-button:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .event-button i {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .event-button:hover i {
+            transform: translateX(-5px);
+        }
+
+        .event-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+    /* Animaciones base */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .past-events-title {
+            font-size: 1.8rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .events-header {
+            padding: 2rem 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .event-button {
+            padding: 0.8rem 2rem;
+            font-size: 0.9rem;
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
     }
 </style>
 
-<section class="container my-5">
-    <h2 class="text-center section-title">Próximos Eventos</h2>
+<div class="main-content">
+    <div class="container events-container">
+        <!-- Header principal -->
+        <div class="events-header">
+            <h2 class="section-title">
+                <i class="fas fa-calendar-check"></i> Próximos Eventos
+            </h2>
+            <div class="divider"></div>
+            <p class="section-subtitle">
+                Descubre los eventos más emocionantes del Servicio Nacional de Empleo Chiapas
+            </p>
+        </div>
 
-    @{
-        // Lista de eventos Noel López
-        var eventos = new[] {
-    new { Vigente = 0, Titulo = "Feria de Empleo Escuintla 2025", Imagen = "/Img/FeriaEscuintla.jpeg", Fecha = "2025-05-08", Lugar = "Explanada del Parque Central.", Descripcion = "La Feria de Empleo Escuintla 2025 es un evento estratégico que reúne a las principales empresas e instituciones de la región con ciudadanos en búsqueda de oportunidades laborales.", Liga = "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode" },
-    new { Vigente = 1, Titulo = "Día por el Empleo Tuxtla Gutiérrez", Imagen = "/Img/DiaEmpleoTuxtla.jpeg", Fecha = "2025-05-20", Lugar = "Parque Central de Plan de Ayala.", Descripcion = "En un ambiente dinámico y profesional, los asistentes tendrán acceso a vacantes de diversos sectores económicos representativos de Tuxtla Gutiérrez y sus alrededores.", Liga = "https://forms.office.com/r/iVqHujs1CB" },
-    new { Vigente = 1, Titulo = "Feria Virtual de Empleo 2025", Imagen = "/Img/FeriaVirtual2025.jpeg", Fecha = "2025-05-22", Lugar = "Online", Descripcion = "La Feria Virtual de Empleo 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en el estado.", Liga = "https://forms.office.com/r/4KmxE1xsjW" },
-    new { Vigente = 1, Titulo = "Feria de Empleo Tonalá 2025", Imagen = "/Img/FeriaTonala.jpeg", Fecha = "2025-05-23", Lugar = "Explanada del Parque Central", Descripcion = "La Feria de Empleo Tonalá 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en este municipio emblemático.", Liga = "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode" },
-    new { Vigente = 1, Titulo = "Feria Nacional de Empleo Tapachula 2025", Imagen = "/Img/FeriaTapachulaJunio2025.png", Fecha = "2025-06-09", Lugar = "Hotel Holiday Inn Ctra. a Puerto Madero, KM 3.5 Col. Las Hortensias, C.P. 30797", Descripcion = "La Feria Nacional de Empleo Tapachula 2025 consolida la vocación de esta ciudad como centro neurálgico del desarrollo económico del sur-sureste mexicano, ofreciendo perspectivas laborales que contribuyen al crecimiento integral de la zona fronteriza más dinámica del país.", Liga = "https://forms.office.com/r/vfGDSxF7eC" },
-    new { Vigente = 1, Titulo = "Feria Nacional de Empleo Las Margaritas 2025", Imagen = "/Img/FeriaLasMargaritasJunioi2025.png", Fecha = "2025-06-18", Lugar = "Explanada del Parque Central de las Margaritas", Descripcion = "La Feria Nacional de Empleo Las Margaritas Chiapas 2025 constituye una oportunidad histórica para el desarrollo laboral en esta región fronteriza de gran importancia estratégica. Este evento lleva por primera vez oportunidades de empleo de alcance estatal y nacional a una comunidad que ha sido pilar fundamental en la economía agrícola y ganadera del estado de Chiapas.", Liga = "https://forms.office.com/r/stG2V2Sm0u?origin=lprLink" },
-    new { Vigente = 1, Titulo = "Feria Nacional de Empleo Ocosiongo 2025", Imagen = "/Img/FeriaOcosingoJunio2025.png", Fecha = "2025-06-19", Lugar = "Universidad Tecnológica de la Selva, Ctra Ocosingo - Altamirano entronque Tonina km 0.5,  Col. Predio Laltic", Descripcion = "La Feria Nacional de Empleo Ocosingo Chiapas 2025 representa una iniciativa transformadora que lleva oportunidades laborales de nivel estatal y nacional al corazón de la Selva Lacandona. Este evento pionero reconoce el potencial humano y la riqueza cultural de esta región estratégica, conectando a la población local con empresas estatales y nacionales interesadas en el desarrollo sostenible y la responsabilidad social.", Liga = "https://forms.office.com/r/DCK0i3wC4j?origin=lprLink" },
-    new { Vigente = 1, Titulo = "Feria Nacional de Empleo y del Emprendimiento Berriozábal 2025", Imagen = "/Img/feria_berriozabal.jpeg", Fecha = "2025-07-09", Lugar = "Explanada del Parque Central, Berriozábal, Chiapas.", Descripcion = "Esta innovadora propuesta reconoce la vocación empresarial de Berriozábal y su potencial como centro de desarrollo económico en la región centro del estado.", Liga = "https://forms.office.com/r/g0gcvfhfmE?origin=lprLink" },
-    new { Vigente = 1, Titulo = "Feria Nacional de Empleo San Cristóbal de las Casas 2025", Imagen = "/Img/feria_sclc.jpeg", Fecha = "2025-07-07", Lugar = "Centro de Convenciones el Carmén, Miguel Hidalgo s/n, Barrio de Santa Lucía, San Cristóbal de las Casas, Chiapas.", Descripcion = "La Feria Nacional de Empleo San Cristóbal de las Casas 2025 se consolida como el evento laboral más significativo de Los Altos de Chiapas, aprovechando la relevancia cultural, turística y académica de esta ciudad colonial Pueblo Mágico", Liga = "https://forms.office.com/r/5XqMjknYTr?origin=lprLink" },
-    };
+        <!-- Grid de eventos futuros -->
+        <div class="row gy-4 mb-5">
+            @if (eventoPrincipal != null)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card from-bottom">
+                        <div class="event-img-container">
+                            <img src="@eventoPrincipal.imagen" alt="@eventoPrincipal.titulo" class="event-img" />
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge-proximo">
+                                <i class="fas fa-star"></i> Destacado
+                            </span>
+                            <h5 class="event-title">@eventoPrincipal.titulo</h5>
+                            <p class="event-info flex-grow-1" style="text-align: justify;">@eventoPrincipal.descripcion</p>
+                            <p class="event-info">
+                                <i class="fas fa-calendar-alt text-primary"></i>
+                                <strong>Fecha:</strong> @eventoPrincipal.fecha
+                            </p>
+                            <p class="event-info">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <strong>Lugar:</strong> @eventoPrincipal.lugar
+                            </p>
+                            @if (eventoPrincipal.vigente == 1)
+                            {
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <a href="@eventoPrincipal.liga" target="_blank" class="btn event-button">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Regístrate</span>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
 
-        // Filtrar eventos futuros y el evento más próximo
-        var eventosFuturos = eventos.Where(e => DateTime.Parse(e.Fecha) >= fechaActual).OrderBy(e => DateTime.Parse(e.Fecha)).ToList();
-        var eventoPrincipal = eventosFuturos.FirstOrDefault(); // El evento más cercano a la fecha actual
-        var eventosRestantesFuturos = eventosFuturos.Skip(1).OrderBy(e => DateTime.Parse(e.Fecha)).ToList(); // Resto en orden descendente
+            @{
+                int counter = 0;
+            }
+            @foreach (var evento in eventosRestantesFuturos)
+            {
+                var animationClass = (counter % 2 == 0) ? "from-left" : "from-right";
+                counter++;
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card @animationClass">
+                        <div class="event-img-container">
+                            <img src="@evento.imagen" alt="@evento.titulo" class="event-img" />
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge-proximo">
+                                <i class="fas fa-clock"></i> Próximamente
+                            </span>
+                            <h5 class="event-title">@evento.titulo</h5>
+                            <p class="event-info flex-grow-1" style="text-align: justify;">@evento.descripcion</p>
+                            <p class="event-info">
+                                <i class="fas fa-calendar-alt text-primary"></i>
+                                <strong>Fecha:</strong> @evento.fecha
+                            </p>
+                            <p class="event-info">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <strong>Lugar:</strong> @evento.lugar
+                            </p>
+                            @if (evento.vigente == 1)
+                            {
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <a href="@evento.liga" target="_blank" class="btn event-button">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Regístrate</span>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
 
-        // Filtrar eventos pasados
-        var eventosPasados = eventos.Where(e => DateTime.Parse(e.Fecha) < fechaActual).OrderByDescending(e => DateTime.Parse(e.Fecha)).ToList(); // Pasados en orden descendente
+        <!-- Sección de eventos pasados -->
+        <div class="divider" style="margin: 4rem auto;"></div>
+
+        <h3 class="past-events-title">
+            <i class="fas fa-history"></i> Eventos Realizados
+        </h3>
+
+        <div class="row gy-4">
+            @{
+                int pastCounter = 0;
+            }
+            @foreach (var evento in eventosPasados)
+            {
+                var pastAnimationClass = (pastCounter % 3 == 0) ? "from-left" : (pastCounter % 3 == 1) ? "from-right" : "from-bottom";
+                pastCounter++;
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card @pastAnimationClass">
+                        <div class="event-img-container">
+                            <img src="@evento.imagen" alt="@evento.titulo" class="event-img" />
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge-pasado">
+                                <i class="fas fa-check-circle"></i> Finalizado
+                            </span>
+                            <h5 class="event-title">@evento.titulo</h5>
+                            <p class="event-info flex-grow-1" style="text-align: justify;">@evento.descripcion</p>
+                            <p class="event-info">
+                                <i class="fas fa-calendar-alt text-primary"></i>
+                                <strong>Fecha:</strong> @evento.fecha
+                            </p>
+                            <p class="event-info">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <strong>Lugar:</strong> @evento.lugar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    // Intersection Observer para animaciones al hacer scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.event-card');
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                } else {
+                    // Opcional: ocultar al salir del viewport
+                    entry.target.style.opacity = '0';
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    });
+</script>
+
+@functions {
+    public class Evento
+    {
+        public int vigente { get; set; }
+        public string titulo { get; set; }
+        public string imagen { get; set; }
+        public string fecha { get; set; }
+        public string lugar { get; set; }
+        public string descripcion { get; set; }
+        public string liga { get; set; }
     }
-
-    <div class="row gy-4">
-        @if (eventoPrincipal != null)
-        {
-            // Agregar el evento más próximo primero
-            <div class="col-md-6 col-lg-4">
-                <div class="card event-card">
-                    <img src="@eventoPrincipal.Imagen" alt="@eventoPrincipal.Titulo" class="event-img" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="event-title">@eventoPrincipal.Titulo</h5>
-                        <p class="event-info flex-grow-1" style="text-align: justify;">@eventoPrincipal.Descripcion</p>
-                        <p class="event-info"><strong>Fecha:</strong> @eventoPrincipal.Fecha</p>
-                        <p class="event-info"><strong>Lugar:</strong> @eventoPrincipal.Lugar</p>
-                        @if (eventoPrincipal.Vigente == 1)
-                        {
-                            <div class="d-flex justify-content-center mt-auto">
-                                <a href="@eventoPrincipal.Liga" target="_blank" class="btn btn-sm btn-primary event-button">Registrate</a>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
-
-        @foreach (var evento in eventosRestantesFuturos)
-        {
-            <div class="col-md-6 col-lg-4">
-                <div class="card event-card">
-                    <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="event-title">@evento.Titulo</h5>
-                        <p class="event-info flex-grow-1" style="text-align: justify;">@evento.Descripcion</p>
-                        <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
-                        <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
-                        @if (evento.Vigente == 1)
-                        {
-                            <div class="d-flex justify-content-center mt-auto">
-                                <a href="@evento.Liga" target="_blank" class="btn btn-sm btn-primary event-button">Registrate</a>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-
-    <h3 class="past-events-title">Eventos Pasados</h3>
-    <div class="row gy-4">
-        @foreach (var evento in eventosPasados)
-        {
-            <div class="col-md-6 col-lg-4">
-                <div class="card event-card">
-                    <img src="@evento.Imagen" alt="@evento.Titulo" class="event-img" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="event-title">@evento.Titulo</h5>
-                        <p class="event-info flex-grow-1" style="text-align: justify;">@evento.Descripcion</p>
-                        <p class="event-info"><strong>Fecha:</strong> @evento.Fecha</p>
-                        <p class="event-info"><strong>Lugar:</strong> @evento.Lugar</p>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</section>
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "vigente": 1,
+    "titulo": "prueba",
+    "imagen": "/Img/nombreimagen.jpg",
+    "fecha": "2025-11-15",
+    "lugar": "Ubicación del evento",
+    "descripcion": "Descripción completa...",
+    "liga": "https://tu-enlace.com"
+  },
+  {
+    "vigente": 0,
+    "titulo": "Feria de Empleo Escuintla 2025",
+    "imagen": "/Img/FeriaEscuintla.jpeg",
+    "fecha": "2025-05-08",
+    "lugar": "Explanada del Parque Central.",
+    "descripcion": "La Feria de Empleo Escuintla 2025 es un evento estratégico que reúne a las principales empresas e instituciones de la región con ciudadanos en búsqueda de oportunidades laborales.",
+    "liga": "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Día por el Empleo Tuxtla Gutiérrez",
+    "imagen": "/Img/DiaEmpleoTuxtla.jpeg",
+    "fecha": "2025-05-20",
+    "lugar": "Parque Central de Plan de Ayala.",
+    "descripcion": "En un ambiente dinámico y profesional, los asistentes tendrán acceso a vacantes de diversos sectores económicos representativos de Tuxtla Gutiérrez y sus alrededores.",
+    "liga": "https://forms.office.com/r/iVqHujs1CB"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Virtual de Empleo 2025",
+    "imagen": "/Img/FeriaVirtual2025.jpeg",
+    "fecha": "2025-05-22",
+    "lugar": "Online",
+    "descripcion": "La Feria Virtual de Empleo 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en el estado.",
+    "liga": "https://forms.office.com/r/4KmxE1xsjW"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria de Empleo Tonalá 2025",
+    "imagen": "/Img/FeriaTonala.jpeg",
+    "fecha": "2025-05-23",
+    "lugar": "Explanada del Parque Central",
+    "descripcion": "La Feria de Empleo Tonalá 2025 representa una plataforma estratégica para impulsar la activación económica y laboral en este municipio emblemático.",
+    "liga": "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UOTRLSUU5RUZPT0Q5MFA1MFg0MFdTS0FNRC4u&origin=QRCode"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Nacional de Empleo Tapachula 2025",
+    "imagen": "/Img/FeriaTapachulaJunio2025.png",
+    "fecha": "2025-06-09",
+    "lugar": "Hotel Holiday Inn Ctra. a Puerto Madero, KM 3.5 Col. Las Hortensias, C.P. 30797",
+    "descripcion": "La Feria Nacional de Empleo Tapachula 2025 consolida la vocación de esta ciudad como centro neurálgico del desarrollo económico del sur-sureste mexicano, ofreciendo perspectivas laborales que contribuyen al crecimiento integral de la zona fronteriza más dinámica del país.",
+    "liga": "https://forms.office.com/r/vfGDSxF7eC"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Nacional de Empleo Las Margaritas 2025",
+    "imagen": "/Img/FeriaLasMargaritasJunioi2025.png",
+    "fecha": "2025-06-18",
+    "lugar": "Explanada del Parque Central de las Margaritas",
+    "descripcion": "La Feria Nacional de Empleo Las Margaritas Chiapas 2025 constituye una oportunidad histórica para el desarrollo laboral en esta región fronteriza de gran importancia estratégica. Este evento lleva por primera vez oportunidades de empleo de alcance estatal y nacional a una comunidad que ha sido pilar fundamental en la economía agrícola y ganadera del estado de Chiapas.",
+    "liga": "https://forms.office.com/r/stG2V2Sm0u?origin=lprLink"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Nacional de Empleo Ocosiongo 2025",
+    "imagen": "/Img/FeriaOcosingoJunio2025.png",
+    "fecha": "2025-06-19",
+    "lugar": "Universidad Tecnológica de la Selva, Ctra Ocosingo - Altamirano entronque Tonina km 0.5,  Col. Predio Laltic",
+    "descripcion": "La Feria Nacional de Empleo Ocosingo Chiapas 2025 representa una iniciativa transformadora que lleva oportunidades laborales de nivel estatal y nacional al corazón de la Selva Lacandona. Este evento pionero reconoce el potencial humano y la riqueza cultural de esta región estratégica, conectando a la población local con empresas estatales y nacionales interesadas en el desarrollo sostenible y la responsabilidad social.",
+    "liga": "https://forms.office.com/r/DCK0i3wC4j?origin=lprLink"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Nacional de Empleo y del Emprendimiento Berriozábal 2025",
+    "imagen": "/Img/feria_berriozabal.jpeg",
+    "fecha": "2025-07-09",
+    "lugar": "Explanada del Parque Central, Berriozábal, Chiapas.",
+    "descripcion": "Esta innovadora propuesta reconoce la vocación empresarial de Berriozábal y su potencial como centro de desarrollo económico en la región centro del estado.",
+    "liga": "https://forms.office.com/r/g0gcvfhfmE?origin=lprLink"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Nacional de Empleo San Cristóbal de las Casas 2025",
+    "imagen": "/Img/feria_sclc.jpeg",
+    "fecha": "2025-07-07",
+    "lugar": "Centro de Convenciones el Carmén, Miguel Hidalgo s/n, Barrio de Santa Lucía, San Cristóbal de las Casas, Chiapas.",
+    "descripcion": "La Feria Nacional de Empleo San Cristóbal de las Casas 2025 se consolida como el evento laboral más significativo de Los Altos de Chiapas, aprovechando la relevancia cultural, turística y académica de esta ciudad colonial Pueblo Mágico",
+    "liga": "https://forms.office.com/r/5XqMjknYTr?origin=lprLink"
+  }
+]
