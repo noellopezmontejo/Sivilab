@@ -1,0 +1,350 @@
+﻿@model Sivilab.Portal.Models.Evento
+@{
+    ViewData["Title"] = "Editar Evento";
+    var indiceEvento = ViewBag.IndiceEvento;
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .form-container {
+        padding: 3rem 0;
+        min-height: 100vh;
+    }
+
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        animation: slideUp 0.5s ease;
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .form-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .current-image-box {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+        .current-image-box img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-image-box .image-label {
+            display: block;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+    .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+    .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: 2px dashed #667eea;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #667eea;
+        font-weight: 600;
+    }
+
+        .file-input-label:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            border-color: #764ba2;
+            color: #764ba2;
+        }
+
+    .file-name {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
+        font-style: italic;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3rem;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(52, 152, 219, 0.4);
+        width: 100%;
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(52, 152, 219, 0.6);
+            color: white;
+        }
+
+    .btn-cancel {
+        background: #6c757d;
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3rem;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-3px);
+            color: white;
+        }
+
+    .text-danger {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+        .info-box i {
+            color: #ff9800;
+        }
+
+    @@media (max-width: 768px) {
+        .form-card
+
+    {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-title {
+        font-size: 2rem;
+    }
+
+    .btn-submit, .btn-cancel {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+
+    }
+</style>
+
+<div class="form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <h2 class="form-title">
+                        <i class="fas fa-edit"></i> Editar Evento
+                    </h2>
+                    <p class="form-subtitle">Modifica la información del evento</p>
+
+                    <div class="info-box">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Nota:</strong> Si no seleccionas una nueva imagen, se mantendrá la actual.
+                    </div>
+
+                    <form asp-action="Edit" asp-route-id="@indiceEvento" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-heading text-primary"></i> Título del Evento
+                                </label>
+                                <input asp-for="titulo" class="form-control" placeholder="Ej: Feria de Empleo 2025" />
+                                <span asp-validation-for="titulo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-toggle-on text-success"></i> Estado
+                                </label>
+                                <select asp-for="vigente" class="form-select">
+                                    <option value="1">Vigente</option>
+                                    <option value="0">No Vigente</option>
+                                </select>
+                                <span asp-validation-for="vigente" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-align-left text-info"></i> Descripción
+                            </label>
+                            <textarea asp-for="descripcion" class="form-control" placeholder="Describe el evento de manera detallada..."></textarea>
+                            <span asp-validation-for="descripcion" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar text-primary"></i> Fecha
+                                </label>
+                                <input asp-for="fecha" type="date" class="form-control" />
+                                <span asp-validation-for="fecha" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt text-danger"></i> Lugar
+                                </label>
+                                <input asp-for="lugar" class="form-control" placeholder="Ej: Parque Central" />
+                                <span asp-validation-for="lugar" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-link text-warning"></i> Liga de Registro
+                            </label>
+                            <input asp-for="liga" type="url" class="form-control" placeholder="https://ejemplo.com/registro" />
+                            <span asp-validation-for="liga" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-image text-success"></i> Imagen del Evento
+                            </label>
+
+                            @if (!string.IsNullOrEmpty(Model.imagen))
+                            {
+                                <div class="current-image-box">
+                                    <span class="image-label">
+                                        <i class="fas fa-check-circle"></i> Imagen Actual
+                                    </span>
+                                    <img src="@Model.imagen" alt="Imagen actual" />
+                                </div>
+                            }
+
+                            <div class="file-input-wrapper">
+                                <input type="file" name="imagenFile" id="imagenFile" accept="image/*" onchange="updateFileName(this)" />
+                                <label for="imagenFile" class="file-input-label">
+                                    <i class="fas fa-sync-alt fa-2x"></i>
+                                    <span>Cambiar imagen (opcional)</span>
+                                </label>
+                            </div>
+                            <div class="file-name" id="fileName">Ningún archivo seleccionado</div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6 mb-2">
+                                <button type="submit" class="btn-submit">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <a asp-action="Index" class="btn-cancel">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateFileName(input) {
+        const fileName = input.files[0] ? input.files[0].name : 'Ningún archivo seleccionado';
+        document.getElementById('fileName').textContent = fileName;
+
+        if (input.files[0]) {
+            document.getElementById('fileName').style.color = '#2ecc71';
+            document.getElementById('fileName').style.fontWeight = '600';
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

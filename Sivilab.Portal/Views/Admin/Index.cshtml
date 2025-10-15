@@ -1,0 +1,303 @@
+﻿@model List<Sivilab.Portal.Models.Evento>
+@{
+    ViewData["Title"] = "Administrar Eventos";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .admin-container {
+        padding: 3rem 0;
+        min-height: 100vh;
+    }
+
+    .admin-header {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 2rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(46, 204, 113, 0.6);
+            color: white;
+        }
+
+    .table-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table thead th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+            .table tbody tr:hover {
+                background: #f8f9fa;
+                transform: scale(1.01);
+            }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+    .event-img-thumb {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge-vigente {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .badge-no-vigente {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+    }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+
+    .alert {
+        border-radius: 15px;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        animation: slideDown 0.5s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+    @@media (max-width: 768px) {
+        .table-container
+
+    {
+        overflow-x: auto;
+    }
+
+    .admin-title {
+        font-size: 1.8rem;
+    }
+
+    }
+</style>
+
+<div class="admin-container">
+    <div class="container">
+        <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="admin-title">
+                        <i class="fas fa-cog"></i> Panel de Administración
+                    </h1>
+                    <p class="text-muted mb-0">Gestiona todos los eventos del sistema</p>
+                </div>
+                <a asp-action="Create" class="btn-create">
+                    <i class="fas fa-plus-circle"></i> Crear Nuevo Evento
+                </a>
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="table-container">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Imagen</th>
+                                <th>Título</th>
+                                <th>Fecha</th>
+                                <th>Lugar</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                var evento = Model[i];
+                                <tr>
+                                    <td><strong>@(i + 1)</strong></td>
+                                    <td>
+                                        <img src="@evento.imagen" alt="@evento.titulo" class="event-img-thumb" />
+                                    </td>
+                                    <td>
+                                        <strong>@evento.titulo</strong>
+                                        <br />
+                                        <small class="text-muted">@(evento.descripcion.Length > 50 ? evento.descripcion.Substring(0, 50) + "..." : evento.descripcion)</small>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-calendar text-primary"></i>
+                                        @evento.fecha
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-map-marker-alt text-danger"></i>
+                                        @(evento.lugar.Length > 30 ? evento.lugar.Substring(0, 30) + "..." : evento.lugar)
+                                    </td>
+                                    <td>
+                                        @if (evento.vigente == 1)
+                                        {
+                                            <span class="badge-vigente">
+                                                <i class="fas fa-check"></i> Vigente
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-no-vigente">
+                                                <i class="fas fa-times"></i> No Vigente
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@i" class="btn-action btn-edit">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@i" class="btn-action btn-delete">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No hay eventos registrados</h3>
+                    <p>Comienza creando tu primer evento</p>
+                    <a asp-action="Create" class="btn-create mt-3">
+                        <i class="fas fa-plus-circle"></i> Crear Evento
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 text-center">
+            <a asp-controller="Home" asp-action="Index" class="text-white">
+                <i class="fas fa-arrow-left"></i> Volver a la página principal
+            </a>
+        </div>
+    </div>
+</div>

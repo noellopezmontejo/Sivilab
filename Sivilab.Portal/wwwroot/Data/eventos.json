@@ -1,13 +1,4 @@
-[
-  {
-    "vigente": 1,
-    "titulo": "prueba",
-    "imagen": "/Img/nombreimagen.jpg",
-    "fecha": "2025-11-15",
-    "lugar": "Ubicación del evento",
-    "descripcion": "Descripción completa...",
-    "liga": "https://tu-enlace.com"
-  },
+﻿[
   {
     "vigente": 0,
     "titulo": "Feria de Empleo Escuintla 2025",
@@ -88,5 +79,14 @@
     "lugar": "Centro de Convenciones el Carmén, Miguel Hidalgo s/n, Barrio de Santa Lucía, San Cristóbal de las Casas, Chiapas.",
     "descripcion": "La Feria Nacional de Empleo San Cristóbal de las Casas 2025 se consolida como el evento laboral más significativo de Los Altos de Chiapas, aprovechando la relevancia cultural, turística y académica de esta ciudad colonial Pueblo Mágico",
     "liga": "https://forms.office.com/r/5XqMjknYTr?origin=lprLink"
+  },
+  {
+    "vigente": 1,
+    "titulo": "prueba",
+    "imagen": "/Img/b73e5c2b-a22b-494c-b54a-0edf660e2014_309322.png",
+    "fecha": "2025-10-23",
+    "lugar": "en el centro",
+    "descripcion": "es una prueba",
+    "liga": "https://ejemplo.com"
   }
 ]
