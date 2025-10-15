@@ -48,6 +48,7 @@ namespace Sivilab.Models.Models.Eventos
 
         public int? NoPlazas { get; set; }
 
+
         public int? AtendidosH { get; set; }
 
         public int? AtendidosM { get; set; }
