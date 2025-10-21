@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Web.Http;
 
 namespace Sivilab.Models.Models
 {
@@ -31,38 +30,4 @@ namespace Sivilab.Models.Models
         public string? UsuarioRegistro { get; set; }
     }
 
-    [ApiController]
-    [Route("api/[controller]")]
-
-    public class UsuarioCurpController : ControllerBase
-    {
-        [HttpGet("{curp}")]
-        public ActionResult<UsuarioCrp> GetUsuarioByCurp(string curp)
-        {
-            // Aquí iría la lógica para obtener el usuario por CURP
-            // Por ahora, retornamos un ejemplo estático
-            var usuario = new UsuarioCrp
-            {
-                Curp = "1234567890",
-                Nombre = "Juan",
-                ApellidoPaterno = "Perez",
-                ApellidoMaterno = "Lopez",
-                FechaNacimiento = new DateTime(1990, 1, 1),
-                Genero = "Masculino",
-                EstadoNacimiento = "Jalisco",
-                Nacionalidad = "Mexicana",
-                EstadoResidencia = "Jalisco",
-                MunicipioResidencia = "Guadalajara",
-                CodigoPostal = "44100",
-                Calle = "Avenida Siempre Viva",
-                NumeroExterior = "123",
-                NumeroInterior = "A",
-                Colonia = "Centro",
-                Telefono = "3333333333",
-                CorreoElectronico = "JuanLopez@gmail.com",
-
-            };
-            return Ok(usuario);
-        }
-    }
 }
