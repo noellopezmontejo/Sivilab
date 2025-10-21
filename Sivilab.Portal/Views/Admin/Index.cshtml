@@ -5,7 +5,7 @@
 
 <style>
     body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(180deg, #2d6a5f 0%, #4a9b8e 100%);
         min-height: 100vh;
     }
 
@@ -25,7 +25,7 @@
     .admin-title {
         font-size: 2.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(180deg, #2d6a5f 0%, #4a9b8e 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
@@ -63,7 +63,7 @@
     }
 
         .table thead th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(180deg, #2d6a5f 0%, #4a9b8e 100%);
             color: white;
             border: none;
             font-weight: 700;
@@ -201,9 +201,14 @@
                     </h1>
                     <p class="text-muted mb-0">Gestiona todos los eventos del sistema</p>
                 </div>
-                <a asp-action="Create" class="btn-create">
-                    <i class="fas fa-plus-circle"></i> Crear Nuevo Evento
-                </a>
+                <div class="d-flex gap-2">
+                    <a asp-action="Create" class="btn-create">
+                        <i class="fas fa-plus-circle"></i> Crear Nuevo Evento
+                    </a>
+                    <a asp-controller="Login" asp-action="Logout" class="btn-create" style="background: linear-gradient(135deg, #e74c3c, #c0392b); box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
             </div>
         </div>
 

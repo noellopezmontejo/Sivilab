@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sivilab.Portal.Models;
 using Sivilab.Portal.Services;
+using Sivilab.Portal.Filters; // ⭐ NUEVO
 
 namespace Sivilab.Portal.Controllers
 {
+    [ServiceFilter(typeof(AdminAuthFilter))] // ⭐ NUEVO: Protege todo el controlador
     public class AdminController : Controller
     {
         private readonly EventoService _eventoService;
