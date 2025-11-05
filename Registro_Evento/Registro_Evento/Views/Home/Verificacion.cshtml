@@ -1,0 +1,245 @@
+﻿@{
+    ViewData["Title"] = "Verificación de Registro - EMPLEOTÓN CHIAPAS 2025";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10 col-md-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                    <h1 class="mb-0 text-center">
+                        <i class="fas fa-check-circle me-3"></i>
+                        VERIFICACIÓN DE REGISTRO
+                    </h1>
+                    <p class="text-center mb-0 mt-3 opacity-90 fs-6">
+                        EMPLEOTÓN CHIAPAS 2025 - Servicio Nacional de Empleo
+                    </p>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Mensaje de bienvenida y éxito -->
+                    <div class="alert border-0 mb-4" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);">
+                        <div class="text-center">
+                            <i class="fas fa-check-circle text-success" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <h3 class="text-success fw-bold mb-3">¡REGISTRO EXITOSO!</h3>
+                            <p class="mb-2">
+                                <strong>Bienvenido(a), @ViewBag.Nombre</strong>
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-ticket-alt me-2"></i>
+                                <strong>Folio de Registro:</strong> <span class="badge bg-primary fs-6">@ViewBag.Folio</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Instrucciones -->
+                    <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                        <div class="text-center">
+                            <i class="fas fa-envelope-open-text me-2" style="font-size: 2rem;"></i>
+                            <h5 class="fw-bold mt-2 mb-3">Código de Verificación Enviado</h5>
+                            <p class="mb-2">
+                                Hemos enviado un código de verificación de <strong>6 dígitos</strong> a:
+                            </p>
+                            <p class="mb-3">
+                                <i class="fas fa-envelope me-2"></i>
+                                <strong class="text-primary">@ViewBag.Email</strong>
+                            </p>
+                            <p class="mb-0 small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Por favor, revise su bandeja de entrada y la carpeta de correo no deseado (spam).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje de alerta/éxito dinámico -->
+                    <div id="alertMessage" class="alert alert-dismissible fade" role="alert" style="display: none;">
+                        <i id="alertIcon" class="me-2"></i>
+                        <span id="alertText"></span>
+                        <button type="button" class="btn-close" onclick="closeAlert()"></button>
+                    </div>
+
+                    <!-- Formulario -->
+                    <form id="verificacionForm" class="needs-validation" novalidate>
+                        <div class="card bg-light mb-4">
+                            <div class="card-body p-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-8">
+                                        <label for="codigoVerificacion" class="form-label fw-bold text-center d-block mb-3">
+                                            <i class="fas fa-key me-2 text-primary"></i>
+                                            INGRESE EL CÓDIGO DE VERIFICACIÓN
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <input type="text"
+                                               id="codigoVerificacion"
+                                               name="codigoVerificacion"
+                                               class="form-control form-control-lg text-center"
+                                               placeholder="000000"
+                                               maxlength="6"
+                                               style="font-size: 2rem; letter-spacing: 0.5rem; font-family: 'Courier New', monospace; font-weight: bold;"
+                                               required
+                                               pattern="[0-9]{6}" />
+
+                                        <div class="form-text text-center mt-2">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Código de 6 dígitos numéricos
+                                        </div>
+
+                                        <div class="invalid-feedback text-center">
+                                            Por favor ingrese un código de 6 dígitos.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none;">
+                                <i class="fas fa-check-circle me-2"></i>VERIFICAR CÓDIGO
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="#" class="text-decoration-none" onclick="reenviarCodigo(event)">
+                                <i class="fas fa-redo me-1"></i>
+                                ¿No recibiste el código? Reenviar
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Información adicional -->
+                    <div class="card border-warning mt-4">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-lightbulb me-2 text-warning"></i>
+                                Consejos para encontrar tu código:
+                            </h6>
+                            <ul class="mb-0">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Revisa tu bandeja de entrada y la carpeta de spam
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    El correo proviene de: noreply@empleotonchiapas.gob.mx
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    El código tiene una validez de 15 minutos
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Si no lo encuentras, puedes solicitar un reenvío
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botón para volver al inicio -->
+                    <div class="text-center mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Funciones de alerta
+        function showAlert(type, message) {
+            var alertDiv = document.getElementById('alertMessage');
+            var alertIcon = document.getElementById('alertIcon');
+            var alertText = document.getElementById('alertText');
+
+            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+
+            if (type === 'success') {
+                alertIcon.className = 'fas fa-check-circle me-2';
+            } else if (type === 'danger') {
+                alertIcon.className = 'fas fa-exclamation-triangle me-2';
+            } else if (type === 'warning') {
+                alertIcon.className = 'fas fa-exclamation-circle me-2';
+            } else {
+                alertIcon.className = 'fas fa-info-circle me-2';
+            }
+
+            alertText.textContent = message;
+            alertDiv.style.display = 'block';
+
+            // Auto-cerrar después de 5 segundos
+            setTimeout(function() {
+                closeAlert();
+            }, 5000);
+        }
+
+        function closeAlert() {
+            var alertDiv = document.getElementById('alertMessage');
+            alertDiv.style.display = 'none';
+        }
+
+        // Validación solo números en el campo de código
+        document.getElementById('codigoVerificacion').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Función para reenviar código
+        function reenviarCodigo(event) {
+            event.preventDefault();
+
+            if (confirm('¿Desea recibir un nuevo código de verificación?')) {
+                showAlert('success', 'Se ha enviado un nuevo código a su correo electrónico.');
+                // TODO: Implementar llamada AJAX al servidor para reenviar código
+            }
+        }
+
+        // Validación y submit del formulario
+        document.getElementById('verificacionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (this.checkValidity() === false) {
+                showAlert('danger', 'Por favor, ingrese un código de verificación válido de 6 dígitos.');
+            } else {
+                var codigo = document.getElementById('codigoVerificacion').value;
+
+                // Simulación de verificación (frontend only)
+                showAlert('success', '¡Código verificado correctamente! Registro completado con éxito.');
+
+                // Opcional: Redirigir después de unos segundos
+                setTimeout(function() {
+                    if (confirm('Su registro ha sido completado. ¿Desea volver al inicio?')) {
+                        window.location.href = '@Url.Action("Index", "Home")';
+                    }
+                }, 2000);
+
+                // TODO: Aquí irá la lógica real de verificación con el backend
+            }
+
+            this.classList.add('was-validated');
+        });
+
+        // Focus automático en el campo de código al cargar
+        window.addEventListener('load', function() {
+            document.getElementById('codigoVerificacion').focus();
+        });
+
+        // Validación del formulario con Bootstrap
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                }, false);
+            });
+        })();
+    </script>
+}

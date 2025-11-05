@@ -40,7 +40,7 @@
                         <button type="button" class="btn-close" onclick="closeAlert()"></button>
                     </div>
 
-                    <form id="empleotonForm" class="needs-validation" novalidate>
+                    <form id="empleotonForm" class="needs-validation" method="post" asp-action="ProcesarRegistro" asp-controller="Home" novalidate>
 
                         <!-- Sección 1: Datos Personales Básicos -->
                         <div class="section-header mb-4">
@@ -351,8 +351,85 @@
                                 <div class="invalid-feedback">Por favor ingrese el salario pretendido.</div>
                             </div>
                         </div>
+                        <!-- Sección 7: Datos de Acceso -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-key me-2"></i>Datos de Acceso
+                            </h4>
+                        </div>
 
-                        <!-- Sección 7: Términos y Condiciones -->
+                        <div class="card border-info mb-4">
+                            <div class="card-body">
+                                <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Se enviará un código de verificación al correo electrónico que proporcione para confirmar su identidad.</small>
+                                </div>
+
+                                <!-- Pregunta sobre correo -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-question-circle me-2 text-primary"></i>
+                                        20. ¿DESEA UTILIZAR EL MISMO CORREO ELECTRÓNICO REGISTRADO ANTERIORMENTE? <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="usarMismoCorreo" value="Si" id="mismoCorreoS" required />
+                                            <label class="form-check-label" for="mismoCorreoS">SÍ, USAR EL MISMO</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="usarMismoCorreo" value="No" id="mismoCorreoN" required />
+                                            <label class="form-check-label" for="mismoCorreoN">NO, USAR OTRO</label>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <!-- Correo de Acceso -->
+                                    <div class="col-12">
+                                        <label for="correoAcceso" class="form-label fw-bold">
+                                            <i class="fas fa-envelope me-2 text-primary"></i>21. CORREO ELECTRÓNICO PARA ACCESO <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" id="correoAcceso" name="correoAcceso" class="form-control"
+                                               placeholder="ejemplo@correo.com"
+                                               readonly
+                                               required />
+                                        <div class="form-text">
+                                            <i class="fas fa-shield-alt me-1"></i>Este correo será utilizado para enviar el código de verificación
+                                        </div>
+                                        <div class="invalid-feedback">Por favor ingrese un correo electrónico válido.</div>
+                                    </div>
+
+                                    <!-- Contraseña -->
+                                    <div class="col-md-6">
+                                        <label for="contrasena" class="form-label fw-bold">
+                                            <i class="fas fa-lock me-2 text-primary"></i>22. CONTRASEÑA <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="password" id="contrasena" name="contrasena" class="form-control"
+                                               placeholder="Ingrese su contraseña"
+                                               minlength="8"
+                                               required />
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Mínimo 8 caracteres
+                                        </div>
+                                        <div class="invalid-feedback">La contraseña debe tener al menos 8 caracteres.</div>
+                                    </div>
+
+                                    <!-- Confirmar Contraseña -->
+                                    <div class="col-md-6">
+                                        <label for="confirmarContrasena" class="form-label fw-bold">
+                                            <i class="fas fa-lock me-2 text-primary"></i>23. CONFIRMAR CONTRASEÑA <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="password" id="confirmarContrasena" name="confirmarContrasena" class="form-control"
+                                               placeholder="Confirme su contraseña"
+                                               minlength="8"
+                                               required />
+                                        <div class="invalid-feedback" id="confirmarContrasenaFeedback">Las contraseñas no coinciden.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sección 8: Términos y Condiciones -->
                         <div class="section-header mb-4">
                             <h4 class="text-primary border-bottom pb-2">
                                 <i class="fas fa-file-contract me-2"></i>Términos y Condiciones
@@ -364,7 +441,7 @@
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="aceptaTerminos" name="aceptaTerminos" required />
                                     <label class="form-check-label" for="aceptaTerminos">
-                                        <strong>20. DECLARO BAJO PROTESTA DE DECIR VERDAD</strong> que los datos contenidos en este registro son verdaderos.
+                                        <strong>24. DECLARO BAJO PROTESTA DE DECIR VERDAD</strong> que los datos contenidos en este registro son verdaderos.
                                         Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y de conformidad con lo señalado en el artículo 20,
                                         ambos de la "LEY GENERAL DE PROTECCIÓN DE DATOS PERSONALES EN POSESIÓN DE SUJETOS OBLIGADOS (LGPDPPSO)"
                                         expreso mi voluntad, específica e informada, para que se efectúe el tratamiento de mis datos personales por la OSNE.
@@ -375,7 +452,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="aceptaPrivacidad" name="aceptaPrivacidad" required />
                                     <label class="form-check-label" for="aceptaPrivacidad">
-                                        <strong>21. ACEPTO</strong> que la recolección de datos personales se lleva a cabo a través de la página electrónica
+                                        <strong>25. ACEPTO</strong> que la recolección de datos personales se lleva a cabo a través de la página electrónica
                                         del portal digital gubernamental cuyo administrador es la UNIDAD DEL SERVICIO NACIONAL DE EMPLEO (USNE).
                                     </label>
                                     <div class="invalid-feedback">Debe aceptar el tratamiento de datos personales.</div>
@@ -505,31 +582,107 @@
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
         });
 
-        // Validación del formulario
+        // Manejo de correo de acceso
+        var correoContacto = document.getElementById('correoElectronico');
+        var correoAcceso = document.getElementById('correoAcceso');
+        var mismoCorreoS = document.getElementById('mismoCorreoS');
+        var mismoCorreoN = document.getElementById('mismoCorreoN');
+
+        mismoCorreoS.addEventListener('change', function() {
+            if (this.checked) {
+                correoAcceso.value = correoContacto.value;
+                correoAcceso.readOnly = true;
+                correoAcceso.classList.add('bg-light');
+            }
+        });
+
+        mismoCorreoN.addEventListener('change', function() {
+            if (this.checked) {
+                correoAcceso.value = '';
+                correoAcceso.readOnly = false;
+                correoAcceso.classList.remove('bg-light');
+                correoAcceso.focus();
+            }
+        });
+
+        correoContacto.addEventListener('input', function() {
+            if (mismoCorreoS.checked) {
+                correoAcceso.value = this.value;
+            }
+        });
+
+        correoAcceso.addEventListener('blur', function() {
+            var email = this.value;
+            var patronEmail = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            
+            if (email && patronEmail.test(email)) {
+                showAlert('success', 'Correo electrónico válido. Se enviará un código de verificación a esta dirección.');
+            } else if (email) {
+                showAlert('warning', 'Por favor ingrese un correo electrónico válido para recibir el código de verificación.');
+            }
+        });
+
+        // Validación de contraseñas
+        var contrasena = document.getElementById('contrasena');
+        var confirmarContrasena = document.getElementById('confirmarContrasena');
+        var confirmarContrasenaFeedback = document.getElementById('confirmarContrasenaFeedback');
+
+        function validarContrasenas() {
+            if (contrasena.value && confirmarContrasena.value) {
+                if (contrasena.value !== confirmarContrasena.value) {
+                    confirmarContrasena.setCustomValidity('Las contraseñas no coinciden');
+                    confirmarContrasenaFeedback.textContent = 'Las contraseñas no coinciden.';
+                    return false;
+                } else {
+                    confirmarContrasena.setCustomValidity('');
+                    confirmarContrasenaFeedback.textContent = '';
+                    return true;
+                }
+            }
+        }
+
+        contrasena.addEventListener('input', validarContrasenas);
+        confirmarContrasena.addEventListener('input', validarContrasenas);
+
+        confirmarContrasena.addEventListener('blur', function() {
+            if (validarContrasenas() && contrasena.value && confirmarContrasena.value) {
+                showAlert('success', 'Las contraseñas coinciden correctamente.');
+            }
+        });
+
+                // Validación del formulario
         document.getElementById('empleotonForm').addEventListener('submit', function(event) {
             event.preventDefault();
             event.stopPropagation();
 
-            if (this.checkValidity() === false) {
-                showAlert('danger', 'Por favor, complete todos los campos requeridos correctamente.');
-            } else {
-                // Simular envío exitoso
-                var folio = 'EMP-2025-' + Math.floor(Math.random() * 900000 + 100000);
-                var nombre = document.getElementById('nombreCompleto').value;
-                var email = document.getElementById('correoElectronico').value;
-
-                showAlert('success', 'Registro exitoso para ' + nombre + '. Folio: ' + folio + '. Confirmación enviada a ' + email);
-
-                // Opcional: limpiar formulario
-                setTimeout(function() {
-                    if (confirm('¿Desea registrar otra persona?')) {
-                        document.getElementById('empleotonForm').reset();
-                        document.getElementById('empleotonForm').classList.remove('was-validated');
-                    }
-                }, 2000);
+            // Validar que se haya seleccionado una opción de correo
+            if (!mismoCorreoS.checked && !mismoCorreoN.checked) {
+                showAlert('danger', 'Por favor, indique si desea usar el mismo correo o uno diferente.');
+                this.classList.add('was-validated');
+                return;
             }
 
-            this.classList.add('was-validated');
+            // Validar correo de acceso
+            if (!correoAcceso.value) {
+                showAlert('danger', 'Por favor, proporcione un correo electrónico para acceso.');
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Validar contraseñas
+            if (!validarContrasenas()) {
+                showAlert('danger', 'Las contraseñas no coinciden. Por favor verifique.');
+                this.classList.add('was-validated');
+                return;
+            }
+
+            if (this.checkValidity() === false) {
+                showAlert('danger', 'Por favor, complete todos los campos requeridos correctamente.');
+                this.classList.add('was-validated');
+            } else {
+                // Enviar el formulario al servidor
+                this.submit();
+            }
         });
     </script>
 }

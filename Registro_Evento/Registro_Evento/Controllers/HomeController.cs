@@ -71,5 +71,41 @@ namespace Registro_Evento.Controllers
         {
             return View();
         }
+
+        // Acción para mostrar el formulario de registro
+        public IActionResult Registro()
+        {
+            return View();
+        }
+
+        // Acción simple para redirigir a verificación (sin lógica de backend por ahora)
+        [HttpPost]
+        public IActionResult ProcesarRegistro(IFormCollection form)
+        {
+            // Solo obtener datos básicos del formulario
+            string nombreCompleto = form["nombreCompleto"];
+            string correoElectronico = form["correoAcceso"];
+
+            // Generar folio de ejemplo
+            string folio = "EMP-2025-" + new Random().Next(100000, 999999).ToString();
+
+            // Redirigir a la página de verificación
+            return RedirectToAction("Verificacion", new
+            {
+                email = correoElectronico,
+                nombre = nombreCompleto,
+                folio = folio
+            });
+        }
+
+        // Acción para mostrar la página de verificación
+        public IActionResult Verificacion(string email, string nombre, string folio)
+        {
+            ViewBag.Email = email;
+            ViewBag.Nombre = nombre;
+            ViewBag.Folio = folio;
+
+            return View();
+        }
     }
 }
