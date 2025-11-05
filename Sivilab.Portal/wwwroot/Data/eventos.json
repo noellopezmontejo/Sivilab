@@ -82,11 +82,20 @@
   },
   {
     "vigente": 1,
-    "titulo": "prueba",
-    "imagen": "/Img/b73e5c2b-a22b-494c-b54a-0edf660e2014_309322.png",
+    "titulo": "Feria Nacional de Empleo para Grupos Vulnerables Tuxtla 2025",
+    "imagen": "/Img/Feria_Tutla_Octubre_2025.jpeg",
     "fecha": "2025-10-23",
-    "lugar": "en el centro",
-    "descripcion": "es una prueba",
-    "liga": "https://ejemplo.com"
+    "lugar": "Expo convenciones Chiapas, Blvd. de los castillos, No. 410, Col. Montes Azules, Tuxtla Gutiérrez, Chiapas, C.P. 29020",
+    "descripcion": "Esta feria forma parte de una estrategia nacional más amplia del Plan México, que busca crear empleos formales con condiciones laborales dignas y seguras.",
+    "liga": "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UMDhKNDIzTExQRU9NQUI3RzdLVTA0NE44MS4u&origin=QRCode"
+  },
+  {
+    "vigente": 1,
+    "titulo": "Feria Nacional de Empleo para Grupos Vulnerables Comitán 2025",
+    "imagen": "/Img/Feria_comitan_Octubre_2025.jpeg",
+    "fecha": "2025-10-23",
+    "lugar": "Salón las Flores, Blvd. las Bugambilias, No. 801, Fracc. Las Flores, Comitán, Chiapas.",
+    "descripcion": "Esta feria forma parte de una estrategia nacional más amplia del Plan México, que busca crear empleos formales con condiciones laborales dignas y seguras.",
+    "liga": "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAYAAA3Dl_9UMDhKNDIzTExQRU9NQUI3RzdLVTA0NE44MS4u&origin=QRCode"
   }
 ]
