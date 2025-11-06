@@ -1,0 +1,839 @@
+﻿@page "/emploton"
+@page "/emploton/{CurpInicial}"
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+
+<PageTitle>EMPLEOTÓN CHIAPAS 2025</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                    <h1 class="mb-0 text-center">
+                        <i class="fas fa-briefcase me-3"></i>
+                        EMPLEOTÓN CHIAPAS 2025
+                    </h1>
+                    <p class="text-center mb-0 mt-3 opacity-90 fs-6">
+                        Sistema de Registro para Buscadores de Empleo - Servicio Nacional de Empleo Chiapas
+                    </p>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Mensaje de bienvenida -->
+                    <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Estimado buscador de empleo,</strong> la Secretaría de Economía y del Trabajo a través del Servicio Nacional de Empleo Chiapas,
+                        te invita a postularte en el EMPLEOTÓN 2025. ¡Regístrate! Todos nuestros servicios son gratuitos.
+                    </div>
+
+                    <!-- Nota de privacidad -->
+                    <div class="alert alert-warning border-0 mb-4" style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <small>
+                            <strong>Aviso de Privacidad:</strong> Cuando envíe este formulario, no recopilará automáticamente sus detalles,
+                            como el nombre y la dirección de correo electrónico, a menos que lo proporcione usted mismo.
+                        </small>
+                    </div>
+
+                    <!-- Mensaje de éxito/error -->
+                    @if (!string.IsNullOrEmpty(mensaje))
+                    {
+                        <div class="alert @GetAlertClass() alert-dismissible fade show" role="alert">
+                            <i class="fas @GetAlertIcon() me-2"></i>
+                            @mensaje
+                            <button type="button" class="btn-close" @onclick="CerrarAlerta"></button>
+                        </div>
+                    }
+
+                    <EditForm Model="@formulario" OnValidSubmit="EnviarFormulario" FormName="EmpleotonForm">
+                        <DataAnnotationsValidator />
+
+                        <!-- Sección 1: Datos Personales Básicos -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-user me-2"></i>Datos Personales Básicos
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- CURP -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-id-card me-2 text-primary"></i>1. CURP <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.Curp"
+                                           @oninput="OnCurpInput"
+                                           class="form-control text-uppercase"
+                                           placeholder="Ingrese su CURP"
+                                           maxlength="18"
+                                           style="font-family: 'Courier New', monospace; letter-spacing: 1px;"
+                                           disabled="@(!string.IsNullOrEmpty(CurpInicial))" />
+                                <ValidationMessage For="@(() => formulario.Curp)" class="text-danger" />
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>18 caracteres alfanuméricos
+                                </div>
+                            </div>
+
+                            <!-- Nombre Completo -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user-tag me-2 text-primary"></i>2. NOMBRE COMPLETO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.NombreCompleto"
+                                           class="form-control"
+                                           placeholder="Nombre completo" />
+                                <ValidationMessage For="@(() => formulario.NombreCompleto)" class="text-danger" />
+                            </div>
+
+                            <!-- Género -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-venus-mars me-2 text-primary"></i>3. GÉNERO <span class="text-danger">*</span>
+                                </label>
+                                <InputRadioGroup @bind-Value="formulario.Genero">
+                                    <div class="mt-2">
+                                        <div class="form-check">
+                                            <InputRadio Value="@("Masculino")" class="form-check-input" id="generoM" />
+                                            <label class="form-check-label" for="generoM">MASCULINO</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <InputRadio Value="@("Femenino")" class="form-check-input" id="generoF" />
+                                            <label class="form-check-label" for="generoF">FEMENINO</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <InputRadio Value="@("No Binario")" class="form-check-input" id="generoNB" />
+                                            <label class="form-check-label" for="generoNB">NO BINARIO</label>
+                                        </div>
+                                    </div>
+                                </InputRadioGroup>
+                                <ValidationMessage For="@(() => formulario.Genero)" class="text-danger" />
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-2 text-primary"></i>4. FECHA DE NACIMIENTO <span class="text-danger">*</span>
+                                </label>
+                                <InputDate @bind-Value="formulario.FechaNacimiento" class="form-control" />
+                                <ValidationMessage For="@(() => formulario.FechaNacimiento)" class="text-danger" />
+                            </div>
+
+                            <!-- Lugar de Nacimiento -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>5. LUGAR DE NACIMIENTO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.LugarNacimiento"
+                                           class="form-control"
+                                           placeholder="Ciudad, Estado" />
+                                <ValidationMessage For="@(() => formulario.LugarNacimiento)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Programa Jóvenes Construyendo el Futuro -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                                    6. ¿ERES EGRESADO DEL PROGRAMA DE JÓVENES CONSTRUYENDO EL FUTURO? <span class="text-danger">*</span>
+                                </label>
+                                <InputRadioGroup @bind-Value="formulario.EsEgresadoJovenes">
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <InputRadio Value="@("Si")" class="form-check-input" id="jovenesS" />
+                                            <label class="form-check-label" for="jovenesS">SÍ</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <InputRadio Value="@("No")" class="form-check-input" id="jovenesN" />
+                                            <label class="form-check-label" for="jovenesN">NO</label>
+                                        </div>
+                                    </div>
+                                </InputRadioGroup>
+                                <ValidationMessage For="@(() => formulario.EsEgresadoJovenes)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Datos de Contacto -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-address-book me-2"></i>Datos de Contacto
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Teléfono -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-phone me-2 text-primary"></i>7. TELÉFONO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.Telefono"
+                                           class="form-control"
+                                           placeholder="Ej: 961-123-4567" />
+                                <ValidationMessage For="@(() => formulario.Telefono)" class="text-danger" />
+                            </div>
+
+                            <!-- Correo Electrónico -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>8. CORREO ELECTRÓNICO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.CorreoElectronico"
+                                           @oninput="OnCorreoContactoInput"
+                                           type="email"
+                                           class="form-control"
+                                           placeholder="ejemplo@correo.com" />
+                                <ValidationMessage For="@(() => formulario.CorreoElectronico)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Sección 3: Dirección -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-home me-2"></i>Dirección
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-city me-2 text-primary"></i>9. MUNICIPIO Y ESTADO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.MunicipioEstado"
+                                           class="form-control"
+                                           placeholder="Municipio, Estado" />
+                                <ValidationMessage For="@(() => formulario.MunicipioEstado)" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-mail-bulk me-2 text-primary"></i>10. CÓDIGO POSTAL <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.CodigoPostal"
+                                           @oninput="OnCodigoPostalInput"
+                                           class="form-control"
+                                           placeholder="00000"
+                                           maxlength="5" />
+                                <ValidationMessage For="@(() => formulario.CodigoPostal)" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-map-signs me-2 text-primary"></i>11. COLONIA <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.Colonia"
+                                           class="form-control"
+                                           placeholder="Nombre de la colonia" />
+                                <ValidationMessage For="@(() => formulario.Colonia)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Sección 4: Formación Académica -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-graduation-cap me-2"></i>Formación Académica
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-school me-2 text-primary"></i>12. NIVEL DE ESTUDIOS <span class="text-danger">*</span>
+                                </label>
+                                <InputSelect @bind-Value="formulario.NivelEstudios" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="Primaria">Primaria</option>
+                                    <option value="Secundaria">Secundaria</option>
+                                    <option value="Preparatoria">Preparatoria</option>
+                                    <option value="Técnico">Técnico</option>
+                                    <option value="Licenciatura">Licenciatura</option>
+                                    <option value="Maestría">Maestría</option>
+                                    <option value="Doctorado">Doctorado</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => formulario.NivelEstudios)" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-certificate me-2 text-primary"></i>13. CARRERA O ESPECIALIDAD <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.CarreraEspecialidad"
+                                           class="form-control"
+                                           placeholder="Ej: Ing. en Sistemas, Contabilidad..." />
+                                <ValidationMessage For="@(() => formulario.CarreraEspecialidad)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Sección 5: Experiencia Laboral -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-briefcase me-2"></i>Experiencia Laboral
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-history me-2 text-primary"></i>14. EXPERIENCIA LABORAL <span class="text-danger">*</span>
+                                </label>
+                                <InputTextArea @bind-Value="formulario.ExperienciaLaboral"
+                                               class="form-control"
+                                               rows="3"
+                                               placeholder="Describa brevemente su experiencia laboral..." />
+                                <ValidationMessage For="@(() => formulario.ExperienciaLaboral)" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user-tie me-2 text-primary"></i>15. PUESTOS DE TRABAJO QUE HA TENIDO <span class="text-danger">*</span>
+                                </label>
+                                <InputTextArea @bind-Value="formulario.PuestosTrabajo"
+                                               class="form-control"
+                                               rows="3"
+                                               placeholder="Liste los puestos que ha desempeñado..." />
+                                <ValidationMessage For="@(() => formulario.PuestosTrabajo)" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-clock me-2 text-primary"></i>16. AÑOS DE EXPERIENCIA <span class="text-danger">*</span>
+                                </label>
+                                <InputSelect @bind-Value="formulario.AniosExperiencia" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="Sin experiencia">Sin experiencia</option>
+                                    <option value="Menos de 1 año">Menos de 1 año</option>
+                                    <option value="1-2 años">1-2 años</option>
+                                    <option value="3-5 años">3-5 años</option>
+                                    <option value="6-10 años">6-10 años</option>
+                                    <option value="Más de 10 años">Más de 10 años</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => formulario.AniosExperiencia)" class="text-danger" />
+
+                                <div class="mt-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-language me-2 text-primary"></i>17. DOMINIO DE OTRO IDIOMA <span class="text-danger">*</span>
+                                    </label>
+                                    <InputText @bind-Value="formulario.DominioIdioma"
+                                               class="form-control"
+                                               placeholder="Ej: Inglés - Intermedio, Ninguno" />
+                                    <ValidationMessage For="@(() => formulario.DominioIdioma)" class="text-danger" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 6: Aspiraciones Laborales -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-target me-2"></i>Aspiraciones Laborales
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-star me-2 text-primary"></i>18. PUESTO DESEADO <span class="text-danger">*</span>
+                                </label>
+                                <InputTextArea @bind-Value="formulario.PuestoDeseado"
+                                               class="form-control"
+                                               rows="3"
+                                               placeholder="Describa el puesto o área en la que le gustaría trabajar..." />
+                                <ValidationMessage For="@(() => formulario.PuestoDeseado)" class="text-danger" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-dollar-sign me-2 text-primary"></i>19. SALARIO PRETENDIDO <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <InputNumber @bind-Value="formulario.SalarioPretendido"
+                                                 class="form-control"
+                                                 placeholder="0.00"
+                                                 step="0.01" />
+                                    <span class="input-group-text">MXN</span>
+                                </div>
+                                <div class="form-text">Salario mensual deseado</div>
+                                <ValidationMessage For="@(() => formulario.SalarioPretendido)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Sección 7: Datos de Acceso -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-key me-2"></i>Datos de Acceso
+                            </h4>
+                        </div>
+
+                        <div class="card border-info mb-4">
+                            <div class="card-body">
+                                <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Se enviará un código de verificación al correo electrónico que proporcione para confirmar su identidad.</small>
+                                </div>
+
+                                <!-- Pregunta sobre correo -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-question-circle me-2 text-primary"></i>
+                                        20. ¿DESEA UTILIZAR EL MISMO CORREO ELECTRÓNICO REGISTRADO ANTERIORMENTE? <span class="text-danger">*</span>
+                                    </label>
+                                    <InputRadioGroup @bind-Value="formulario.UsarMismoCorreo">
+                                        <div class="mt-2">
+                                            <div class="form-check form-check-inline">
+                                                <InputRadio Value="@("Si")" class="form-check-input" id="mismoCorreoS" @onclick="@(() => UsarMismoCorreo(true))" />
+                                                <label class="form-check-label" for="mismoCorreoS">SÍ, USAR EL MISMO</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <InputRadio Value="@("No")" class="form-check-input" id="mismoCorreoN" @onclick="@(() => UsarMismoCorreo(false))" />
+                                                <label class="form-check-label" for="mismoCorreoN">NO, USAR OTRO</label>
+                                            </div>
+                                        </div>
+                                    </InputRadioGroup>
+                                    <ValidationMessage For="@(() => formulario.UsarMismoCorreo)" class="text-danger" />
+                                </div>
+
+                                <div class="row g-3">
+                                    <!-- Correo de Acceso -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-envelope me-2 text-primary"></i>21. CORREO ELECTRÓNICO PARA ACCESO <span class="text-danger">*</span>
+                                        </label>
+                                        <InputText @bind-Value="formulario.CorreoAcceso"
+                                                   type="email"
+                                                   class="@GetCorreoAccesoClass()"
+                                                   placeholder="ejemplo@correo.com"
+                                                   readonly="@correoAccesoReadOnly" />
+                                        <div class="form-text">
+                                            <i class="fas fa-shield-alt me-1"></i>Este correo será utilizado para enviar el código de verificación
+                                        </div>
+                                        <ValidationMessage For="@(() => formulario.CorreoAcceso)" class="text-danger" />
+                                    </div>
+
+                                    <!-- Contraseña -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-lock me-2 text-primary"></i>22. CONTRASEÑA <span class="text-danger">*</span>
+                                        </label>
+                                        <InputText @bind-Value="formulario.Contrasena"
+                                                   type="password"
+                                                   class="form-control"
+                                                   placeholder="Ingrese su contraseña"
+                                                   @oninput="ValidarContrasenas" />
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Mínimo 8 caracteres
+                                        </div>
+                                        <ValidationMessage For="@(() => formulario.Contrasena)" class="text-danger" />
+                                    </div>
+
+                                    <!-- Confirmar Contraseña -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-lock me-2 text-primary"></i>23. CONFIRMAR CONTRASEÑA <span class="text-danger">*</span>
+                                        </label>
+                                        <InputText @bind-Value="formulario.ConfirmarContrasena"
+                                                   type="password"
+                                                   class="form-control"
+                                                   placeholder="Confirme su contraseña"
+                                                   @oninput="ValidarContrasenas" />
+                                        @if (!string.IsNullOrEmpty(mensajeContrasena))
+                                        {
+                                            <div class="@(contrasenasCoinciden ? "text-success" : "text-danger") mt-1">
+                                                @mensajeContrasena
+                                            </div>
+                                        }
+                                        <ValidationMessage For="@(() => formulario.ConfirmarContrasena)" class="text-danger" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 8: Términos y Condiciones -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-file-contract me-2"></i>Términos y Condiciones
+                            </h4>
+                        </div>
+
+                        <div class="card border-warning mb-4">
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <InputCheckbox @bind-Value="formulario.AceptaTerminos" class="form-check-input" id="aceptaTerminos" />
+                                    <label class="form-check-label" for="aceptaTerminos">
+                                        <strong>24. DECLARO BAJO PROTESTA DE DECIR VERDAD</strong> que los datos contenidos en este registro son verdaderos.
+                                        Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y de conformidad con lo señalado en el artículo 20,
+                                        ambos de la "LEY GENERAL DE PROTECCIÓN DE DATOS PERSONALES EN POSESIÓN DE SUJETOS OBLIGADOS (LGPDPPSO)"
+                                        expreso mi voluntad, específica e informada, para que se efectúe el tratamiento de mis datos personales por la OSNE.
+                                    </label>
+                                    <ValidationMessage For="@(() => formulario.AceptaTerminos)" class="text-danger" />
+                                </div>
+
+                                <div class="form-check">
+                                    <InputCheckbox @bind-Value="formulario.AceptaPrivacidad" class="form-check-input" id="aceptaPrivacidad" />
+                                    <label class="form-check-label" for="aceptaPrivacidad">
+                                        <strong>25. ACEPTO</strong> que la recolección de datos personales se lleva a cabo a través de la página electrónica
+                                        del portal digital gubernamental cuyo administrador es la UNIDAD DEL SERVICIO NACIONAL DE EMPLEO (USNE).
+                                    </label>
+                                    <ValidationMessage For="@(() => formulario.AceptaPrivacidad)" class="text-danger" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de Envío -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;">
+                                <i class="fas fa-paper-plane me-2"></i>ENVIAR REGISTRO
+                            </button>
+                        </div>
+
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información adicional -->
+<div class="mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>¿Qué es el EMPLEOTÓN?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        El <strong>EMPLEOTÓN CHIAPAS 2025</strong> es una iniciativa del Servicio Nacional de Empleo
+                        que conecta a buscadores de empleo con oportunidades laborales en todo el estado de Chiapas.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Servicios gratuitos</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Vinculación laboral directa</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Oportunidades en diversos sectores</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Protección de Datos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        Tus datos personales están protegidos bajo la <strong>LGPDPPSO</strong> y serán utilizados
+                        exclusivamente para fines de vinculación laboral.
+                    </p>
+                    <p class="mb-0">
+                        <a href="/privacy" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>Ver Aviso de Privacidad Integral
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? CurpInicial { get; set; }
+
+    [SupplyParameterFromForm]
+    private EmpleotonModel formulario { get; set; } = new();
+    
+    private string mensaje = string.Empty;
+    private string tipoMensaje = string.Empty;
+    private bool correoAccesoReadOnly = false;
+    private string mensajeContrasena = string.Empty;
+    private bool contrasenasCoinciden = false;
+
+    protected override void OnInitialized()
+    {
+        // Inicialización si es necesaria
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Solo auto-llenar si el formulario está vacío (primera carga)
+        if (!string.IsNullOrEmpty(CurpInicial) && string.IsNullOrEmpty(formulario.Curp))
+        {
+            formulario.Curp = CurpInicial.ToUpper();
+            AutoLlenarDesdeCurp();
+        }
+    }
+
+    private void OnCurpInput(ChangeEventArgs e)
+    {
+        var valor = e.Value?.ToString() ?? "";
+        formulario.Curp = valor.ToUpper();
+        
+        if (formulario.Curp.Length == 18)
+        {
+            ValidarCurp();
+        }
+    }
+
+    private void ValidarCurp()
+    {
+        var patron = @"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$";
+        if (System.Text.RegularExpressions.Regex.IsMatch(formulario.Curp, patron))
+        {
+            MostrarMensaje("success", "CURP válida");
+            AutoLlenarDesdeCurp();
+        }
+        else
+        {
+            MostrarMensaje("danger", "CURP no válida. Verifique el formato.");
+        }
+    }
+
+    private void AutoLlenarDesdeCurp()
+    {
+        if (formulario.Curp.Length >= 11)
+        {
+            // Auto-llenar género desde CURP
+            char sexo = formulario.Curp[10];
+            formulario.Genero = sexo == 'H' ? "Masculino" : sexo == 'M' ? "Femenino" : "";
+
+            // Auto-llenar fecha de nacimiento
+            try
+            {
+                int año = int.Parse(formulario.Curp.Substring(4, 2));
+                int mes = int.Parse(formulario.Curp.Substring(6, 2));
+                int dia = int.Parse(formulario.Curp.Substring(8, 2));
+                año += (año > DateTime.Now.Year % 100) ? 1900 : 2000;
+                formulario.FechaNacimiento = new DateTime(año, mes, dia);
+            }
+            catch { }
+        }
+    }
+
+    private void OnCodigoPostalInput(ChangeEventArgs e)
+    {
+        var valor = e.Value?.ToString() ?? "";
+        // Solo permitir números
+        formulario.CodigoPostal = new string(valor.Where(char.IsDigit).ToArray());
+        if (formulario.CodigoPostal.Length > 5)
+        {
+            formulario.CodigoPostal = formulario.CodigoPostal.Substring(0, 5);
+        }
+    }
+
+    private void OnCorreoContactoInput(ChangeEventArgs e)
+    {
+        formulario.CorreoElectronico = e.Value?.ToString() ?? "";
+        
+        // Si está seleccionado "usar mismo correo", actualizar automáticamente
+        if (formulario.UsarMismoCorreo == "Si")
+        {
+            formulario.CorreoAcceso = formulario.CorreoElectronico;
+        }
+    }
+
+    private void UsarMismoCorreo(bool usar)
+    {
+        if (usar)
+        {
+            formulario.CorreoAcceso = formulario.CorreoElectronico;
+            correoAccesoReadOnly = true;
+        }
+        else
+        {
+            formulario.CorreoAcceso = string.Empty;
+            correoAccesoReadOnly = false;
+        }
+        StateHasChanged();
+    }
+
+    private void ValidarContrasenas()
+    {
+        if (!string.IsNullOrEmpty(formulario.Contrasena) && !string.IsNullOrEmpty(formulario.ConfirmarContrasena))
+        {
+            if (formulario.Contrasena == formulario.ConfirmarContrasena)
+            {
+                contrasenasCoinciden = true;
+                mensajeContrasena = "✓ Las contraseñas coinciden correctamente.";
+            }
+            else
+            {
+                contrasenasCoinciden = false;
+                mensajeContrasena = "✗ Las contraseñas no coinciden.";
+            }
+        }
+        else
+        {
+            mensajeContrasena = string.Empty;
+            contrasenasCoinciden = false;
+        }
+    }
+
+    private string GetAlertClass()
+    {
+        return tipoMensaje switch
+        {
+            "success" => "alert-success",
+            "warning" => "alert-warning",
+            "danger" => "alert-danger",
+            _ => "alert-info"
+        };
+    }
+
+    private string GetAlertIcon()
+    {
+        return tipoMensaje switch
+        {
+            "success" => "fa-check-circle",
+            "warning" => "fa-exclamation-circle",
+            "danger" => "fa-exclamation-triangle",
+            _ => "fa-info-circle"
+        };
+    }
+
+    private void MostrarMensaje(string tipo, string msg)
+    {
+        tipoMensaje = tipo;
+        mensaje = msg;
+        StateHasChanged();
+
+        // Auto-cerrar después de 5 segundos
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(5000);
+            mensaje = string.Empty;
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void CerrarAlerta()
+    {
+        mensaje = string.Empty;
+    }
+
+private async Task EnviarFormulario()
+{
+    // Validaciones adicionales antes de enviar
+    if (string.IsNullOrEmpty(formulario.UsarMismoCorreo))
+    {
+        MostrarMensaje("danger", "Por favor, indique si desea usar el mismo correo o uno diferente.");
+        return;
+    }
+
+    if (string.IsNullOrEmpty(formulario.CorreoAcceso))
+    {
+        MostrarMensaje("danger", "Por favor, proporcione un correo electrónico para acceso.");
+        return;
+    }
+
+    if (formulario.Contrasena != formulario.ConfirmarContrasena)
+    {
+        MostrarMensaje("danger", "Las contraseñas no coinciden. Por favor verifique.");
+        return;
+    }
+
+    // Generar un folio de prueba
+    var folio = "EMP-2025-" + new Random().Next(100000, 999999);
+    
+    // Redirigir directamente a la página de verificación
+    Navigation.NavigateTo($"/verificacion/{folio}?nombre={Uri.EscapeDataString(formulario.NombreCompleto)}&email={Uri.EscapeDataString(formulario.CorreoAcceso)}");
+}
+    private string GetCorreoAccesoClass()
+{
+    return correoAccesoReadOnly ? "form-control bg-light" : "form-control";
+}
+    public class EmpleotonModel
+    {
+        [Required(ErrorMessage = "La CURP es obligatoria")]
+        [StringLength(18, MinimumLength = 18, ErrorMessage = "La CURP debe tener 18 caracteres")]
+        [RegularExpression(@"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$", ErrorMessage = "Formato de CURP inválido")]
+        public string Curp { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nombre completo es obligatorio")]
+        public string NombreCompleto { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El género es obligatorio")]
+        public string Genero { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
+        public DateTime? FechaNacimiento { get; set; }
+
+        [Required(ErrorMessage = "El lugar de nacimiento es obligatorio")]
+        public string LugarNacimiento { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Este campo es obligatorio")]
+        public string EsEgresadoJovenes { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El teléfono es obligatorio")]
+        public string Telefono { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
+        [EmailAddress(ErrorMessage = "Ingrese un correo válido")]
+        public string CorreoElectronico { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El municipio y estado son obligatorios")]
+        public string MunicipioEstado { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El código postal es obligatorio")]
+        [StringLength(5, MinimumLength = 5, ErrorMessage = "El código postal debe tener 5 dígitos")]
+        [RegularExpression(@"^\d{5}$", ErrorMessage = "El código postal debe contener solo números")]
+        public string CodigoPostal { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La colonia es obligatoria")]
+        public string Colonia { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nivel de estudios es obligatorio")]
+        public string NivelEstudios { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La carrera o especialidad es obligatoria")]
+        public string CarreraEspecialidad { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La experiencia laboral es obligatoria")]
+        public string ExperienciaLaboral { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Los puestos de trabajo son obligatorios")]
+        public string PuestosTrabajo { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Los años de experiencia son obligatorios")]
+        public string AniosExperiencia { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El dominio de idioma es obligatorio")]
+        public string DominioIdioma { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El puesto deseado es obligatorio")]
+        public string PuestoDeseado { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El salario pretendido es obligatorio")]
+        [Range(1, double.MaxValue, ErrorMessage = "Ingrese un salario válido mayor a 0")]
+        public decimal? SalarioPretendido { get; set; }
+
+        [Required(ErrorMessage = "Debe indicar si desea usar el mismo correo")]
+        public string UsarMismoCorreo { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo de acceso es obligatorio")]
+        [EmailAddress(ErrorMessage = "Ingrese un correo válido")]
+        public string CorreoAcceso { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        public string Contrasena { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Debe confirmar la contraseña")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        [Compare(nameof(Contrasena), ErrorMessage = "Las contraseñas no coinciden")]
+        public string ConfirmarContrasena { get; set; } = string.Empty;
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Debe aceptar los términos y condiciones")]
+        public bool AceptaTerminos { get; set; }
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Debe aceptar el tratamiento de datos personales")]
+        public bool AceptaPrivacidad { get; set; }
+    }
+}

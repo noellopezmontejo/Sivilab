@@ -1,7 +1,163 @@
 ﻿@page "/"
+@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Validador de CURP</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0 text-center">
+                        <i class="fas fa-id-card me-2"></i>
+                        Validador de CURP
+                    </h2>
+                    <p class="text-center mb-0 mt-2 opacity-75">
+                        Sistema profesional de validación de Clave Única de Registro de Población
+                    </p>
+                </div>
+                <div class="card-body">
 
-Welcome to your new app.
+                    @if (!string.IsNullOrEmpty(mensaje))
+                    {
+                        <div class="alert @(tipoMensaje == "success" ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                            <i class="fas @(tipoMensaje == "success" ? "fa-check-circle" : "fa-exclamation-triangle") me-2"></i>
+                            @mensaje
+                            <button type="button" class="btn-close" @onclick="CerrarAlerta"></button>
+                        </div>
+                    }
+
+                    <EditForm Model="@curpModel" OnValidSubmit="ValidarCurp" FormName="CurpValidatorForm">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user-tag me-2 text-primary"></i>Ingrese su CURP:
+                            </label>
+                            <InputText @bind-Value="curpModel.Curp"
+                                       class="form-control form-control-lg text-uppercase"
+                                       placeholder="Ej: ABCD123456HDFGHI09"
+                                       maxlength="18"
+                                       style="letter-spacing: 2px; font-family: 'Courier New', monospace;"
+                                       autocomplete="off" />
+                            <ValidationMessage For="@(() => curpModel.Curp)" class="text-danger" />
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                La CURP debe tener exactamente 18 caracteres alfanuméricos
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled="@estaValidando">
+                                @if (estaValidando)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Validando...</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-search me-2"></i>
+                                    <span>Validar CURP</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-question-circle me-2"></i>¿Qué es la CURP?
+            </h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-2">
+                La <strong>Clave Única de Registro de Población (CURP)</strong> es un código alfanumérico único
+                de identidad de 18 caracteres que identifica oficialmente tanto a residentes como
+                a ciudadanos mexicanos en todo el país.
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private CurpModel curpModel { get; set; } = new();
+
+    private string mensaje = string.Empty;
+    private string tipoMensaje = string.Empty;
+    private bool estaValidando = false;
+
+    private async Task ValidarCurp()
+    {
+        estaValidando = true;
+
+        // Convertir a mayúsculas
+        curpModel.Curp = curpModel.Curp.ToUpper();
+
+        // Validación básica
+        if (string.IsNullOrWhiteSpace(curpModel.Curp))
+        {
+            mensaje = "Por favor ingrese una CURP válida.";
+            tipoMensaje = "danger";
+            estaValidando = false;
+            return;
+        }
+
+        if (curpModel.Curp.Length != 18)
+        {
+            mensaje = "La CURP debe tener exactamente 18 caracteres.";
+            tipoMensaje = "danger";
+            estaValidando = false;
+            return;
+        }
+
+        // Validación de formato básico
+        var patron = System.Text.RegularExpressions.Regex.IsMatch(
+            curpModel.Curp,
+            @"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$"
+        );
+
+        if (!patron)
+        {
+            mensaje = "El formato de la CURP no es válido.";
+            tipoMensaje = "danger";
+            estaValidando = false;
+            return;
+        }
+
+        // Simulación de validación
+        await Task.Delay(500);
+
+        // Si la validación es exitosa, redirigir al formulario
+        mensaje = "CURP válida. Redirigiendo al formulario de registro...";
+        tipoMensaje = "success";
+
+        await Task.Delay(1500);
+
+        // Redirigir al formulario pasando la CURP
+        Navigation.NavigateTo($"/emploton/{curpModel.Curp}");
+
+        estaValidando = false;
+    }
+
+    private void CerrarAlerta()
+    {
+        mensaje = string.Empty;
+    }
+
+    public class CurpModel
+    {
+        [Required(ErrorMessage = "La CURP es obligatoria")]
+        [StringLength(18, MinimumLength = 18, ErrorMessage = "La CURP debe tener exactamente 18 caracteres")]
+        public string Curp { get; set; } = string.Empty;
+    }
+}

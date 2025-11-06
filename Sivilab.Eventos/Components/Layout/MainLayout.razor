@@ -1,23 +1,135 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<!-- Header moderno -->
+<header class="modern-header">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <!-- Logo y nombre de la empresa -->
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <div class="logo-container me-3">
+                    <i class="fas fa-calendar-check logo-icon"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Registro Evento</span>
+                    <small class="brand-tagline">Sistema de Validación CURP</small>
+                </div>
+            </a>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <!-- Toggle button para móvil -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Menú de navegación -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                            <i class="fas fa-home me-2"></i>Inicio
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#privacidad">
+                            <i class="fas fa-shield-alt me-2"></i>Privacidad
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto">
+                            <i class="fas fa-envelope me-2"></i>Contacto
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Contenido principal -->
+<main class="main-content">
+    @Body
+</main>
+
+<!-- Footer moderno -->
+<footer class="modern-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 class="footer-title">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Registro Evento
+                    </h5>
+                    <p class="footer-description">
+                        Sistema profesional de validación de CURP para eventos y registros oficiales. Tecnología confiable y segura.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h6 class="footer-subtitle">Servicios</h6>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Validación CURP</a></li>
+                        <li><a href="#" class="footer-link">Registro de Eventos</a></li>
+                        <li><a href="#" class="footer-link">Consultoría</a></li>
+                        <li><a href="#" class="footer-link">Soporte Técnico</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h6 class="footer-subtitle">Enlaces Útiles</h6>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Inicio</a></li>
+                        <li><a href="#" class="footer-link">Política de Privacidad</a></li>
+                        <li><a href="#" class="footer-link">Términos de Uso</a></li>
+                        <li><a href="#" class="footer-link">Ayuda</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4" id="contacto">
+                <div class="footer-section">
+                    <h6 class="footer-subtitle">Contacto</h6>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Tuxtla Gutiérrez, Chiapas</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+52 (961) 123-4567</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@registroevento.com</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="copyright">
+                        © 2025 Registro Evento. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="developed-by">
+                        <i class="fas fa-code me-1"></i>
+                        Desarrollado con .razor
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
