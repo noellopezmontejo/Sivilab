@@ -7,6 +7,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7264/") });
+// después de builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7264/") });
+builder.Services.AddScoped<Sivilab.Web.Services.ICandidatoCrpService, Sivilab.Web.Services.CandidatoCrpService>();
 
 var app = builder.Build();
 

@@ -40,7 +40,12 @@ builder.Services.AddAuthorization(options =>
 // Registro de servicios del repositorio
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
+// Registra el repositorio de candidatos
+builder.Services.AddScoped<ICandidatoCrpRepository, CandidatoCrpRepository>();
+
+
 builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 // Agregar la conexión a la base de datos
 builder.Services.AddTransient<IDbConnection>(sp =>

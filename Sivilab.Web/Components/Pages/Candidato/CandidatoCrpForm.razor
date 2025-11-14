@@ -1,0 +1,91 @@
+﻿@page "/candidato/{Id:int}"
+@page "/candidato/nuevo"
+@inject Sivilab.Web.Services.ICandidatoCrpService CandidatoService
+@using Sivilab.Models.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>@(IsNew ? "Nuevo Candidato" : "Editar Candidato")</h3>
+
+@if (isLoading)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <label>CURP</label>
+            <InputText class="form-control" @bind-Value="model.Curp" />
+        </div>
+        <div class="mb-2">
+            <label>Nombre</label>
+            <InputText class="form-control" @bind-Value="model.Nombre" />
+        </div>
+        <div class="mb-2">
+            <label>Apellido Paterno</label>
+            <InputText class="form-control" @bind-Value="model.ApellidoPaterno" />
+        </div>
+        <div class="mb-2">
+            <label>Apellido Materno</label>
+            <InputText class="form-control" @bind-Value="model.ApellidoMaterno" />
+        </div>
+        <div class="mb-2">
+            <label>Fecha Nacimiento</label>
+            <InputDate class="form-control" @bind-Value="model.FechaNacimiento" />
+        </div>
+        <div class="mb-2">
+            <label>Correo</label>
+            <InputText class="form-control" @bind-Value="model.CorreoElectronico" />
+        </div>
+
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <a class="btn btn-secondary ms-2" href="/candidatos">Cancelar</a>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    private CandidatoCrp model = new CandidatoCrp
+        {
+            FechaNacimiento = System.DateTime.Now
+        };
+
+    private bool isLoading = true;
+    private bool IsNew => !Id.HasValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue)
+        {
+            var item = await CandidatoService.ObtenerPorIdAsync(Id.Value);
+            if (item != null) model = item;
+        }
+        isLoading = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsNew)
+        {
+            var newId = await CandidatoService.CrearAsync(model);
+            // Navegar a lista o a editar con id nuevo — por simplicidad ir a lista
+            NavManager.NavigateTo("/candidatos");
+        }
+        else
+        {
+            if (Id.HasValue)
+            {
+                await CandidatoService.ActualizarAsync(Id.Value, model);
+                NavManager.NavigateTo("/candidatos");
+            }
+        }
+    }
+
+    [Inject]
+    private NavigationManager NavManager { get; set; } = default!;
+}

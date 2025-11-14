@@ -1,0 +1,91 @@
+﻿@page "/candidatos"
+@inject Sivilab.Web.Services.ICandidatoCrpService CandidatoService
+@using Sivilab.Models.Models
+
+<h3>Candidatos CRP</h3>
+
+<div class="mb-3">
+    <input @bind="searchCurp" placeholder="Buscar por CURP" class="form-control" />
+    <button class="btn btn-primary mt-2" @onclick="BuscarPorCurp">Buscar</button>
+    <button class="btn btn-secondary mt-2 ms-2" @onclick="CargarTodos">Limpiar / Mostrar todos</button>
+    <a class="btn btn-success mt-2 ms-2" href="/candidato/nuevo">Nuevo candidato</a>
+</div>
+
+@if (isLoading)
+{
+    <p>Cargando...</p>
+}
+else if (!candidatos.Any())
+{
+    <p>No se encontraron candidatos.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>CandidatoId</th>
+                <th>CURP</th>
+                <th>Nombre</th>
+                <th>Apellido Paterno</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in candidatos)
+            {
+                <tr>
+                    <td>@c.CandidatoId</td>
+                    <td>@c.Curp</td>
+                    <td>@c.Nombre</td>
+                    <td>@c.ApellidoPaterno</td>
+                    <td>@c.CorreoElectronico</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="@($"/candidato/{c.CandidatoId}")">Editar</a>
+                        <button class="btn btn-sm btn-danger ms-1" @onclick="() => Eliminar(c.CandidatoId)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<CandidatoCrp> candidatos = new List<CandidatoCrp>();
+    private string searchCurp = string.Empty;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarTodos();
+    }
+
+    private async Task CargarTodos()
+    {
+        isLoading = true;
+        candidatos = await CandidatoService.ObtenerTodosAsync();
+        isLoading = false;
+    }
+
+    private async Task BuscarPorCurp()
+    {
+        if (string.IsNullOrWhiteSpace(searchCurp))
+        {
+            await CargarTodos();
+            return;
+        }
+
+        isLoading = true;
+        var item = await CandidatoService.ObtenerPorCurpAsync(searchCurp.Trim());
+        candidatos = item is null ? new List<CandidatoCrp>() : new List<CandidatoCrp> { item };
+        isLoading = false;
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var ok = await CandidatoService.EliminarAsync(id);
+        if (ok) await CargarTodos();
+        else /* mostrar mensaje error */ ;
+    }
+}
