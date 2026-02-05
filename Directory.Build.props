@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Deshabilitar fingerprinting y compresión para evitar conflictos -->
+    <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
+    <CompressionEnabled>false</CompressionEnabled>
+  </PropertyGroup>
+</Project>
