@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Sivilab.Models.Models;
 
-namespace Sivilab.Web.Services
+namespace Sivilab.Eventos.Services
 {
     public class CandidatoCrpService : ICandidatoCrpService
     {
@@ -17,7 +17,7 @@ namespace Sivilab.Web.Services
 
         public async Task<IEnumerable<CandidatoCrp>> ObtenerTodos()
         {
-            return await _http.GetFromJsonAsync<IEnumerable<CandidatoCrp>>("api/CandidatoCrp") ?? new List<CandidatoCrp>();
+            return await _http.GetFromJson<IEnumerable<CandidatoCrp>>("api/CandidatoCrp") ?? new List<CandidatoCrp>();
         }
 
         public async Task<CandidatoCrp?> ObtenerPorId(int id)
