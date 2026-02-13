@@ -1,8 +1,10 @@
+
 using Sivilab.Data.Repositories;
+using Sivilab.Eventos.Components;
+using Sivilab.Eventos.Components;
+using Sivilab.Eventos.Services;
 using System.Data;
-using Sivilab.Eventos.Components;
 using System.Data.SqlClient;
-using Sivilab.Eventos.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +14,15 @@ builder.Services.AddRazorComponents()
 
 
 // Registrar el repositorio de candidatos
-builder.Services.AddScoped<ICandidatoCrpRepository, CandidatoCrpRepository>();
+builder.Services.AddScoped<ICandidatoCrpService, CandidatoCrpService>();
+// Registrar repositorio y servicio de Acceso_Web
+builder.Services.AddScoped<IAccesoWebRepository, AccesoWebRepository>();
+builder.Services.AddScoped<IAccesoWebService, AccesoWebService>();
 
 // Configurar HttpClient para consumir la API
 builder.Services.AddHttpClient("SivilabAPI", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7001");
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7264");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 

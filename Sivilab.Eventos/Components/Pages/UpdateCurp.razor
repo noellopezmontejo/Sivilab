@@ -1,0 +1,415 @@
+@page "/updatecurp"
+@page "/updatecurp/{Curp}"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Sivilab.Eventos.Services
+@using Sivilab.Models.Models
+@inject ICandidatoCrpService Repository
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Iniciar Sesión - EMPLEOTÓN CHIAPAS 2025</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                    <h1 class="mb-0 text-center">
+                        <i class="fas fa-user-lock me-3"></i>
+                        ACTUALIZAR INFORMACIÓN
+                    </h1>
+                    <p class="text-center mb-0 mt-3 opacity-90 fs-6">
+                        EMPLEOTÓN CHIAPAS 2025 - Servicio Nacional de Empleo Chiapas
+                    </p>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Indicador de carga -->
+                    @if (validando)
+                    {
+                        <div class="alert alert-info border-0 mb-4 text-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Validando...</span>
+                            </div>
+                            <strong>Validando credenciales...</strong>
+                        </div>
+                    }
+
+                    <!-- Mensaje informativo -->
+                    <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>CURP ya registrada.</strong> Para actualizar su información, inicie sesión con sus credenciales.
+                    </div>
+
+                    <!-- Mensaje de éxito/error -->
+                    @if (!string.IsNullOrEmpty(mensaje))
+                    {
+                        <div class="alert @GetAlertClass() alert-dismissible fade show" role="alert">
+                            <i class="fas @GetAlertIcon() me-2"></i>
+                            @mensaje
+                            <button type="button" class="btn-close" @onclick="CerrarAlerta"></button>
+                        </div>
+                    }
+
+                    <EditForm Model="@loginForm" OnValidSubmit="IniciarSesion" FormName="LoginForm">
+                        <DataAnnotationsValidator />
+
+                        <!-- Sección: Iniciar Sesión -->
+                        <div class="section-header mb-4">
+                            <h4 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                            </h4>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- CURP (readonly si viene por parámetro) -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-id-card me-2 text-primary"></i>CURP <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="loginForm.Curp"
+                                           class="form-control text-uppercase"
+                                           placeholder="Ingrese su CURP"
+                                           maxlength="18"
+                                           style="font-family: 'Courier New', monospace; letter-spacing: 1px;"
+                                           disabled="@(!string.IsNullOrEmpty(Curp))" />
+                                <ValidationMessage For="@(() => loginForm.Curp)" class="text-danger" />
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>18 caracteres alfanuméricos
+                                </div>
+                            </div>
+
+                            <!-- Correo Electrónico -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>CORREO ELECTRÓNICO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="loginForm.CorreoAcceso"
+                                           type="email"
+                                           class="form-control"
+                                           placeholder="ejemplo@correo.com" />
+                                <ValidationMessage For="@(() => loginForm.CorreoAcceso)" class="text-danger" />
+                            </div>
+
+                            <!-- Contraseña -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-lock me-2 text-primary"></i>CONTRASEÑA <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="loginForm.Contrasena"
+                                           type="password"
+                                           class="form-control"
+                                           placeholder="Ingrese su contraseña" />
+                                <ValidationMessage For="@(() => loginForm.Contrasena)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Botón de inicio de sesión -->
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" 
+                                    class="btn btn-primary btn-lg" 
+                                    style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;"
+                                    disabled="@validando">
+                                @if (validando)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    <span>VALIDANDO...</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    <span>INICIAR SESIÓN</span>
+                                }
+                            </button>
+                        </div>
+
+                        <!-- Separador -->
+                        <div class="text-center mb-3">
+                            <hr class="my-4" />
+                            <p class="text-muted">¿Olvidó su contraseña?</p>
+                        </div>
+
+                    </EditForm>
+
+                    <!-- Sección: Recuperar Contraseña -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary mb-3">
+                                <i class="fas fa-key me-2"></i>Recuperar Contraseña
+                            </h5>
+
+                            <EditForm Model="@recuperarForm" OnValidSubmit="RecuperarContrasena" FormName="RecuperarForm">
+                                <DataAnnotationsValidator />
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-envelope me-2 text-primary"></i>CORREO ELECTRÓNICO REGISTRADO
+                                        </label>
+                                        <InputText @bind-Value="recuperarForm.CorreoRecuperacion"
+                                                   type="email"
+                                                   class="form-control"
+                                                   placeholder="ejemplo@correo.com" />
+                                        <ValidationMessage For="@(() => recuperarForm.CorreoRecuperacion)" class="text-danger" />
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Se enviará un enlace de recuperación a este correo
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" 
+                                                class="btn btn-outline-primary w-100"
+                                                disabled="@enviandoRecuperacion">
+                                            @if (enviandoRecuperacion)
+                                            {
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                <span>ENVIANDO...</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-paper-plane me-2"></i>
+                                                <span>ENVIAR ENLACE DE RECUPERACIÓN</span>
+                                            }
+                                        </button>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Botón para regresar -->
+            <div class="text-center mt-3">
+                <a href="/emploton" class="btn btn-link">
+                    <i class="fas fa-arrow-left me-2"></i>Regresar al formulario de registro
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información adicional -->
+<div class="mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>¿Necesita ayuda?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        Si tiene problemas para acceder a su cuenta, puede:
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Recuperar su contraseña usando el correo registrado</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Contactar al centro de ayuda del SNE Chiapas</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Visitar una oficina del Servicio Nacional de Empleo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Seguridad
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        Sus datos están protegidos y son confidenciales.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-lock text-success me-2"></i>Conexión segura</li>
+                        <li><i class="fas fa-lock text-success me-2"></i>Datos encriptados</li>
+                        <li><i class="fas fa-lock text-success me-2"></i>Cumplimiento LGPDPPSO</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Curp { get; set; }
+
+    [SupplyParameterFromForm]
+    private LoginModel loginForm { get; set; } = new();
+
+    [SupplyParameterFromForm]
+    private RecuperarModel recuperarForm { get; set; } = new();
+
+    private string mensaje = string.Empty;
+    private string tipoMensaje = string.Empty;
+    private bool validando = false;
+    private bool enviandoRecuperacion = false;
+
+    protected override void OnInitialized()
+    {
+        // Si viene CURP por parámetro, pre-llenar el formulario
+        if (!string.IsNullOrEmpty(Curp))
+        {
+            loginForm.Curp = Curp.ToUpper();
+        }
+    }
+
+    private async Task IniciarSesion()
+    {
+        validando = true;
+        StateHasChanged();
+
+        try
+        {
+            // Buscar candidato por CURP
+            var candidato = await Repository.ObtenerPorCurp(loginForm.Curp);
+
+            if (candidato == null)
+            {
+                MostrarMensaje("danger", "No se encontró un registro con esta CURP.");
+                return;
+            }
+
+            // Validar correo
+            if (candidato.CorreoAcceso?.ToLower() != loginForm.CorreoAcceso?.ToLower())
+            {
+                MostrarMensaje("danger", "El correo electrónico no coincide con el registrado.");
+                return;
+            }
+
+            // Validar contraseña (deberías usar hash en producción)
+            if (candidato.Contrasena != loginForm.Contrasena)
+            {
+                MostrarMensaje("danger", "La contraseña es incorrecta.");
+                return;
+            }
+
+            // Login exitoso - redirigir a formulario de actualización
+            MostrarMensaje("success", "Inicio de sesión exitoso. Redirigiendo...");
+            await Task.Delay(1500);
+            Navigation.NavigateTo($"/emploton/{candidato.Curp}");
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error al iniciar sesión: {ex.Message}");
+        }
+        finally
+        {
+            validando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RecuperarContrasena()
+    {
+        enviandoRecuperacion = true;
+        StateHasChanged();
+
+        try
+        {
+            // Buscar candidato por correo
+            var candidatos = await Repository.ObtenerTodos();
+            var candidato = candidatos.FirstOrDefault(c => 
+                c.CorreoAcceso?.ToLower() == recuperarForm.CorreoRecuperacion?.ToLower());
+
+            if (candidato == null)
+            {
+                // Por seguridad, no revelar si el correo existe o no
+                MostrarMensaje("info", 
+                    "Si el correo está registrado, recibirá un enlace de recuperación en los próximos minutos.");
+            }
+            else
+            {
+                // TODO: Implementar envío de correo con token de recuperación
+                // Por ahora solo simular el proceso
+                MostrarMensaje("success", 
+                    $"Se ha enviado un enlace de recuperación a {recuperarForm.CorreoRecuperacion}. " +
+                    "Por favor, revise su bandeja de entrada y spam.");
+                
+                // Limpiar formulario
+                recuperarForm = new();
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error al procesar la recuperación: {ex.Message}");
+        }
+        finally
+        {
+            enviandoRecuperacion = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetAlertClass()
+    {
+        return tipoMensaje switch
+        {
+            "success" => "alert-success",
+            "warning" => "alert-warning",
+            "danger" => "alert-danger",
+            "info" => "alert-info",
+            _ => "alert-info"
+        };
+    }
+
+    private string GetAlertIcon()
+    {
+        return tipoMensaje switch
+        {
+            "success" => "fa-check-circle",
+            "warning" => "fa-exclamation-circle",
+            "danger" => "fa-exclamation-triangle",
+            "info" => "fa-info-circle",
+            _ => "fa-info-circle"
+        };
+    }
+
+    private void MostrarMensaje(string tipo, string msg)
+    {
+        tipoMensaje = tipo;
+        mensaje = msg;
+        StateHasChanged();
+
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(5000);
+            mensaje = string.Empty;
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void CerrarAlerta()
+    {
+        mensaje = string.Empty;
+    }
+
+    // Modelos de validación
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "La CURP es obligatoria")]
+        [StringLength(18, MinimumLength = 18, ErrorMessage = "La CURP debe tener 18 caracteres")]
+        [RegularExpression(@"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$", ErrorMessage = "Formato de CURP inválido")]
+        public string Curp { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
+        [EmailAddress(ErrorMessage = "Ingrese un correo válido")]
+        public string CorreoAcceso { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        public string Contrasena { get; set; } = string.Empty;
+    }
+
+    public class RecuperarModel
+    {
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
+        [EmailAddress(ErrorMessage = "Ingrese un correo válido")]
+        public string CorreoRecuperacion { get; set; } = string.Empty;
+    }
+}

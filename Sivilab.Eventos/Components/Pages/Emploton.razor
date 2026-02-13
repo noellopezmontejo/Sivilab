@@ -4,13 +4,14 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Data.SqlClient
+@using Sivilab.Eventos.Services
 @using Sivilab.Models.Models
 @using Sivilab.Data.Repositories
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
 @inject HttpClient Http
 @inject ICandidatoCrpService Repository
-
 
 <PageTitle>EMPLEOTÓN CHIAPAS 2025</PageTitle>
 
@@ -40,12 +41,25 @@
                         </div>
                     }
 
-                    <!-- NUEVO: Mostrar si es actualización -->
-                    @if (esCandidatoExistente && !cargando)
+                    <!-- NUEVO: Mostrar botón de login si CURP existe -->
+                    @if (mostrarBotonLogin && !cargando)
                     {
                         <div class="alert alert-warning border-0 mb-4">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Información encontrada:</strong> Los datos a continuación corresponden a un registro existente. Puede actualizarlos si es necesario.
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>CURP ya registrada.</strong> Esta CURP ya tiene una cuenta en el sistema. 
+                                    Para actualizar su información debe iniciar sesión.
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button type="button" 
+                                            class="btn btn-warning" 
+                                            @onclick="IrALogin">
+                                        <i class="fas fa-sign-in-alt me-2"></i>
+                                        Ir a Iniciar Sesión
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     }
 
@@ -123,15 +137,15 @@
                                 <InputRadioGroup @bind-Value="formulario.Genero">
                                     <div class="mt-2">
                                         <div class="form-check">
-                                            <InputRadio Value="@("Masculino")" class="form-check-input" id="generoM" />
+                                            <InputRadio Value="1" class="form-check-input" id="generoM" />
                                             <label class="form-check-label" for="generoM">MASCULINO</label>
                                         </div>
                                         <div class="form-check">
-                                            <InputRadio Value="@("Femenino")" class="form-check-input" id="generoF" />
+                                            <InputRadio Value="2" class="form-check-input" id="generoF" />
                                             <label class="form-check-label" for="generoF">FEMENINO</label>
                                         </div>
                                         <div class="form-check">
-                                            <InputRadio Value="@("No Binario")" class="form-check-input" id="generoNB" />
+                                            <InputRadio Value="3" class="form-check-input" id="generoNB" />
                                             <label class="form-check-label" for="generoNB">NO BINARIO</label>
                                         </div>
                                     </div>
@@ -160,33 +174,10 @@
                             </div>
                         </div>
 
-                        <!-- Programa Jóvenes Construyendo el Futuro -->
-                        <div class="card bg-light mb-4">
-                            <div class="card-body">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
-                                    6. ¿ERES EGRESADO DEL PROGRAMA DE JÓVENES CONSTRUYENDO EL FUTURO? <span class="text-danger">*</span>
-                                </label>
-                                <InputRadioGroup @bind-Value="formulario.EsEgresadoJovenes">
-                                    <div class="mt-2">
-                                        <div class="form-check form-check-inline">
-                                            <InputRadio Value="@("Si")" class="form-check-input" id="jovenesS" />
-                                            <label class="form-check-label" for="jovenesS">SÍ</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <InputRadio Value="@("No")" class="form-check-input" id="jovenesN" />
-                                            <label class="form-check-label" for="jovenesN">NO</label>
-                                        </div>
-                                    </div>
-                                </InputRadioGroup>
-                                <ValidationMessage For="@(() => formulario.EsEgresadoJovenes)" class="text-danger" />
-                            </div>
-                        </div>
-
-                        <!-- Sección 2: Datos de Contacto -->
+                        <!-- Sección 2: Información de Contacto -->
                         <div class="section-header mb-4">
                             <h4 class="text-primary border-bottom pb-2">
-                                <i class="fas fa-address-book me-2"></i>Datos de Contacto
+                                <i class="fas fa-phone-alt me-2"></i>Información de Contacto
                             </h4>
                         </div>
 
@@ -194,71 +185,104 @@
                             <!-- Teléfono -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-phone me-2 text-primary"></i>7. TELÉFONO <span class="text-danger">*</span>
+                                    <i class="fas fa-phone me-2 text-primary"></i>1. TELÉFONO <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.Telefono"
                                            class="form-control"
-                                           placeholder="Ej: 961-123-4567" />
+                                           placeholder="Número de teléfono" />
                                 <ValidationMessage For="@(() => formulario.Telefono)" class="text-danger" />
                             </div>
 
                             <!-- Correo Electrónico -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-envelope me-2 text-primary"></i>8. CORREO ELECTRÓNICO <span class="text-danger">*</span>
+                                    <i class="fas fa-envelope me-2 text-primary"></i>2. CORREO ELECTRÓNICO <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.CorreoElectronico"
-                                           @oninput="OnCorreoContactoInput"
-                                           type="email"
                                            class="form-control"
-                                           placeholder="ejemplo@correo.com" />
+                                           placeholder="Correo electrónico" />
                                 <ValidationMessage For="@(() => formulario.CorreoElectronico)" class="text-danger" />
+                            </div>
+
+                            <!-- Usar mismo correo -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-envelope-square me-2 text-primary"></i>3. USAR MISMO CORREO PARA ACCESO <span class="text-danger">*</span>
+                                </label>
+                                <InputSelect @bind-Value="formulario.UsarMismoCorreo" class="form-select">
+                                    <option value="">Seleccione una opción</option>
+                                    <option value="Si">Sí</option>
+                                    <option value="No">No</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => formulario.UsarMismoCorreo)" class="text-danger" />
+                            </div>
+
+                            <!-- Correo de Acceso -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-unlock-alt me-2 text-primary"></i>4. CORREO DE ACCESO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.CorreoAcceso"
+                                           class="form-control"
+                                           placeholder="Correo para iniciar sesión"
+                                           readonly="@correoAccesoReadOnly" />
+                                <ValidationMessage For="@(() => formulario.CorreoAcceso)" class="text-danger" />
+                                <div class="form-text">
+                                    * Este correo será utilizado para acceder al sistema.
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Sección 3: Dirección -->
+                        <!-- Sección 3: Datos de Ubicación -->
                         <div class="section-header mb-4">
                             <h4 class="text-primary border-bottom pb-2">
-                                <i class="fas fa-home me-2"></i>Dirección
+                                <i class="fas fa-map-marked-alt me-2"></i>Datos de Ubicación
                             </h4>
                         </div>
+
                         <div class="row g-3 mb-4">
-                            <div class="col-md-3">
+                            <!-- Estado -->
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-mail-bulk me-2 text-primary"></i>9. CÓDIGO POSTAL <span class="text-danger">*</span>
-                                </label>
-                                <InputText @bind-Value="formulario.CodigoPostal"
-                                           @oninput="OnCodigoPostalInput"
-                                           class="form-control"
-                                           placeholder="00000"
-                                           maxlength="5" />
-                                <ValidationMessage For="@(() => formulario.CodigoPostal)" class="text-danger" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-map me-2 text-primary"></i>10. ESTADO <span class="text-danger">*</span>
+                                    <i class="fas fa-map-signs me-2 text-primary"></i>1. ESTADO <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.Estado"
                                            class="form-control"
                                            placeholder="Estado" />
                                 <ValidationMessage For="@(() => formulario.Estado)" class="text-danger" />
                             </div>
-                            <div class="col-md-3">
+
+                            <!-- Municipio -->
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-city me-2 text-primary"></i>11. MUNICIPIO <span class="text-danger">*</span>
+                                    <i class="fas fa-city me-2 text-primary"></i>2. MUNICIPIO <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.Municipio"
                                            class="form-control"
                                            placeholder="Municipio" />
                                 <ValidationMessage For="@(() => formulario.Municipio)" class="text-danger" />
                             </div>
-                            <div class="col-md-3">
+
+                            <!-- Código Postal -->
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-map-signs me-2 text-primary"></i>12. COLONIA <span class="text-danger">*</span>
+                                    <i class="fas fa-envelope me-2 text-primary"></i>3. CÓDIGO POSTAL <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.CodigoPostal"
+                                           class="form-control"
+                                           placeholder="Código postal"
+                                           maxlength="5" />
+                                <ValidationMessage For="@(() => formulario.CodigoPostal)" class="text-danger" />
+                            </div>
+
+                            <!-- Colonia -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-house-user me-2 text-primary"></i>4. COLONIA <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.Colonia"
                                            class="form-control"
-                                           placeholder="Nombre de la colonia" />
+                                           placeholder="Colonia" />
                                 <ValidationMessage For="@(() => formulario.Colonia)" class="text-danger" />
                             </div>
                         </div>
@@ -271,30 +295,25 @@
                         </div>
 
                         <div class="row g-3 mb-4">
+                            <!-- Nivel de Estudios -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-school me-2 text-primary"></i>13. NIVEL DE ESTUDIOS <span class="text-danger">*</span>
+                                    <i class="fas fa-book-open me-2 text-primary"></i>1. NIVEL DE ESTUDIOS <span class="text-danger">*</span>
                                 </label>
-                                <InputSelect @bind-Value="formulario.NivelEstudios" class="form-select">
-                                    <option value="">Seleccione...</option>
-                                    <option value="Primaria">Primaria</option>
-                                    <option value="Secundaria">Secundaria</option>
-                                    <option value="Preparatoria">Preparatoria</option>
-                                    <option value="Técnico">Técnico</option>
-                                    <option value="Licenciatura">Licenciatura</option>
-                                    <option value="Maestría">Maestría</option>
-                                    <option value="Doctorado">Doctorado</option>
-                                </InputSelect>
+                                <InputText @bind-Value="formulario.NivelEstudios"
+                                           class="form-control"
+                                           placeholder="Nivel de estudios" />
                                 <ValidationMessage For="@(() => formulario.NivelEstudios)" class="text-danger" />
                             </div>
 
+                            <!-- Carrera o Especialidad -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-certificate me-2 text-primary"></i>14. CARRERA O ESPECIALIDAD <span class="text-danger">*</span>
+                                    <i class="fas fa-pencil-alt me-2 text-primary"></i>2. CARRERA O ESPECIALIDAD <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.CarreraEspecialidad"
                                            class="form-control"
-                                           placeholder="Ej: Ing. en Sistemas, Contabilidad..." />
+                                           placeholder="Carrera o especialidad" />
                                 <ValidationMessage For="@(() => formulario.CarreraEspecialidad)" class="text-danger" />
                             </div>
                         </div>
@@ -307,52 +326,48 @@
                         </div>
 
                         <div class="row g-3 mb-4">
-                            <div class="col-12">
+                            <!-- Experiencia Laboral -->
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-history me-2 text-primary"></i>15. EXPERIENCIA LABORAL <span class="text-danger">*</span>
+                                    <i class="fas fa-clock me-2 text-primary"></i>1. TIEMPO DE EXPERIENCIA LABORAL <span class="text-danger">*</span>
                                 </label>
-                                <InputTextArea @bind-Value="formulario.ExperienciaLaboral"
-                                               class="form-control"
-                                               rows="3"
-                                               placeholder="Describa brevemente su experiencia laboral..." />
+                                <InputText @bind-Value="formulario.ExperienciaLaboral"
+                                           class="form-control"
+                                           placeholder="Ej. 2 años" />
                                 <ValidationMessage For="@(() => formulario.ExperienciaLaboral)" class="text-danger" />
                             </div>
 
+                            <!-- Último Puesto Desempeñado -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-user-tie me-2 text-primary"></i>16. PUESTOS DE TRABAJO QUE HA TENIDO <span class="text-danger">*</span>
+                                    <i class="fas fa-briefcase me-2 text-primary"></i>2. ÚLTIMO PUESTO DESEMPEÑADO <span class="text-danger">*</span>
                                 </label>
-                                <InputTextArea @bind-Value="formulario.PuestosTrabajo"
-                                               class="form-control"
-                                               rows="3"
-                                               placeholder="Liste los puestos que ha desempeñado..." />
+                                <InputText @bind-Value="formulario.PuestosTrabajo"
+                                           class="form-control"
+                                           placeholder="Puesto más reciente" />
                                 <ValidationMessage For="@(() => formulario.PuestosTrabajo)" class="text-danger" />
                             </div>
 
+                            <!-- Años de Experiencia -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-clock me-2 text-primary"></i>17. AÑOS DE EXPERIENCIA <span class="text-danger">*</span>
+                                    <i class="fas fa-calendar-check me-2 text-primary"></i>3. AÑOS DE EXPERIENCIA EN EL PUESTO <span class="text-danger">*</span>
                                 </label>
-                                <InputSelect @bind-Value="formulario.AniosExperiencia" class="form-select">
-                                    <option value="">Seleccione...</option>
-                                    <option value="Sin experiencia">Sin experiencia</option>
-                                    <option value="Menos de 1 año">Menos de 1 año</option>
-                                    <option value="1-2 años">1-2 años</option>
-                                    <option value="3-5 años">3-5 años</option>
-                                    <option value="6-10 años">6-10 años</option>
-                                    <option value="Más de 10 años">Más de 10 años</option>
-                                </InputSelect>
+                                <InputText @bind-Value="formulario.AniosExperiencia"
+                                           class="form-control"
+                                           placeholder="Ej. 1 año" />
                                 <ValidationMessage For="@(() => formulario.AniosExperiencia)" class="text-danger" />
+                            </div>
 
-                                <div class="mt-3">
-                                    <label class="form-label fw-bold">
-                                        <i class="fas fa-language me-2 text-primary"></i>18. DOMINIO DE OTRO IDIOMA <span class="text-danger">*</span>
-                                    </label>
-                                    <InputText @bind-Value="formulario.DominioIdioma"
-                                               class="form-control"
-                                               placeholder="Ej: Inglés - Intermedio, Ninguno" />
-                                    <ValidationMessage For="@(() => formulario.DominioIdioma)" class="text-danger" />
-                                </div>
+                            <!-- Dominio de Idioma -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-comments me-2 text-primary"></i>4. IDIOMA(S) Y NIVEL DE DOMINIO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.DominioIdioma"
+                                           class="form-control"
+                                           placeholder="Ej. Inglés - Avanzado" />
+                                <ValidationMessage For="@(() => formulario.DominioIdioma)" class="text-danger" />
                             </div>
                         </div>
 
@@ -364,30 +379,25 @@
                         </div>
 
                         <div class="row g-3 mb-4">
-                            <div class="col-md-8">
+                            <!-- Puesto Deseado -->
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-star me-2 text-primary"></i>19. PUESTO DESEADO <span class="text-danger">*</span>
+                                    <i class="fas fa-briefcase me-2 text-primary"></i>1. PUESTO DESEADO <span class="text-danger">*</span>
                                 </label>
-                                <InputTextArea @bind-Value="formulario.PuestoDeseado"
-                                               class="form-control"
-                                               rows="3"
-                                               placeholder="Describa el puesto o área en la que le gustaría trabajar..." />
+                                <InputText @bind-Value="formulario.PuestoDeseado"
+                                           class="form-control"
+                                           placeholder="Puesto que desea ocupar" />
                                 <ValidationMessage For="@(() => formulario.PuestoDeseado)" class="text-danger" />
                             </div>
 
-                            <div class="col-md-4">
+                            <!-- Salario Pretendido -->
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-dollar-sign me-2 text-primary"></i>20. SALARIO PRETENDIDO <span class="text-danger">*</span>
+                                    <i class="fas fa-money-bill-wave me-2 text-primary"></i>2. SALARIO PRETENDIDO <span class="text-danger">*</span>
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <InputNumber @bind-Value="formulario.SalarioPretendido"
-                                                 class="form-control"
-                                                 placeholder="0.00"
-                                                 step="0.01" />
-                                    <span class="input-group-text">MXN</span>
-                                </div>
-                                <div class="form-text">Salario mensual deseado</div>
+                                <InputNumber @bind-Value="formulario.SalarioPretendido"
+                                             class="form-control"
+                                             placeholder="Salario mensual" />
                                 <ValidationMessage For="@(() => formulario.SalarioPretendido)" class="text-danger" />
                             </div>
                         </div>
@@ -395,104 +405,87 @@
                         <!-- Sección 7: Datos de Acceso -->
                         <div class="section-header mb-4">
                             <h4 class="text-primary border-bottom pb-2">
-                                <i class="fas fa-key me-2"></i>Datos de Acceso
+                                <i class="fas fa-user-lock me-2"></i>Datos de Acceso
                             </h4>
                         </div>
 
-                        <div class="card border-info mb-4">
-                            <div class="card-body">
-                                <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    <small>Se enviará un código de verificación al correo electrónico que proporcione para confirmar su identidad.</small>
+                        <div class="row g-3 mb-4">
+                            <!-- Usar mismo correo -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-envelope-square me-2 text-primary"></i>1. USAR MISMO CORREO PARA ACCESO <span class="text-danger">*</span>
+                                </label>
+                                <InputSelect @bind-Value="formulario.UsarMismoCorreo" class="form-select">
+                                    <option value="">Seleccione una opción</option>
+                                    <option value="Si">Sí</option>
+                                    <option value="No">No</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => formulario.UsarMismoCorreo)" class="text-danger" />
+                            </div>
+
+                            <!-- Correo de Acceso -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-unlock-alt me-2 text-primary"></i>2. CORREO DE ACCESO <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.CorreoAcceso"
+                                           class="form-control"
+                                           placeholder="Correo para iniciar sesión"
+                                           readonly="@correoAccesoReadOnly" />
+                                <ValidationMessage For="@(() => formulario.CorreoAcceso)" class="text-danger" />
+                                <div class="form-text">
+                                    * Este correo será utilizado para acceder al sistema.
                                 </div>
+                            </div>
 
-                                <div class="row g-3">
-                                    <!-- Correo de Acceso -->
-                                    <div class="col-12">
-                                        <label class="form-label fw-bold">
-                                            <i class="fas fa-envelope me-2 text-primary"></i>21. CORREO ELECTRÓNICO PARA ACCESO <span class="text-danger">*</span>
-                                        </label>
-                                        <InputText @bind-Value="formulario.CorreoAcceso"
-                                                   type="email"
-                                                   class="@GetCorreoAccesoClass()"
-                                                   placeholder="ejemplo@correo.com"
-                                                   readonly="@correoAccesoReadOnly" />
-                                        <div class="form-text">
-                                            <i class="fas fa-shield-alt me-1"></i>Este correo será utilizado para enviar el código de verificación
-                                        </div>
-                                        <ValidationMessage For="@(() => formulario.CorreoAcceso)" class="text-danger" />
-                                    </div>
+                            <!-- Contraseña -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-key me-2 text-primary"></i>3. CONTRASEÑA <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.Contrasena"
+                                           type="password"
+                                           class="form-control"
+                                           placeholder="Ingrese una contraseña" />
+                                <ValidationMessage For="@(() => formulario.Contrasena)" class="text-danger" />
+                            </div>
 
-                                    <!-- Contraseña -->
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">
-                                            <i class="fas fa-lock me-2 text-primary"></i>22. CONTRASEÑA <span class="text-danger">*</span>
-                                        </label>
-                                        <InputText @bind-Value="formulario.Contrasena"
-                                                   type="password"
-                                                   class="form-control"
-                                                   placeholder="Ingrese su contraseña"
-                                                   @oninput="ValidarContrasenas" />
-                                        <div class="form-text">
-                                            <i class="fas fa-info-circle me-1"></i>Mínimo 8 caracteres
-                                        </div>
-                                        <ValidationMessage For="@(() => formulario.Contrasena)" class="text-danger" />
-                                    </div>
-
-                                    <!-- Confirmar Contraseña -->
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">
-                                            <i class="fas fa-lock me-2 text-primary"></i>23. CONFIRMAR CONTRASEÑA <span class="text-danger">*</span>
-                                        </label>
-                                        <InputText @bind-Value="formulario.ConfirmarContrasena"
-                                                   type="password"
-                                                   class="form-control"
-                                                   placeholder="Confirme su contraseña"
-                                                   @oninput="ValidarContrasenas" />
-                                        @if (!string.IsNullOrEmpty(mensajeContrasena))
-                                        {
-                                            <div class="@(contrasenasCoinciden ? "text-success" : "text-danger") mt-1">
-                                                @mensajeContrasena
-                                            </div>
-                                        }
-                                        <ValidationMessage For="@(() => formulario.ConfirmarContrasena)" class="text-danger" />
-                                    </div>
-                                </div>
+                            <!-- Confirmar Contraseña -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-key me-2 text-primary"></i>4. CONFIRMAR CONTRASEÑA <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="formulario.ConfirmarContrasena"
+                                           type="password"
+                                           class="form-control"
+                                           placeholder="Confirme su contraseña" />
+                                <ValidationMessage For="@(() => formulario.ConfirmarContrasena)" class="text-danger" />
                             </div>
                         </div>
 
-                        <!-- Sección 8: Términos y Condiciones -->
-                        <div class="section-header mb-4">
-                            <h4 class="text-primary border-bottom pb-2">
-                                <i class="fas fa-file-contract me-2"></i>Términos y Condiciones
-                            </h4>
-                        </div>
-
-                        <div class="card border-warning mb-4">
-                            <div class="card-body">
-                                <div class="form-check mb-3">
-                                    <InputCheckbox @bind-Value="formulario.AceptaTerminos" class="form-check-input" id="aceptaTerminos" />
-                                    <label class="form-check-label" for="aceptaTerminos">
-                                        <strong>24. DECLARO BAJO PROTESTA DE DECIR VERDAD</strong> que los datos contenidos en este registro son verdaderos.
-                                        Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y de conformidad con lo señalado en el artículo 20,
-                                        ambos de la "LEY GENERAL DE PROTECCIÓN DE DATOS PERSONALES EN POSESIÓN DE SUJETOS OBLIGADOS (LGPDPPSO)"
-                                        expreso mi voluntad, específica e informada, para que se efectúe el tratamiento de mis datos personales por la OSNE.
-                                    </label>
-                                    <ValidationMessage For="@(() => formulario.AceptaTerminos)" class="text-danger" />
-                                </div>
-
-                                <div class="form-check">
-                                    <InputCheckbox @bind-Value="formulario.AceptaPrivacidad" class="form-check-input" id="aceptaPrivacidad" />
-                                    <label class="form-check-label" for="aceptaPrivacidad">
-                                        <strong>25. ACEPTO</strong> que la recolección de datos personales se lleva a cabo a través de la página electrónica
-                                        del portal digital gubernamental cuyo administrador es la UNIDAD DEL SERVICIO NACIONAL DE EMPLEO (USNE).
-                                    </label>
-                                    <ValidationMessage For="@(() => formulario.AceptaPrivacidad)" class="text-danger" />
-                                </div>
+                        <!-- Términos y Condiciones -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="formulario.AceptaTerminos" class="form-check-input" id="terminosCheck" />
+                                <label class="form-check-label" for="terminosCheck">
+                                    He leído y acepto los <a href="/terminos" target="_blank" class="link-primary">términos y condiciones</a>
+                                </label>
                             </div>
+                            <ValidationMessage For="@(() => formulario.AceptaTerminos)" class="text-danger" />
                         </div>
 
-                        <!-- Botón de Envío - MODIFICADO para mostrar estado de guardado -->
+                        <!-- Privacidad -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="formulario.AceptaPrivacidad" class="form-check-input" id="privacidadCheck" />
+                                <label class="form-check-label" for="privacidadCheck">
+                                    Acepto el tratamiento de mis datos personales según lo establecido en el <a href="/privacidad" target="_blank" class="link-primary">aviso de privacidad</a>
+                                </label>
+                            </div>
+                            <ValidationMessage For="@(() => formulario.AceptaPrivacidad)" class="text-danger" />
+                        </div>
+
+                        <!-- Botón de Envío -->
                         <div class="d-grid gap-2 mb-4">
                             <button type="submit" 
                                     class="btn btn-primary btn-lg" 
@@ -506,7 +499,7 @@
                                 else
                                 {
                                     <i class="fas fa-paper-plane me-2"></i>
-                                    <span>@(esCandidatoExistente ? "ACTUALIZAR REGISTRO" : "ENVIAR REGISTRO")</span>
+                                    <span>ENVIAR REGISTRO</span>
                                 }
                             </button>
                         </div>
@@ -577,11 +570,16 @@
     private string mensajeContrasena = string.Empty;
     private bool contrasenasCoinciden = false;
 
-    // NUEVO: Variables para manejo de BD
+    // Variables para manejo de BD
     private bool cargando = false;
     private bool guardando = false;
     private int? candidatoIdExistente = null;
     private bool esCandidatoExistente = false;
+    private bool mostrarBotonLogin = false;
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "sesion")]
+    public string? Sesion { get; set; }
 
     protected override void OnInitialized()
     {
@@ -590,20 +588,25 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        // Solo auto-llenar si el formulario está vacío (primera carga)
-        if (!string.IsNullOrEmpty(CurpInicial) && string.IsNullOrEmpty(formulario.Curp))
+        if (!string.IsNullOrEmpty(CurpInicial))
         {
             formulario.Curp = CurpInicial.ToUpper();
-            await BuscarCandidatoPorCurp(); // Ahora sí puede usar await
+            
+            // Si viene con sesión activa, cargar datos del candidato
+            if (Sesion == "activa")
+            {
+                await CargarDatosCandidato();
+            }
+            else
+            {
+                // Nuevo registro - solo auto-llenar desde CURP
+                AutoLlenarDesdeCurp();
+            }
         }
     }
 
-    // NUEVO: Método para buscar candidato en BD
-    private async Task BuscarCandidatoPorCurp()
+    private async Task CargarDatosCandidato()
     {
-        if (string.IsNullOrEmpty(formulario.Curp) || formulario.Curp.Length != 18)
-            return;
-
         cargando = true;
         StateHasChanged();
 
@@ -613,23 +616,15 @@
             
             if (candidato != null)
             {
-                // Candidato encontrado - cargar datos
                 esCandidatoExistente = true;
                 candidatoIdExistente = candidato.CandidatoId;
                 CargarDatosDesdeBaseDatos(candidato);
-                MostrarMensaje("info", "Se encontró información existente para esta CURP. Puede actualizarla a continuación.");
-            }
-            else
-            {
-                // Nuevo candidato
-                esCandidatoExistente = false;
-                AutoLlenarDesdeCurp();
-                MostrarMensaje("success", "CURP válida. Complete el formulario para registrarse.");
+                MostrarMensaje("info", "Datos cargados. Puede actualizarlos si lo desea.");
             }
         }
         catch (Exception ex)
         {
-            MostrarMensaje("danger", $"Error al buscar información: {ex.Message}");
+            MostrarMensaje("danger", $"Error al cargar datos: {ex.Message}");
         }
         finally
         {
@@ -638,146 +633,58 @@
         }
     }
 
-    // Reemplazar el método CargarDatosDesdeBaseDatos
-    private void CargarDatosDesdeBaseDatos(CandidatoCrp candidato)
+    private async Task BuscarCandidatoPorCurp()
     {
-        // Datos básicos
-        formulario.Curp = candidato.Curp;
-        formulario.NombreCompleto = candidato.NombreCompleto; // Usa la propiedad calculada
-        formulario.Genero = candidato.Genero; // Ya viene como "Masculino", "Femenino", etc.
-        formulario.FechaNacimiento = candidato.FechaNacimiento;
-        formulario.LugarNacimiento = candidato.LugarNacimiento;
-        
-        // Programa Jóvenes
-        formulario.EsEgresadoJovenes = candidato.EsEgresadoJovenes;
-        
-        // Contacto
-        formulario.Telefono = candidato.Telefono;
-        formulario.CorreoElectronico = candidato.CorreoElectronico;
-        formulario.CorreoAcceso = candidato.CorreoAcceso;
-        
-        // Dirección
-        formulario.Estado = candidato.Estado;
-        formulario.Municipio = candidato.Municipio;
-        formulario.CodigoPostal = candidato.CodigoPostal;
-        formulario.Colonia = candidato.Colonia;
-        
-        // Formación Académica
-        formulario.NivelEstudios = candidato.NivelEstudios;
-        formulario.CarreraEspecialidad = candidato.CarreraEspecialidad;
-        
-        // Experiencia Laboral
-        formulario.ExperienciaLaboral = candidato.ExperienciaLaboral;
-        formulario.PuestosTrabajo = candidato.PuestosTrabajo;
-        formulario.AniosExperiencia = candidato.AniosExperiencia;
-        formulario.DominioIdioma = candidato.DominioIdioma;
-        
-        // Aspiraciones
-        formulario.PuestoDeseado = candidato.PuestoDeseado;
-        formulario.SalarioPretendido = candidato.SalarioPretendido;
-        
-        // Datos de acceso
-        formulario.UsarMismoCorreo = candidato.UsarMismoCorreo;
-        
-        // NO cargamos contraseñas por seguridad
-    }
+        if (string.IsNullOrEmpty(formulario.Curp) || formulario.Curp.Length != 18)
+            return;
 
-    // Reemplazar el método MapearFormularioACandidato
-    private CandidatoCrp MapearFormularioACandidato()
-    {
-        // Separar nombre completo en partes
-        var nombrePartes = formulario.NombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var nombre = nombrePartes.Length > 0 ? nombrePartes[0] : "";
-        var paterno = nombrePartes.Length > 1 ? nombrePartes[1] : "";
-        var materno = nombrePartes.Length > 2 ? string.Join(" ", nombrePartes.Skip(2)) : "";
+        cargando = true;
+        mostrarBotonLogin = false;
+        StateHasChanged();
 
-        return new CandidatoCrp
+        try
         {
-            // Datos básicos
-            Curp = formulario.Curp,
-            Nombre = nombre,
-            Paterno = paterno,
-            Materno = materno,
-            Genero = formulario.Genero,
-            FechaNacimiento = formulario.FechaNacimiento,
-            LugarNacimiento = formulario.LugarNacimiento,
+            var candidato = await Repository.ObtenerPorCurp(formulario.Curp);
             
-            // Programa Jóvenes
-            EsEgresadoJovenes = formulario.EsEgresadoJovenes,
-            
-            // Contacto
-            Telefono = formulario.Telefono,
-            CorreoElectronico = formulario.CorreoElectronico,
-            CorreoAcceso = formulario.CorreoAcceso,
-            
-            // Dirección
-            Estado = formulario.Estado,
-            Municipio = formulario.Municipio,
-            CodigoPostal = formulario.CodigoPostal,
-            Colonia = formulario.Colonia,
-            
-            // Formación Académica
-            NivelEstudios = formulario.NivelEstudios,
-            CarreraEspecialidad = formulario.CarreraEspecialidad,
-            
-            // Experiencia Laboral
-            ExperienciaLaboral = formulario.ExperienciaLaboral,
-            PuestosTrabajo = formulario.PuestosTrabajo,
-            AniosExperiencia = formulario.AniosExperiencia,
-            DominioIdioma = formulario.DominioIdioma,
-            
-            // Aspiraciones
-            PuestoDeseado = formulario.PuestoDeseado,
-            SalarioPretendido = formulario.SalarioPretendido,
-            
-            // Datos de acceso
-            UsarMismoCorreo = formulario.UsarMismoCorreo,
-            Contrasena = formulario.Contrasena,
-            ConfirmarContrasena = formulario.ConfirmarContrasena,
-            
-            // Términos
-            AceptaTerminos = formulario.AceptaTerminos,
-            AceptaPrivacidad = formulario.AceptaPrivacidad,
-            
-            // FolioSIISNE se puede generar en el repositorio o aquí
-            FolioSIISNE = 0 // El repositorio puede generarlo
-        };
-    }
-
-    private void OnCurpInput(ChangeEventArgs e)
-    {
-        var valor = e.Value?.ToString() ?? "";
-        formulario.Curp = valor.ToUpper();
-        
-        if (formulario.Curp.Length == 18)
+            if (candidato != null)
+            {
+                esCandidatoExistente = true;
+                candidatoIdExistente = candidato.CandidatoId;
+                mostrarBotonLogin = true;
+                MostrarMensaje("warning", "Esta CURP ya está registrada. Por favor, inicie sesión para actualizar su información.");
+            }
+            else
+            {
+                esCandidatoExistente = false;
+                mostrarBotonLogin = false;
+                AutoLlenarDesdeCurp();
+                MostrarMensaje("success", "CURP válida. Complete el formulario para registrarse.");
+            }
+        }
+        catch (Exception ex)
         {
-            _ = ValidarCurpAsync(); // Llamar versión async
+            MostrarMensaje("danger", $"Error al buscar información: {ex.Message}");
+            Console.WriteLine($"Error completo: {ex}");
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
         }
     }
 
-    private async Task ValidarCurpAsync() // MODIFICADO: Ahora es async
+    private void IrALogin()
     {
-        var patron = @"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$";
-        if (System.Text.RegularExpressions.Regex.IsMatch(formulario.Curp, patron))
-        {
-            MostrarMensaje("success", "CURP válida. Buscando información...");
-            await BuscarCandidatoPorCurp(); // NUEVO: Buscar en BD
-        }
-        else
-        {
-            MostrarMensaje("danger", "CURP no válida. Verifique el formato.");
-        }
+        Navigation.NavigateTo($"/updatecurp/{formulario.Curp}");
     }
 
     private void AutoLlenarDesdeCurp()
     {
         if (formulario.Curp.Length >= 11)
         {
-            // Auto-llenar género desde CURP
             char sexo = formulario.Curp[10];
-            formulario.Genero = sexo == 'H' ? "Masculino" : sexo == 'M' ? "Femenino" : "";
+            formulario.Genero = sexo == 'H' ? 1 : sexo == 'M' ? 2 : 3;
 
-            // Auto-llenar fecha de nacimiento
             try
             {
                 int año = int.Parse(formulario.Curp.Substring(4, 2));
@@ -790,174 +697,81 @@
         }
     }
 
-    private void OnCodigoPostalInput(ChangeEventArgs e)
+    private async Task ValidarCurpAsync()
+    {
+        var patron = @"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$";
+        if (System.Text.RegularExpressions.Regex.IsMatch(formulario.Curp, patron))
+        {
+            MostrarMensaje("success", "CURP válida. Buscando información...");
+            await Task.Delay(100);
+            await BuscarCandidatoPorCurp();
+        }
+        else
+        {
+            MostrarMensaje("danger", "CURP no válida. Verifique el formato.");
+        }
+    }
+
+    private void OnCurpInput(ChangeEventArgs e)
     {
         var valor = e.Value?.ToString() ?? "";
-        formulario.CodigoPostal = new string(valor.Where(char.IsDigit).ToArray());
-        if (formulario.CodigoPostal.Length > 5)
-        {
-            formulario.CodigoPostal = formulario.CodigoPostal.Substring(0, 5);
-        }
-    }
-
-    private void OnCorreoContactoInput(ChangeEventArgs e)
-    {
-        formulario.CorreoElectronico = e.Value?.ToString() ?? "";
+        formulario.Curp = valor.ToUpper();
         
-        if (formulario.UsarMismoCorreo == "Si")
+        if (formulario.Curp.Length == 18)
         {
-            formulario.CorreoAcceso = formulario.CorreoElectronico;
+            _ = ValidarCurpAsync();
         }
     }
 
-    private void UsarMismoCorreo(bool usar)
-    {
-        if (usar)
-        {
-            formulario.CorreoAcceso = formulario.CorreoElectronico;
-            correoAccesoReadOnly = true;
-        }
-        else
-        {
-            formulario.CorreoAcceso = string.Empty;
-            correoAccesoReadOnly = false;
-        }
-        StateHasChanged();
-    }
-
-    private void ValidarContrasenas()
-    {
-        if (!string.IsNullOrEmpty(formulario.Contrasena) && !string.IsNullOrEmpty(formulario.ConfirmarContrasena))
-        {
-            if (formulario.Contrasena == formulario.ConfirmarContrasena)
-            {
-                contrasenasCoinciden = true;
-                mensajeContrasena = "✓ Las contraseñas coinciden correctamente.";
-            }
-            else
-            {
-                contrasenasCoinciden = false;
-                mensajeContrasena = "✗ Las contraseñas no coinciden.";
-            }
-        }
-        else
-        {
-            mensajeContrasena = string.Empty;
-            contrasenasCoinciden = false;
-        }
-    }
-
-    private string GetAlertClass()
-    {
-        return tipoMensaje switch
-        {
-            "success" => "alert-success",
-            "warning" => "alert-warning",
-            "danger" => "alert-danger",
-            "info" => "alert-info",
-            _ => "alert-info"
-        };
-    }
-
-    private string GetAlertIcon()
-    {
-        return tipoMensaje switch
-        {
-            "success" => "fa-check-circle",
-            "warning" => "fa-exclamation-circle",
-            "danger" => "fa-exclamation-triangle",
-            "info" => "fa-info-circle",
-            _ => "fa-info-circle"
-        };
-    }
-
-    private void MostrarMensaje(string tipo, string msg)
-    {
-        tipoMensaje = tipo;
-        mensaje = msg;
-        StateHasChanged();
-
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(5000);
-            mensaje = string.Empty;
-            await InvokeAsync(StateHasChanged);
-        });
-    }
-
-    private void CerrarAlerta()
-    {
-        mensaje = string.Empty;
-    }
-
-    // MODIFICADO: Ahora guarda en base de datos
     private async Task EnviarFormulario()
     {
-        if (string.IsNullOrEmpty(formulario.UsarMismoCorreo))
-        {
-            MostrarMensaje("danger", "Por favor, indique si desea usar el mismo correo o uno diferente.");
-            return;
-        }
-
-        if (string.IsNullOrEmpty(formulario.CorreoAcceso))
-        {
-            MostrarMensaje("danger", "Por favor, proporcione un correo electrónico para acceso.");
-            return;
-        }
-
-        if (formulario.Contrasena != formulario.ConfirmarContrasena)
-        {
-            MostrarMensaje("danger", "Las contraseñas no coinciden. Por favor verifique.");
-            return;
-        }
-
         guardando = true;
         StateHasChanged();
 
         try
         {
-            // Mapear EmpleotonModel a CandidatoCrp
             var candidato = MapearFormularioACandidato();
 
             if (esCandidatoExistente && candidatoIdExistente.HasValue)
             {
-                // Actualizar candidato existente
+                // ACTUALIZAR candidato existente
                 candidato.CandidatoId = candidatoIdExistente.Value;
-                var actualizado = await Repository.ActualizarCandidato(candidato);
+                var actualizado = await Repository.Actualizar(candidato.CandidatoId, candidato);
                 
                 if (actualizado)
                 {
-                    MostrarMensaje("success", "Información actualizada exitosamente. Redirigiendo...");
+                    MostrarMensaje("success", "¡Información actualizada exitosamente!");
                     await Task.Delay(2000);
                     var folio = "EMP-2025-" + candidatoIdExistente.Value.ToString("D6");
-                    Navigation.NavigateTo($"/verificacion/{folio}?nombre={Uri.EscapeDataString(formulario.NombreCompleto)}&email={Uri.EscapeDataString(formulario.CorreoAcceso)}");
+                    Navigation.NavigateTo($"/verificacion/{folio}?actualizado=true");
                 }
                 else
                 {
-                    MostrarMensaje("danger", "No se pudo actualizar la información.");
+                    MostrarMensaje("danger", "No se pudo actualizar la información. Intente nuevamente.");
                 }
             }
             else
             {
-                // Registrar nuevo candidato
-                var nuevoId = await Repository.AgregarCandidato(candidato);
+                // CREAR nuevo candidato
+                var nuevoId = await Repository.Crear(candidato);
                 
                 if (nuevoId > 0)
                 {
-                    MostrarMensaje("success", "¡Registro exitoso! Redirigiendo...");
+                    MostrarMensaje("success", "¡Registro exitoso!");
                     await Task.Delay(2000);
                     var folio = "EMP-2025-" + nuevoId.ToString("D6");
-                    Navigation.NavigateTo($"/verificacion/{folio}?nombre={Uri.EscapeDataString(formulario.NombreCompleto)}&email={Uri.EscapeDataString(formulario.CorreoAcceso)}");
+                    Navigation.NavigateTo($"/verificacion/{folio}");
                 }
                 else
                 {
-                    MostrarMensaje("danger", "No se pudo completar el registro.");
+                    MostrarMensaje("danger", "No se pudo completar el registro. Intente nuevamente.");
                 }
             }
         }
         catch (Exception ex)
         {
             MostrarMensaje("danger", $"Error al guardar: {ex.Message}");
+            Console.WriteLine($"Error completo: {ex}");
         }
         finally
         {
@@ -966,28 +780,26 @@
         }
     }
 
-    // NUEVO: Mapear formulario a modelo de BD
-    private CandidatoCrp MapearFormularioACandidato2()
+    private CandidatoCrp MapearFormularioACandidato()
     {
-        // Separar nombre completo en partes
         var nombrePartes = formulario.NombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var nombre = nombrePartes.Length > 0 ? nombrePartes[0] : "";
-        var paterno = nombrePartes.Length > 1 ? nombrePartes[1] : "";
-        var materno = nombrePartes.Length > 2 ? string.Join(" ", nombrePartes.Skip(2)) : "";
-
+        
         return new CandidatoCrp
         {
+            // Si es actualización, mantener el ID
+            CandidatoId = candidatoIdExistente ?? 0,
+            
             // Datos básicos
             Curp = formulario.Curp,
-            Nombre = nombre,
-            Paterno = paterno,
-            Materno = materno,
+            Nombre = nombrePartes.Length > 0 ? nombrePartes[0] : "",
+            Paterno = nombrePartes.Length > 1 ? nombrePartes[1] : "",
+            Materno = nombrePartes.Length > 2 ? string.Join(" ", nombrePartes.Skip(2)) : "",
             Genero = formulario.Genero,
             FechaNacimiento = formulario.FechaNacimiento,
-            LugarNacimiento = formulario.LugarNacimiento,
+            LugarNacimiento = formulario.LugarNacimiento ?? string.Empty,
             
             // Programa Jóvenes
-            EsEgresadoJovenes = formulario.EsEgresadoJovenes,
+            EsEgresadoJovenes = formulario.EsEgresadoJovenes ?? string.Empty,
             
             // Contacto
             Telefono = formulario.Telefono,
@@ -1023,37 +835,100 @@
             AceptaTerminos = formulario.AceptaTerminos,
             AceptaPrivacidad = formulario.AceptaPrivacidad,
             
-            // FolioSIISNE se puede generar en el repositorio o aquí
-            FolioSIISNE = 0 // El repositorio puede generarlo
+            // Folio (generado por el repositorio si es nuevo)
+            FolioSIISNE = 0
         };
     }
 
-    private string GetCorreoAccesoClass()
+    private void MostrarMensaje(string tipo, string msg)
     {
-        return correoAccesoReadOnly ? "form-control bg-light" : "form-control";
+        tipoMensaje = tipo;
+        mensaje = msg;
+        StateHasChanged();
     }
 
-    // Modelo se mantiene igual
+    private void CerrarAlerta() => mensaje = string.Empty;
+
+    private string GetAlertClass() => tipoMensaje switch
+    {
+        "success" => "alert-success",
+        "warning" => "alert-warning",
+        "danger" => "alert-danger",
+        _ => "alert-info"
+    };
+
+    private string GetAlertIcon() => tipoMensaje switch
+    {
+        "success" => "fa-check-circle",
+        "warning" => "fa-exclamation-circle",
+        "danger" => "fa-exclamation-triangle",
+        _ => "fa-info-circle"
+    };
+
+    private void CargarDatosDesdeBaseDatos(CandidatoCrp candidato)
+    {
+        // Datos básicos
+        formulario.Curp = candidato.Curp;
+        formulario.NombreCompleto = candidato.NombreCompleto;
+        formulario.Genero = candidato.Genero;
+        formulario.FechaNacimiento = candidato.FechaNacimiento;
+        formulario.LugarNacimiento = candidato.LugarNacimiento ?? string.Empty;
+        
+        // Programa Jóvenes (si existe en tu modelo)
+        formulario.EsEgresadoJovenes = candidato.EsEgresadoJovenes ?? string.Empty;
+        
+        // Contacto
+        formulario.Telefono = candidato.Telefono ?? string.Empty;
+        formulario.CorreoElectronico = candidato.CorreoElectronico ?? string.Empty;
+        formulario.CorreoAcceso = candidato.CorreoAcceso ?? string.Empty;
+        
+        // Dirección
+        formulario.Estado = candidato.Estado ?? string.Empty;
+        formulario.Municipio = candidato.Municipio ?? string.Empty;
+        formulario.CodigoPostal = candidato.CodigoPostal ?? string.Empty;
+        formulario.Colonia = candidato.Colonia ?? string.Empty;
+        
+        // Formación Académica
+        formulario.NivelEstudios = candidato.NivelEstudios ?? string.Empty;
+        formulario.CarreraEspecialidad = candidato.CarreraEspecialidad ?? string.Empty;
+        
+        // Experiencia Laboral
+        formulario.ExperienciaLaboral = candidato.ExperienciaLaboral ?? string.Empty;
+        formulario.PuestosTrabajo = candidato.PuestosTrabajo ?? string.Empty;
+        formulario.AniosExperiencia = candidato.AniosExperiencia ?? string.Empty;
+        formulario.DominioIdioma = candidato.DominioIdioma ?? string.Empty;
+        
+        // Aspiraciones
+        formulario.PuestoDeseado = candidato.PuestoDeseado ?? string.Empty;
+        formulario.SalarioPretendido = candidato.SalarioPretendido;
+        
+        // Datos de acceso
+        formulario.UsarMismoCorreo = candidato.UsarMismoCorreo ?? string.Empty;
+        
+        // NO cargamos las contraseñas por seguridad
+        // El usuario deberá confirmarlas nuevamente si actualiza
+    }
+
     public class EmpleotonModel
     {
         [Required(ErrorMessage = "La CURP es obligatoria")]
-        [StringLength(18, MinimumLength = 18, ErrorMessage = "La CURP debe tener 18 caracteres")]
-        [RegularExpression(@"^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$", ErrorMessage = "Formato de CURP inválido")]
+        [StringLength(18, MinimumLength = 18)]
         public string Curp { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El nombre completo es obligatorio")]
         public string NombreCompleto { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El género es obligatorio")]
-        public string Genero { get; set; } = string.Empty;
+        [Range(1, 3, ErrorMessage = "Debe seleccionar un género")]
+        public int Genero { get; set; }
 
-        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
+        [Required]
         public DateTime? FechaNacimiento { get; set; }
 
-        [Required(ErrorMessage = "El lugar de nacimiento es obligatorio")]
+        [Required]
         public string LugarNacimiento { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Este campo es obligatorio")]
+        [Required]
         public string EsEgresadoJovenes { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El teléfono es obligatorio")]

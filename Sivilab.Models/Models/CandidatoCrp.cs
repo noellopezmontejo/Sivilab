@@ -27,7 +27,7 @@ namespace Sivilab.Models.Models
 
 
         [Required(ErrorMessage = "El género es obligatorio")]
-        public string Genero { get; set; } = string.Empty;
+        public int Genero { get; set; } = 0;
 
         [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
         public DateTime? FechaNacimiento { get; set; }
