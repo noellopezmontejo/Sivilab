@@ -9,8 +9,8 @@ namespace Sivilab.Eventos.Services
         Task<IEnumerable<CandidatoCrp>> ObtenerTodos();
         Task<CandidatoCrp?> ObtenerPorId(int id);
         Task<CandidatoCrp?> ObtenerPorCurp(string curp);
-        Task<int> Crear(CandidatoCrp model);
-        Task<bool> Actualizar(int id, CandidatoCrp model);
-        Task<bool> Eliminar(int id);
+      
+        Task<int> AgregarCandidato(CandidatoCrp candidato);
+        Task<bool> ActualizarCandidato(CandidatoCrp candidato);
     }
 }

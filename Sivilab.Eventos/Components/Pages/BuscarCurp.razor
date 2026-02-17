@@ -17,7 +17,7 @@
                 <div class="card-header bg-gradient text-white text-center py-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
                     <h3 class="mb-0">
                         <i class="fas fa-user-lock me-2"></i>
-                        ACTUALIZAR INFORMACIÓN
+                        VERIFICACIÓN DE CURP
                     </h3>
                     <p class="mb-0 mt-2 small opacity-90">EMPLEOTÓN CHIAPAS 2025</p>
                 </div>
@@ -37,14 +37,14 @@
                         </div>
                     }
 
-                    <!-- Estado: CURP Encontrada -->
-                    @if (candidatoExiste && !buscando)
+                    <!-- Estado: CURP Encontrada CON Acceso -->
+                    @if (candidatoExiste && tieneAcceso && !buscando)
                     {
                         <div class="alert alert-success border-0 mb-3" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);">
                             <h6 class="alert-heading mb-2">
-                                <i class="fas fa-check-circle me-2"></i>CURP Registrada
+                                <i class="fas fa-check-circle me-2"></i>CURP Registrada con Acceso
                             </h6>
-                            <small>Esta CURP ya está registrada. Inicie sesión para actualizar su información.</small>
+                            <small>Inicie sesión para actualizar su información.</small>
                         </div>
 
                         <!-- Información del candidato -->
@@ -61,9 +61,18 @@
                                             <strong class="font-monospace">@candidatoEncontrado.Curp</strong>
                                         </div>
                                         <div class="col-md-6">
+                                            <small class="text-muted d-block">Nombre:</small>
+                                            <strong>@candidatoEncontrado.NombreCompleto</strong>
+                                        </div>
+                                        <div class="col-md-6">
                                             <small class="text-muted d-block">Correo registrado:</small>
-                                            <strong>@candidatoEncontrado</strong>
-                                            <i class="fas fa-lock ms-1 text-muted small" title="No editable"></i>
+                                            <strong>@candidatoEncontrado.CorreoAcceso</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Estado:</small>
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Con acceso al sistema
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -242,6 +251,150 @@
                         </div>
                     }
 
+                    <!-- NUEVO: Estado: CURP Encontrada SIN Acceso -->
+                    @if (candidatoExiste && !tieneAcceso && !buscando)
+                    {
+                        <div class="alert alert-warning border-0 mb-3" style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
+                            <h6 class="alert-heading mb-2">
+                                <i class="fas fa-exclamation-circle me-2"></i>CURP Registrada sin Acceso
+                            </h6>
+                            <small>Esta CURP está registrada pero no tiene credenciales de acceso al sistema.</small>
+                        </div>
+
+                        <!-- Información del candidato -->
+                        @if (candidatoEncontrado != null)
+                        {
+                            <div class="card bg-light mb-3">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title text-primary mb-2">
+                                        <i class="fas fa-user me-2"></i>Información Registrada
+                                    </h6>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">CURP:</small>
+                                            <strong class="font-monospace">@candidatoEncontrado.Curp</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Nombre:</small>
+                                            <strong>@candidatoEncontrado.NombreCompleto</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Correo:</small>
+                                            <strong>@candidatoEncontrado.CorreoAcceso</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Estado:</small>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Sin acceso al sistema
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Mensaje -->
+                        @if (!string.IsNullOrEmpty(mensaje))
+                        {
+                            <div class="alert @GetAlertClass() alert-dismissible fade show py-2" role="alert">
+                                <small>
+                                    <i class="fas @GetAlertIcon() me-2"></i>
+                                    @mensaje
+                                </small>
+                                <button type="button" class="btn-close btn-sm" @onclick="CerrarAlerta"></button>
+                            </div>
+                        }
+
+                        <!-- Formulario de Registro de Acceso -->
+                        <div class="card border-primary mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-user-plus me-2"></i>Registrar Acceso al Sistema
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Cree sus credenciales de acceso para poder actualizar su información y consultar oportunidades laborales.</small>
+                                </div>
+
+                                <EditForm Model="@registroAccesoForm" OnValidSubmit="CrearAcceso" FormName="RegistroAccesoForm">
+                                    <DataAnnotationsValidator />
+
+                                    <div class="row g-3 mb-3">
+                                        <!-- CURP (readonly) -->
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold small">
+                                                <i class="fas fa-id-card me-1 text-primary"></i>CURP
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-sm bg-light text-uppercase" 
+                                                   value="@Curp" 
+                                                   disabled 
+                                                   style="font-family: 'Courier New', monospace; letter-spacing: 1px;" />
+                                        </div>
+
+                                        <!-- Correo (readonly desde BD) -->
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold small">
+                                                <i class="fas fa-envelope me-1 text-primary"></i>CORREO ELECTRÓNICO
+                                            </label>
+                                            <input type="email" 
+                                                   class="form-control form-control-sm bg-light" 
+                                                   value="@(candidatoEncontrado?.CorreoAcceso ?? "")" 
+                                                   disabled />
+                                            <div class="form-text small">
+                                                <i class="fas fa-info-circle me-1"></i>Se usará este correo para el acceso
+                                            </div>
+                                        </div>
+
+                                        <!-- Contraseña -->
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small">
+                                                <i class="fas fa-lock me-1 text-primary"></i>CONTRASEÑA <span class="text-danger">*</span>
+                                            </label>
+                                            <InputText @bind-Value="registroAccesoForm.Contrasena"
+                                                       type="password"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="Mínimo 8 caracteres" />
+                                            <ValidationMessage For="@(() => registroAccesoForm.Contrasena)" class="text-danger small" />
+                                        </div>
+
+                                        <!-- Confirmar Contraseña -->
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold small">
+                                                <i class="fas fa-lock me-1 text-primary"></i>CONFIRMAR CONTRASEÑA <span class="text-danger">*</span>
+                                            </label>
+                                            <InputText @bind-Value="registroAccesoForm.ConfirmarContrasena"
+                                                       type="password"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="Repita la contraseña" />
+                                            <ValidationMessage For="@(() => registroAccesoForm.ConfirmarContrasena)" class="text-danger small" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Botón de registro -->
+                                    <div class="d-grid">
+                                        <button type="submit"
+                                                class="btn btn-success"
+                                                disabled="@creandoAcceso">
+                                            @if (creandoAcceso)
+                                            {
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                <small>CREANDO ACCESO...</small>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-user-plus me-2"></i>
+                                                <small>CREAR ACCESO AL SISTEMA</small>
+                                            }
+                                        </button>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+
                     <!-- Estado: CURP No Encontrada -->
                     @if (!candidatoExiste && !buscando && busquedaCompletada)
                     {
@@ -279,17 +432,22 @@
     [SupplyParameterFromForm]
     private RecuperarModel recuperarForm { get; set; } = new();
 
+    [SupplyParameterFromForm]
+    private RegistroAccesoModel registroAccesoForm { get; set; } = new();
+
     private string mensaje = string.Empty;
     private string tipoMensaje = string.Empty;
     private bool buscando = true;
     private bool busquedaCompletada = false;
     private bool candidatoExiste = false;
+    private bool tieneAcceso = false;
     private bool validando = false;
     private bool enviandoRecuperacion = false;
+    private bool creandoAcceso = false;
     private bool mostrarFormularioRecuperacion = false;
     private string? tokenRecuperacion = null;
     private CandidatoCrp? candidatoEncontrado = null;
-    private CandidatoCrp? candidatoRecuperacion = null;
+    private AccesoWeb? accesoEncontrado = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -306,15 +464,23 @@
 
         try
         {
-            await Task.Delay(1000);
+            await Task.Delay(800);
+            
+            // 1. Buscar candidato por CURP
             candidatoEncontrado = await Repository.ObtenerPorCurp(Curp);
 
             if (candidatoEncontrado != null)
             {
                 candidatoExiste = true;
+                
+                // 2. Verificar si tiene acceso en Acceso_Web (buscar por correo)
+                accesoEncontrado = await AccesoWebService.ObtenerPorEmail(candidatoEncontrado.CorreoAcceso);
+                
+                tieneAcceso = accesoEncontrado != null;
             }
             else
             {
+                // No existe candidato, redirigir a registro
                 candidatoExiste = false;
                 busquedaCompletada = true;
                 StateHasChanged();
@@ -348,7 +514,7 @@
                 return;
             }
 
-            // VALIDAR CONTRA ACCESO_WEB en lugar de CandidatoCrp
+            // Validar credenciales contra Acceso_Web
             var credencialesValidas = await AccesoWebService.ValidarCredenciales(
                 candidatoEncontrado.CorreoAcceso, 
                 loginForm.Contrasena
@@ -362,7 +528,9 @@
 
             MostrarMensaje("success", "Inicio exitoso. Redirigiendo...");
             await Task.Delay(1500);
-            Navigation.NavigateTo($"/emploton/{Curp}?sesion=activa");
+            
+            // Redirigir al dashboard o página de actualización
+            Navigation.NavigateTo($"/dashboard?curp={Curp}");
         }
         catch (Exception ex)
         {
@@ -375,6 +543,55 @@
         }
     }
 
+    private async Task CrearAcceso()
+    {
+        if (candidatoEncontrado == null)
+        {
+            MostrarMensaje("danger", "No se encontró el candidato.");
+            return;
+        }
+
+        if (registroAccesoForm.Contrasena != registroAccesoForm.ConfirmarContrasena)
+        {
+            MostrarMensaje("danger", "Las contraseñas no coinciden.");
+            return;
+        }
+
+        creandoAcceso = true;
+        StateHasChanged();
+
+        try
+        {
+            // Asignar contraseña al candidato
+            candidatoEncontrado.Contrasena = registroAccesoForm.Contrasena;
+            candidatoEncontrado.ConfirmarContrasena = registroAccesoForm.ConfirmarContrasena;
+
+            var nuevoId = await AccesoWebService.CrearAcceso(candidatoEncontrado);
+            
+            if (nuevoId > 0)
+            {
+                MostrarMensaje("success", "¡Acceso creado exitosamente! Ya puede iniciar sesión.");
+                await Task.Delay(2000);
+                
+                // Recargar para mostrar formulario de login
+                Navigation.NavigateTo($"/buscarcurp/{Curp}", forceLoad: true);
+            }
+            else
+            {
+                MostrarMensaje("danger", "No se pudo crear el acceso. Verifique los datos.");
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            creandoAcceso = false;
+            StateHasChanged();
+        }
+    }
+
     private async Task RecuperarContrasena()
     {
         enviandoRecuperacion = true;
@@ -382,11 +599,27 @@
 
         try
         {
-            tokenRecuperacion = new Random().Next(100000, 999999).ToString();
-            Console.WriteLine($"Token: {tokenRecuperacion}");
-            
-            MostrarMensaje("success", $"Código enviado (DEV: {tokenRecuperacion})");
-            mostrarFormularioRecuperacion = true;
+            if (candidatoEncontrado != null)
+            {
+                var enviado = await AccesoWebService.EnviarCodigoVerificacion(candidatoEncontrado.CorreoAcceso);
+                
+                if (enviado)
+                {
+                    tokenRecuperacion = new Random().Next(100000, 999999).ToString();
+                    Console.WriteLine($"Token de recuperación: {tokenRecuperacion}");
+                    
+                    MostrarMensaje("success", $"Código enviado a su correo.");
+                    mostrarFormularioRecuperacion = true;
+                }
+                else
+                {
+                    MostrarMensaje("danger", "No se pudo enviar el código.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error: {ex.Message}");
         }
         finally
         {
@@ -402,31 +635,43 @@
 
         try
         {
-            if (recuperarForm.TokenRecuperacion != tokenRecuperacion)
-            {
-                MostrarMensaje("danger", "Código incorrecto.");
-                return;
-            }
-
             if (recuperarForm.NuevaContrasena != recuperarForm.ConfirmarNuevaContrasena)
             {
                 MostrarMensaje("danger", "Las contraseñas no coinciden.");
                 return;
             }
 
-            if (candidatoEncontrado != null)
-            {
-                candidatoEncontrado.Contrasena = recuperarForm.NuevaContrasena;
-                candidatoEncontrado.ConfirmarContrasena = recuperarForm.ConfirmarNuevaContrasena;
-                
-                var actualizado = await Repository.Actualizar(candidatoEncontrado.CandidatoId, candidatoEncontrado);
+            // Confirmar email con código
+            var codigoValido = await AccesoWebService.ConfirmarEmail(
+                candidatoEncontrado?.CorreoAcceso ?? "", 
+                recuperarForm.TokenRecuperacion
+            );
 
-                if (actualizado)
-                {
-                    MostrarMensaje("success", "¡Contraseña actualizada!");
-                    CancelarRecuperacion();
-                }
+            if (!codigoValido)
+            {
+                MostrarMensaje("danger", "Código incorrecto o expirado.");
+                return;
             }
+
+            // Actualizar contraseña
+            var actualizado = await AccesoWebService.ActualizarContrasena(
+                candidatoEncontrado?.CorreoAcceso ?? "", 
+                recuperarForm.NuevaContrasena
+            );
+
+            if (actualizado)
+            {
+                MostrarMensaje("success", "¡Contraseña actualizada exitosamente!");
+                CancelarRecuperacion();
+            }
+            else
+            {
+                MostrarMensaje("danger", "No se pudo actualizar la contraseña.");
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error: {ex.Message}");
         }
         finally
         {
@@ -445,8 +690,21 @@
 
     private void CerrarAlerta() => mensaje = string.Empty;
 
-    private string GetAlertClass() => tipoMensaje switch { "success" => "alert-success", "danger" => "alert-danger", "info" => "alert-info", _ => "alert-info" };
-    private string GetAlertIcon() => tipoMensaje switch { "success" => "fa-check-circle", "danger" => "fa-exclamation-triangle", "info" => "fa-info-circle", _ => "fa-info-circle" };
+    private string GetAlertClass() => tipoMensaje switch 
+    { 
+        "success" => "alert-success", 
+        "danger" => "alert-danger", 
+        "info" => "alert-info", 
+        _ => "alert-info" 
+    };
+
+    private string GetAlertIcon() => tipoMensaje switch 
+    { 
+        "success" => "fa-check-circle", 
+        "danger" => "fa-exclamation-triangle", 
+        "info" => "fa-info-circle", 
+        _ => "fa-info-circle" 
+    };
 
     private void MostrarMensaje(string tipo, string msg)
     {
@@ -464,11 +722,27 @@
 
     public class RecuperarModel
     {
+        [Required(ErrorMessage = "El código es obligatorio")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "El código debe tener 6 dígitos")]
         public string TokenRecuperacion { get; set; } = string.Empty;
 
-        [MinLength(8)]
+        [Required(ErrorMessage = "La nueva contraseña es obligatoria")]
+        [MinLength(8, ErrorMessage = "Mínimo 8 caracteres")]
         public string NuevaContrasena { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Debe confirmar la contraseña")]
+        [Compare(nameof(NuevaContrasena), ErrorMessage = "Las contraseñas no coinciden")]
         public string ConfirmarNuevaContrasena { get; set; } = string.Empty;
+    }
+
+    public class RegistroAccesoModel
+    {
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        public string Contrasena { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Debe confirmar la contraseña")]
+        [Compare(nameof(Contrasena), ErrorMessage = "Las contraseñas no coinciden")]
+        public string ConfirmarContrasena { get; set; } = string.Empty;
     }
 }

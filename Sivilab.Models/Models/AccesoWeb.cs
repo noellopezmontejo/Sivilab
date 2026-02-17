@@ -6,7 +6,9 @@ namespace Sivilab.Models.Models
     public class AccesoWeb
     {
         public int CveAccesoWeb { get; set; }
-        
+
+        [Required(ErrorMessage = "la Curp es obligatorio")]
+        public string? Curp { get; set; }
         public string? Nombre { get; set; }
         
         public string? Paterrno { get; set; }

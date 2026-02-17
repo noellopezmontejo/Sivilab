@@ -37,6 +37,9 @@ builder.Services.AddAuthorization(options =>
 });
 
 
+
+builder.Services.AddScoped<IAccesoWebRepository, AccesoWebRepository>();
+
 // Registro de servicios del repositorio
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 

@@ -41,7 +41,7 @@
                         </div>
                     }
 
-                    <!-- NUEVO: Mostrar botón de login si CURP existe -->
+                    <!-- Mostrar botón de login si CURP existe -->
                     @if (mostrarBotonLogin && !cargando)
                     {
                         <div class="alert alert-warning border-0 mb-4">
@@ -137,15 +137,15 @@
                                 <InputRadioGroup @bind-Value="formulario.Genero">
                                     <div class="mt-2">
                                         <div class="form-check">
-                                            <InputRadio Value="1" class="form-check-input" id="generoM" />
+                                            <InputRadio Value="@("Masculino")" class="form-check-input" id="generoM" />
                                             <label class="form-check-label" for="generoM">MASCULINO</label>
                                         </div>
                                         <div class="form-check">
-                                            <InputRadio Value="2" class="form-check-input" id="generoF" />
+                                            <InputRadio Value="@("Femenino")" class="form-check-input" id="generoF" />
                                             <label class="form-check-label" for="generoF">FEMENINO</label>
                                         </div>
                                         <div class="form-check">
-                                            <InputRadio Value="3" class="form-check-input" id="generoNB" />
+                                            <InputRadio Value="@("No Binario")" class="form-check-input" id="generoNB" />
                                             <label class="form-check-label" for="generoNB">NO BINARIO</label>
                                         </div>
                                     </div>
@@ -174,10 +174,33 @@
                             </div>
                         </div>
 
-                        <!-- Sección 2: Información de Contacto -->
+                        <!-- Programa Jóvenes Construyendo el Futuro -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                                    6. ¿ERES EGRESADO DEL PROGRAMA DE JÓVENES CONSTRUYENDO EL FUTURO? <span class="text-danger">*</span>
+                                </label>
+                                <InputRadioGroup @bind-Value="formulario.EsEgresadoJovenes">
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <InputRadio Value="@("Si")" class="form-check-input" id="jovenesS" />
+                                            <label class="form-check-label" for="jovenesS">SÍ</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <InputRadio Value="@("No")" class="form-check-input" id="jovenesN" />
+                                            <label class="form-check-label" for="jovenesN">NO</label>
+                                        </div>
+                                    </div>
+                                </InputRadioGroup>
+                                <ValidationMessage For="@(() => formulario.EsEgresadoJovenes)" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Datos de Contacto -->
                         <div class="section-header mb-4">
                             <h4 class="text-primary border-bottom pb-2">
-                                <i class="fas fa-phone-alt me-2"></i>Información de Contacto
+                                <i class="fas fa-address-book me-2"></i>Datos de Contacto
                             </h4>
                         </div>
 
@@ -185,22 +208,22 @@
                             <!-- Teléfono -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-phone me-2 text-primary"></i>1. TELÉFONO <span class="text-danger">*</span>
+                                    <i class="fas fa-phone me-2 text-primary"></i>7. TELÉFONO <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.Telefono"
                                            class="form-control"
-                                           placeholder="Número de teléfono" />
+                                           placeholder="Ej: 961-123-4567" />
                                 <ValidationMessage For="@(() => formulario.Telefono)" class="text-danger" />
                             </div>
 
                             <!-- Correo Electrónico -->
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">
-                                    <i class="fas fa-envelope me-2 text-primary"></i>2. CORREO ELECTRÓNICO <span class="text-danger">*</span>
+                                    <i class="fas fa-envelope me-2 text-primary"></i>8. CORREO ELECTRÓNICO <span class="text-danger">*</span>
                                 </label>
                                 <InputText @bind-Value="formulario.CorreoElectronico"
                                            class="form-control"
-                                           placeholder="Correo electrónico" />
+                                           placeholder="ejemplo@correo.com" />
                                 <ValidationMessage For="@(() => formulario.CorreoElectronico)" class="text-danger" />
                             </div>
 
@@ -736,7 +759,7 @@
             {
                 // ACTUALIZAR candidato existente
                 candidato.CandidatoId = candidatoIdExistente.Value;
-                var actualizado = await Repository.Actualizar(candidato.CandidatoId, candidato);
+                var actualizado = await Repository.ActualizarCandidato(candidato);
                 
                 if (actualizado)
                 {
@@ -753,7 +776,7 @@
             else
             {
                 // CREAR nuevo candidato
-                var nuevoId = await Repository.Crear(candidato);
+                var nuevoId = await Repository.AgregarCandidato(candidato);
                 
                 if (nuevoId > 0)
                 {

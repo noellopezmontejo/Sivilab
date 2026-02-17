@@ -16,105 +16,134 @@ namespace Sivilab.Data.Repositories
 
         public async Task<AccesoWeb?> ObtenerPorEmail(string email)
         {
-            const string sql = @"
-                SELECT * FROM Acceso_Web 
-                WHERE Email = @Email";
-            
-            return await _db.QueryFirstOrDefaultAsync<AccesoWeb>(sql, new { Email = email });
+            return await _db.QueryFirstOrDefaultAsync<AccesoWeb>(
+                "sp_AccesoWeb_ObtenerPorEmail",
+                new { Email = email },
+                commandType: CommandType.StoredProcedure
+            );
         }
 
         public async Task<AccesoWeb?> ObtenerPorUserName(string userName)
         {
-            const string sql = @"
-                SELECT * FROM Acceso_Web 
-                WHERE UserName = @UserName";
-            
-            return await _db.QueryFirstOrDefaultAsync<AccesoWeb>(sql, new { UserName = userName });
+            return await _db.QueryFirstOrDefaultAsync<AccesoWeb>(
+                "sp_AccesoWeb_ObtenerPorUserName",
+                new { UserName = userName },
+                commandType: CommandType.StoredProcedure
+            );
         }
 
         public async Task<bool> ExisteEmail(string email)
         {
-            const string sql = @"
-                SELECT COUNT(1) FROM Acceso_Web 
-                WHERE Email = @Email";
-            
-            var count = await _db.QuerySingleAsync<int>(sql, new { Email = email });
-            return count > 0;
+            var parameters = new DynamicParameters();
+            parameters.Add("@Email", email);
+            parameters.Add("@Existe", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+
+            await _db.ExecuteAsync(
+                "sp_AccesoWeb_ExisteEmail",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return parameters.Get<bool>("@Existe");
         }
 
         public async Task<bool> ExisteUserName(string userName)
         {
-            const string sql = @"
-                SELECT COUNT(1) FROM Acceso_Web 
-                WHERE UserName = @UserName";
-            
-            var count = await _db.QuerySingleAsync<int>(sql, new { UserName = userName });
-            return count > 0;
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserName", userName);
+            parameters.Add("@Existe", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+
+            await _db.ExecuteAsync(
+                "sp_AccesoWeb_ExisteUserName",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return parameters.Get<bool>("@Existe");
         }
 
         public async Task<int> Crear(AccesoWeb acceso)
         {
-            const string sql = @"
-                INSERT INTO Acceso_Web 
-                    (Nombre, Paterrno, Materno, UserName, Email, PasswordHash, 
-                     IsEmailConfirmed, ConfirmationCode, Role)
-                VALUES 
-                    (@Nombre, @Paterrno, @Materno, @UserName, @Email, @PasswordHash,
-                     @IsEmailConfirmed, @ConfirmationCode, @Role);
-                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-            
-            return await _db.QuerySingleAsync<int>(sql, acceso);
+            var resultado = await _db.QuerySingleAsync<int>(
+                "sp_AccesoWeb_Crear",
+                new
+                {
+                    acceso.Curp,
+                    acceso.Nombre,
+                    acceso.Paterrno,
+                    acceso.Materno,
+                    acceso.UserName,
+                    acceso.Email,
+                    acceso.PasswordHash,
+                    acceso.IsEmailConfirmed,
+                    acceso.ConfirmationCode,
+                    acceso.Role
+                },
+                commandType: CommandType.StoredProcedure
+            );
+
+            return resultado;
         }
 
         public async Task<bool> Actualizar(AccesoWeb acceso)
         {
-            const string sql = @"
-                UPDATE Acceso_Web 
-                SET Nombre = @Nombre,
-                    Paterrno = @Paterrno,
-                    Materno = @Materno,
-                    UserName = @UserName,
-                    Email = @Email,
-                    PasswordHash = @PasswordHash,
-                    IsEmailConfirmed = @IsEmailConfirmed,
-                    ConfirmationCode = @ConfirmationCode,
-                    Role = @Role
-                WHERE CveAccesoWeb = @CveAccesoWeb";
-            
-            var rows = await _db.ExecuteAsync(sql, acceso);
-            return rows > 0;
+            var resultado = await _db.QuerySingleAsync<int>(
+                "sp_AccesoWeb_Actualizar",
+                new
+                {
+                    acceso.CveAccesoWeb,
+                    acceso.Nombre,
+                    acceso.Paterrno,
+                    acceso.Materno,
+                    acceso.UserName,
+                    acceso.Email,
+                    acceso.PasswordHash,
+                    acceso.IsEmailConfirmed,
+                    acceso.ConfirmationCode,
+                    acceso.Role
+                },
+                commandType: CommandType.StoredProcedure
+            );
+
+            return resultado > 0;
         }
 
         public async Task<bool> ValidarCredenciales(string email, string passwordHash)
         {
-            const string sql = @"
-                SELECT COUNT(1) FROM Acceso_Web 
-                WHERE Email = @Email AND PasswordHash = @PasswordHash";
-            
-            var count = await _db.QuerySingleAsync<int>(sql, new { Email = email, PasswordHash = passwordHash });
-            return count > 0;
+            var parameters = new DynamicParameters();
+            parameters.Add("@Email", email);
+            parameters.Add("@PasswordHash", passwordHash);
+            parameters.Add("@EsValido", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+
+            await _db.ExecuteAsync(
+                "sp_AccesoWeb_ValidarCredenciales",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return parameters.Get<bool>("@EsValido");
         }
 
         public async Task<bool> ConfirmarEmail(string email, string confirmationCode)
         {
-            const string sql = @"
-                UPDATE Acceso_Web 
-                SET IsEmailConfirmed = 1, ConfirmationCode = NULL
-                WHERE Email = @Email AND ConfirmationCode = @ConfirmationCode";
-            
-            var rows = await _db.ExecuteAsync(sql, new { Email = email, ConfirmationCode = confirmationCode });
-            return rows > 0;
+            var resultado = await _db.QuerySingleAsync<int>(
+                "sp_AccesoWeb_ConfirmarEmail",
+                new { Email = email, ConfirmationCode = confirmationCode },
+                commandType: CommandType.StoredProcedure
+            );
+
+            return resultado > 0;
         }
 
         public async Task<bool> ActualizarContrasena(string email, string nuevaPasswordHash)
         {
-            const string sql = @"
-                UPDATE Acceso_Web 
-                SET PasswordHash = @NuevaPasswordHash
-                WHERE Email = @Email";
-            
-            var rows = await _db.ExecuteAsync(sql, new { Email = email, NuevaPasswordHash = nuevaPasswordHash });
-            return rows > 0;
+            var resultado = await _db.QuerySingleAsync<int>(
+                "sp_AccesoWeb_ActualizarContrasena",
+                new { Email = email, NuevaPasswordHash = nuevaPasswordHash },
+                commandType: CommandType.StoredProcedure
+            );
+
+            return resultado > 0;
         }
     }
 }

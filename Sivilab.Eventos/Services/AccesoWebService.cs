@@ -1,97 +1,211 @@
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Sivilab.Data.Repositories;
 using Sivilab.Models.Models;
+using System.Net.Http.Json;
 
 namespace Sivilab.Eventos.Services
 {
     public class AccesoWebService : IAccesoWebService
     {
-        private readonly IAccesoWebRepository _repository;
+        private readonly HttpClient _httpClient;
 
-        public AccesoWebService(IAccesoWebRepository repository)
+        public AccesoWebService(IHttpClientFactory httpClientFactory)
         {
-            _repository = repository;
+            _httpClient = httpClientFactory.CreateClient("SivilabAPI");
         }
 
-        public async Task<bool> ValidarEmailDisponible(string email)
+        public async Task<AccesoWeb?> ValidarAcceso(string correo, string contrasena)
         {
-            return !await _repository.ExisteEmail(email);
-        }
-
-        public async Task<bool> ValidarUserNameDisponible(string userName)
-        {
-            return !await _repository.ExisteUserName(userName);
-        }
-
-        public async Task<AccesoWeb?> ObtenerPorEmail(string email)
-        {
-            return await _repository.ObtenerPorEmail(email);
-        }
-
-        public async Task<bool> ValidarCredenciales(string email, string contrasena)
-        {
-            var passwordHash = HashPassword(contrasena);
-            return await _repository.ValidarCredenciales(email, passwordHash);
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/accesoweb/validar", new { correo, contrasena });
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<AccesoWeb>();
+                }
+                
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ValidarAcceso: {ex.Message}");
+                return null;
+            }
         }
 
         public async Task<int> CrearAcceso(CandidatoCrp candidato)
         {
-            var acceso = new AccesoWeb
+            try
             {
-                Nombre = candidato.Nombre,
-                Paterrno = candidato.Paterno,
-                Materno = candidato.Materno,
-                UserName = candidato.CorreoAcceso, // O generar uno único
-                Email = candidato.CorreoAcceso,
-                PasswordHash = HashPassword(candidato.Contrasena),
-                IsEmailConfirmed = false,
-                ConfirmationCode = GenerarCodigoVerificacion(),
-                Role = "Candidato"
-            };
+                var request = new
+                {
+                    curp = candidato.Curp,
+                    nombre = candidato.Nombre,
+                    paterno = candidato.Paterno,
+                    materno = candidato.Materno ?? "",
+                    email = candidato.CorreoAcceso,
+                    contrasena = candidato.Contrasena
+                };
 
-            return await _repository.Crear(acceso);
+                var response = await _httpClient.PostAsJsonAsync("api/AccesoWeb/crear", request);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    // Deserializar usando JsonDocument para manejar respuesta mixta
+                    using var jsonDoc = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonDocument>();
+                    
+                    if (jsonDoc?.RootElement.TryGetProperty("id", out var idElement) == true)
+                    {
+                        return idElement.GetInt32();
+                    }
+                    
+                    return 0;
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error HTTP {response.StatusCode}: {error}");
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Excepción en CrearAcceso: {ex}");
+                return 0;
+            }
         }
 
-        public async Task<bool> ActualizarContrasena(string email, string nuevaContrasena)
+        public async Task<AccesoWeb?> ObtenerPorEmail(string email)
         {
-            var passwordHash = HashPassword(nuevaContrasena);
-            return await _repository.ActualizarContrasena(email, passwordHash);
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/AccesoWeb/email/{email}");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<AccesoWeb>();
+                }
+                
+                // 404 es esperado si no existe
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error en ObtenerPorEmail: {error}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Excepción en ObtenerPorEmail: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<bool> ValidarCredenciales(string email, string contrasena)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/AccesoWeb/validar-credenciales", 
+                    new { email, contrasena });
+                
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ValidarCredenciales: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> ValidarEmailDisponible(string email)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/AccesoWeb/email-disponible/{email}");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var resultado = await response.Content.ReadFromJsonAsync<Dictionary<string, bool>>();
+                    return resultado?["disponible"] ?? false;
+                }
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ValidarEmailDisponible: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> ValidarUserNameDisponible(string userName)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/AccesoWeb/username-disponible/{userName}");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var resultado = await response.Content.ReadFromJsonAsync<Dictionary<string, bool>>();
+                    return resultado?["disponible"] ?? false;
+                }
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ValidarUserNameDisponible: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<bool> EnviarCodigoVerificacion(string email)
         {
-            var acceso = await _repository.ObtenerPorEmail(email);
-            if (acceso == null) return false;
-
-            acceso.ConfirmationCode = GenerarCodigoVerificacion();
-            await _repository.Actualizar(acceso);
-
-            // TODO: Enviar correo con el código
-            Console.WriteLine($"Código de verificación para {email}: {acceso.ConfirmationCode}");
-            
-            return true;
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/AccesoWeb/enviar-codigo", 
+                    new { email });
+                
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en EnviarCodigoVerificacion: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<bool> ConfirmarEmail(string email, string codigo)
         {
-            return await _repository.ConfirmarEmail(email, codigo);
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/AccesoWeb/confirmar-email", 
+                    new { email, codigo });
+                
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ConfirmarEmail: {ex.Message}");
+                return false;
+            }
         }
 
-        // Métodos auxiliares
-        private string HashPassword(string password)
+        public async Task<bool> ActualizarContrasena(string email, string nuevaContrasena)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
-
-        private string GenerarCodigoVerificacion()
-        {
-            return new Random().Next(100000, 999999).ToString();
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync("api/AccesoWeb/actualizar-contrasena", 
+                    new { email, nuevaContrasena });
+                
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ActualizarContrasena: {ex.Message}");
+                return false;
+            }
         }
     }
 }
