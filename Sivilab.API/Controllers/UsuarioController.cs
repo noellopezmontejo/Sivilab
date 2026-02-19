@@ -79,7 +79,7 @@ namespace Sivilab.API.Controllers
 
             // Enviar correo con el código de validación
             var mensaje = $"Hola {usuario.Nombre}, valida tu correo usando este código: {usuario.CodigoValidacion}";
-            await _emailService.EnviarCorreo(usuario.Email, "Validación de Correo", mensaje);
+            await _emailService.EnviarCodigoVerificacion(usuario.Email, "Validación de Correo", mensaje);
 
             return Ok(new { Message = "Usuario registrado. Verifica tu correo para validarlo." });
         }

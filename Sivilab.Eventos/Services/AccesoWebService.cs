@@ -167,7 +167,15 @@ namespace Sivilab.Eventos.Services
                 var response = await _httpClient.PostAsJsonAsync("api/AccesoWeb/enviar-codigo", 
                     new { email });
                 
-                return response.IsSuccessStatusCode;
+                if (response.IsSuccessStatusCode)
+                {
+                    // Leer la respuesta para obtener el código (solo desarrollo)
+                    var contenido = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Respuesta enviar código: {contenido}");
+                    return true;
+                }
+                
+                return false;
             }
             catch (Exception ex)
             {

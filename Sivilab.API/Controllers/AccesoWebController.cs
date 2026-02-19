@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sivilab.Data.Repositories;
 using Sivilab.Models.Models;
+using Sivilab.API.Services;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,10 +12,17 @@ namespace Sivilab.API.Controllers
     public class AccesoWebController : ControllerBase
     {
         private readonly IAccesoWebRepository _repository;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<AccesoWebController> _logger;
 
-        public AccesoWebController(IAccesoWebRepository repository)
+        public AccesoWebController(
+            IAccesoWebRepository repository, 
+            IEmailService emailService,
+            ILogger<AccesoWebController> logger)
         {
             _repository = repository;
+            _emailService = emailService;
+            _logger = logger;
         }
 
         // GET: api/AccesoWeb/email/{email}
@@ -94,23 +102,23 @@ namespace Sivilab.API.Controllers
                 if (request == null || !ModelState.IsValid)
                     return BadRequest(new { mensaje = "Datos inválidos", errores = ModelState });
 
-                // Verificar si el email ya tiene acceso
                 var existe = await _repository.ExisteEmail(request.Email);
                 if (existe)
                     return Conflict(new { mensaje = "Este correo ya tiene acceso registrado" });
 
-                // Crear objeto AccesoWeb
+                var codigoVerificacion = GenerarCodigoVerificacion();
+
                 var acceso = new AccesoWeb
                 {
                     Curp = request.Curp,
                     Nombre = request.Nombre,
                     Paterrno = request.Paterno,
                     Materno = request.Materno ?? "",
-                    UserName = request.Email, // Usar email como username
+                    UserName = request.Email,
                     Email = request.Email,
                     PasswordHash = HashPassword(request.Contrasena),
                     IsEmailConfirmed = false,
-                    ConfirmationCode = GenerarCodigoVerificacion(),
+                    ConfirmationCode = codigoVerificacion,
                     Role = "Candidato"
                 };
 
@@ -118,13 +126,35 @@ namespace Sivilab.API.Controllers
 
                 if (nuevoId > 0)
                 {
-                    return Ok(new { id = nuevoId, mensaje = "Acceso creado exitosamente" });
+                    // Enviar correo
+                    var nombreCompleto = $"{request.Nombre} {request.Paterno} {request.Materno}".Trim();
+                    
+                    _logger.LogInformation("Intentando enviar código a {Email}", request.Email);
+                    
+                    var correoEnviado = await _emailService.EnviarCodigoVerificacion(
+                        request.Email, 
+                        nombreCompleto, 
+                        codigoVerificacion
+                    );
+
+                    if (!correoEnviado)
+                    {
+                        _logger.LogWarning("No se pudo enviar correo a {Email}, pero acceso creado", request.Email);
+                    }
+
+                    return Ok(new 
+                    { 
+                        id = nuevoId, 
+                        mensaje = "Acceso creado exitosamente",
+                        codigoDesarrollo = codigoVerificacion // ELIMINAR EN PRODUCCIÓN
+                    });
                 }
 
                 return BadRequest(new { mensaje = "No se pudo crear el acceso" });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al crear acceso");
                 return StatusCode(500, new { mensaje = $"Error: {ex.Message}" });
             }
         }
@@ -155,23 +185,55 @@ namespace Sivilab.API.Controllers
         {
             try
             {
+                _logger.LogInformation("Solicitud de envío de código para {Email}", request.Email);
+
                 var acceso = await _repository.ObtenerPorEmail(request.Email);
                 
                 if (acceso == null)
+                {
+                    _logger.LogWarning("No se encontró acceso para {Email}", request.Email);
                     return NotFound(new { mensaje = "No se encontró acceso con ese email" });
+                }
 
                 // Generar nuevo código
                 var codigo = GenerarCodigoVerificacion();
                 acceso.ConfirmationCode = codigo;
                 
-                await _repository.Actualizar(acceso);
+                var actualizado = await _repository.Actualizar(acceso);
+                
+                if (!actualizado)
+                {
+                    _logger.LogError("No se pudo actualizar el código en BD para {Email}", request.Email);
+                    return StatusCode(500, new { mensaje = "No se pudo actualizar el código" });
+                }
 
-                // TODO: Enviar correo con el código
-                // Por ahora solo retornamos éxito
-                return Ok(new { mensaje = "Código enviado", codigoDesarrollo = codigo });
+                // Enviar correo
+                var nombreCompleto = $"{acceso.Nombre} {acceso.Paterrno} {acceso.Materno}".Trim();
+                
+                _logger.LogInformation("Enviando correo a {Email} con código {Codigo}", request.Email, codigo);
+                
+                var enviado = await _emailService.EnviarCodigoVerificacion(
+                    request.Email, 
+                    nombreCompleto, 
+                    codigo
+                );
+
+                if (enviado)
+                {
+                    _logger.LogInformation("Código enviado exitosamente a {Email}", request.Email);
+                    return Ok(new 
+                    { 
+                        mensaje = "Código enviado exitosamente",
+                        codigoDesarrollo = codigo // ELIMINAR EN PRODUCCIÓN
+                    });
+                }
+
+                _logger.LogError("EmailService retornó false para {Email}", request.Email);
+                return StatusCode(500, new { mensaje = "No se pudo enviar el correo" });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Excepción al enviar código a {Email}", request.Email);
                 return StatusCode(500, new { mensaje = $"Error: {ex.Message}" });
             }
         }

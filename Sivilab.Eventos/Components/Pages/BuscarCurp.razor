@@ -7,6 +7,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject IAccesoWebService AccesoWebService
+@implements IDisposable
 
 <PageTitle>Verificando CURP - EMPLEOTÓN CHIAPAS 2025</PageTitle>
 
@@ -40,6 +41,7 @@
                     <!-- Estado: CURP Encontrada CON Acceso -->
                     @if (candidatoExiste && tieneAcceso && !buscando)
                     {
+                        <!-- LOGIN NORMAL - Solo si email está confirmado -->
                         <div class="alert alert-success border-0 mb-3" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);">
                             <h6 class="alert-heading mb-2">
                                 <i class="fas fa-check-circle me-2"></i>CURP Registrada con Acceso
@@ -179,10 +181,11 @@
                                     <p class="small mb-2">
                                         Se enviará un código al correo: <strong>@candidatoEncontrado?.CorreoAcceso</strong>
                                     </p>
+                                    
+                                    <!-- BOTÓN SIMPLIFICADO -->
                                     <div class="d-grid">
-                                        <button type="button"
-                                                class="btn btn-outline-primary btn-sm"
-                                                @onclick="RecuperarContrasena"
+                                        <button class="btn btn-outline-primary btn-sm"
+                                                @onclick="RecuperarContrasenaClick"
                                                 disabled="@enviandoRecuperacion">
                                             @if (enviandoRecuperacion)
                                             {
@@ -251,8 +254,146 @@
                         </div>
                     }
 
-                    <!-- NUEVO: Estado: CURP Encontrada SIN Acceso -->
-                    @if (candidatoExiste && !tieneAcceso && !buscando)
+                    <!-- NUEVO: Estado: CURP Encontrada CON Acceso pero SIN Confirmación de Email -->
+                    @if (candidatoExiste && !tieneAcceso && mostrarVerificacionEmail && !buscando)
+                    {
+                        <div class="alert alert-warning border-0 mb-3" style="background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);">
+                            <h6 class="alert-heading mb-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Email No Verificado
+                            </h6>
+                            <small>Debe verificar su correo electrónico antes de poder iniciar sesión.</small>
+                        </div>
+
+                        <!-- Información del candidato -->
+                        @if (candidatoEncontrado != null)
+                        {
+                            <div class="card bg-light mb-3">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title text-primary mb-2">
+                                        <i class="fas fa-user me-2"></i>Información Registrada
+                                    </h6>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">CURP:</small>
+                                            <strong class="font-monospace">@candidatoEncontrado.Curp</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Nombre:</small>
+                                            <strong>@candidatoEncontrado.NombreCompleto</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Correo:</small>
+                                            <strong>@candidatoEncontrado.CorreoAcceso</strong>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted d-block">Estado:</small>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-clock me-1"></i>Pendiente verificación
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Mensaje -->
+                        @if (!string.IsNullOrEmpty(mensaje))
+                        {
+                            <div class="alert @GetAlertClass() alert-dismissible fade show py-2" role="alert">
+                                <small>
+                                    <i class="fas @GetAlertIcon() me-2"></i>
+                                    @mensaje
+                                </small>
+                                <button type="button" class="btn-close btn-sm" @onclick="CerrarAlerta"></button>
+                            </div>
+                        }
+
+                        <!-- Formulario de Verificación de Email -->
+                        <div class="card border-warning mb-3">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-envelope-open-text me-2"></i>Verificar Correo Electrónico
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Se envió un código de verificación al correo: <strong>@candidatoEncontrado?.CorreoAcceso</strong></small>
+                                </div>
+
+                                <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo">
+                                    <DataAnnotationsValidator />
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold small">
+                                            <i class="fas fa-key me-1 text-primary"></i>CÓDIGO DE VERIFICACIÓN (6 DÍGITOS)
+                                        </label>
+                                        <InputText @bind-Value="verificacionForm.Codigo"
+                                                   class="form-control text-center"
+                                                   placeholder="000000"
+                                                   maxlength="6"
+                                                   style="font-size: 1.5rem; letter-spacing: 0.5rem; font-family: monospace;" />
+                                        <ValidationMessage For="@(() => verificacionForm.Codigo)" class="text-danger small" />
+                                        <div class="form-text small">
+                                            <i class="fas fa-info-circle me-1"></i>Revise su bandeja de entrada y carpeta de spam
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success" disabled="@verificandoCodigo">
+                                            @if (verificandoCodigo)
+                                            {
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                <small>VERIFICANDO...</small>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                <small>VERIFICAR CÓDIGO</small>
+                                            }
+                                        </button>
+                                    </div>
+                                </EditForm>
+
+                                <!-- BOTÓN DE REENVIAR FUERA DEL EDITFORM -->
+                                <div class="d-grid mt-2">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            @onclick="ReenviarCodigoVerificacion"
+                                            disabled="@(reenviandoCodigo || tiempoEsperaReenvio > 0)">
+                                        @if (reenviandoCodigo)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                            <small>REENVIANDO...</small>
+                                        }
+                                        else if (tiempoEsperaReenvio > 0)
+                                        {
+                                            <i class="fas fa-clock me-2"></i>
+                                            <small>ESPERE @tiempoEsperaReenvio SEG</small>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-redo me-2"></i>
+                                            <small>REENVIAR CÓDIGO</small>
+                                        }
+                                    </button>
+                                </div>
+
+                                @if (tiempoEsperaReenvio > 0)
+                                {
+                                    <div class="alert alert-warning border-0 mt-2 py-2">
+                                        <small>
+                                            <i class="fas fa-hourglass-half me-2"></i>
+                                            Podrá reenviar el código en <strong>@tiempoEsperaReenvio segundos</strong>
+                                        </small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Estado: CURP Encontrada SIN Acceso (nunca ha creado credenciales) -->
+                    @if (candidatoExiste && !tieneAcceso && !mostrarVerificacionEmail && !buscando)
                     {
                         <div class="alert alert-warning border-0 mb-3" style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
                             <h6 class="alert-heading mb-2">
@@ -393,6 +534,93 @@
                                 </EditForm>
                             </div>
                         </div>
+
+                        <!-- NUEVO: Verificación de Email después de crear acceso -->
+                        @if (mostrarVerificacionEmail && !tieneAcceso)
+                        {
+                            <div class="card border-success mb-3">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-envelope-open-text me-2"></i>Verificar Correo Electrónico
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-success border-0 mb-3">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <small><strong>¡Acceso creado!</strong> Se ha enviado un código de verificación al correo: <strong>@(candidatoEncontrado?.CorreoAcceso)</strong></small>
+                                    </div>
+
+                                    <!-- REEMPLAZAR TODO DESDE <EditForm Model="@verificacionForm"> hasta </EditForm> -->
+                                    <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo">
+                                        <DataAnnotationsValidator />
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold small">
+                                                <i class="fas fa-key me-1 text-primary"></i>CÓDIGO DE VERIFICACIÓN (6 DÍGITOS)
+                                            </label>
+                                            <InputText @bind-Value="verificacionForm.Codigo"
+                                                       class="form-control text-center"
+                                                       placeholder="000000"
+                                                       maxlength="6"
+                                                       style="font-size: 1.5rem; letter-spacing: 0.5rem; font-family: monospace;" />
+                                            <ValidationMessage For="@(() => verificacionForm.Codigo)" class="text-danger small" />
+                                            <div class="form-text small">
+                                                <i class="fas fa-info-circle me-1"></i>Revise su bandeja de entrada y carpeta de spam
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-success" disabled="@verificandoCodigo">
+                                                @if (verificandoCodigo)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                                    <small>VERIFICANDO...</small>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-check-circle me-2"></i>
+                                                    <small>VERIFICAR CÓDIGO</small>
+                                                }
+                                            </button>
+                                        </div>
+                                    </EditForm>
+
+                                    <!-- BOTÓN DE REENVIAR FUERA DEL EDITFORM -->
+                                    <div class="d-grid mt-2">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                @onclick="@(() => ReenviarCodigoVerificacion())"
+                                                disabled="@(reenviandoCodigo || tiempoEsperaReenvio > 0)">
+                                            @if (reenviandoCodigo)
+                                            {
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                <small>REENVIANDO...</small>
+                                            }
+                                            else if (tiempoEsperaReenvio > 0)
+                                            {
+                                                <i class="fas fa-clock me-2"></i>
+                                                <small>ESPERE @tiempoEsperaReenvio SEG</small>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-redo me-2"></i>
+                                                <small>REENVIAR CÓDIGO</small>
+                                            }
+                                        </button>
+                                    </div>
+
+                                    @if (tiempoEsperaReenvio > 0)
+                                    {
+                                        <div class="alert alert-warning border-0 mt-2 py-2">
+                                            <small>
+                                                <i class="fas fa-hourglass-half me-2"></i>
+                                                Podrá reenviar el código en <strong>@tiempoEsperaReenvio segundos</strong>
+                                            </small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
                     }
 
                     <!-- Estado: CURP No Encontrada -->
@@ -435,6 +663,9 @@
     [SupplyParameterFromForm]
     private RegistroAccesoModel registroAccesoForm { get; set; } = new();
 
+    // CAMBIAR: Quitar [SupplyParameterFromForm] del formulario de verificación
+    private VerificacionEmailModel verificacionForm { get; set; } = new();
+
     private string mensaje = string.Empty;
     private string tipoMensaje = string.Empty;
     private bool buscando = true;
@@ -445,9 +676,15 @@
     private bool enviandoRecuperacion = false;
     private bool creandoAcceso = false;
     private bool mostrarFormularioRecuperacion = false;
-    private string? tokenRecuperacion = null;
+    private bool mostrarVerificacionEmail = false;
+    private bool verificandoCodigo = false;
+    private bool reenviandoCodigo = false;
+    private int tiempoEsperaReenvio = 0;
+    private System.Threading.Timer? temporizadorReenvio;
+
     private CandidatoCrp? candidatoEncontrado = null;
     private AccesoWeb? accesoEncontrado = null;
+    private string? tokenRecuperacion = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -476,7 +713,26 @@
                 // 2. Verificar si tiene acceso en Acceso_Web (buscar por correo)
                 accesoEncontrado = await AccesoWebService.ObtenerPorEmail(candidatoEncontrado.CorreoAcceso);
                 
-                tieneAcceso = accesoEncontrado != null;
+                if (accesoEncontrado != null)
+                {
+                    // 3. Verificar si el email está confirmado
+                    tieneAcceso = accesoEncontrado.IsEmailConfirmed;
+                    
+                    // Si tiene acceso creado pero NO confirmado, enviar código automáticamente
+                    if (!tieneAcceso)
+                    {
+                        Console.WriteLine("⚠️ Acceso creado pero email NO confirmado - Enviando código automáticamente");
+                        mostrarVerificacionEmail = true;
+                        verificacionForm = new VerificacionEmailModel();
+                        
+                        // ENVIAR CÓDIGO AUTOMÁTICAMENTE
+                        await EnviarCodigoAutomaticamente();
+                    }
+                }
+                else
+                {
+                    tieneAcceso = false;
+                }
             }
             else
             {
@@ -514,7 +770,7 @@
                 return;
             }
 
-            // Validar credenciales contra Acceso_Web
+            // VALIDAR CONTRA ACCESO_WEB en lugar de CandidatoCrp
             var credencialesValidas = await AccesoWebService.ValidarCredenciales(
                 candidatoEncontrado.CorreoAcceso, 
                 loginForm.Contrasena
@@ -543,6 +799,7 @@
         }
     }
 
+    // MODIFICAR CrearAcceso
     private async Task CrearAcceso()
     {
         if (candidatoEncontrado == null)
@@ -558,11 +815,9 @@
         }
 
         creandoAcceso = true;
-        StateHasChanged();
 
         try
         {
-            // Asignar contraseña al candidato
             candidatoEncontrado.Contrasena = registroAccesoForm.Contrasena;
             candidatoEncontrado.ConfirmarContrasena = registroAccesoForm.ConfirmarContrasena;
 
@@ -570,15 +825,17 @@
             
             if (nuevoId > 0)
             {
-                MostrarMensaje("success", "¡Acceso creado exitosamente! Ya puede iniciar sesión.");
-                await Task.Delay(2000);
+                verificacionForm = new VerificacionEmailModel();
+                mostrarVerificacionEmail = true;
                 
-                // Recargar para mostrar formulario de login
-                Navigation.NavigateTo($"/buscarcurp/{Curp}", forceLoad: true);
+                // Iniciar temporizador de reenvío (60 segundos)
+                IniciarTemporizadorReenvio(60);
+                
+                MostrarMensaje("success", "¡Acceso creado! Revise su correo para el código de verificación.");
             }
             else
             {
-                MostrarMensaje("danger", "No se pudo crear el acceso. Verifique los datos.");
+                MostrarMensaje("danger", "No se pudo crear el acceso.");
             }
         }
         catch (Exception ex)
@@ -592,29 +849,33 @@
         }
     }
 
-    private async Task RecuperarContrasena()
+    // NUEVO: Verificar código de email
+    private async Task VerificarCodigo()
     {
-        enviandoRecuperacion = true;
-        StateHasChanged();
+        verificandoCodigo = true;
 
         try
         {
-            if (candidatoEncontrado != null)
+            if (string.IsNullOrWhiteSpace(verificacionForm.Codigo))
             {
-                var enviado = await AccesoWebService.EnviarCodigoVerificacion(candidatoEncontrado.CorreoAcceso);
-                
-                if (enviado)
-                {
-                    tokenRecuperacion = new Random().Next(100000, 999999).ToString();
-                    Console.WriteLine($"Token de recuperación: {tokenRecuperacion}");
-                    
-                    MostrarMensaje("success", $"Código enviado a su correo.");
-                    mostrarFormularioRecuperacion = true;
-                }
-                else
-                {
-                    MostrarMensaje("danger", "No se pudo enviar el código.");
-                }
+                MostrarMensaje("danger", "Por favor ingrese el código.");
+                return;
+            }
+
+            var confirmado = await AccesoWebService.ConfirmarEmail(
+                candidatoEncontrado?.CorreoAcceso ?? "",
+                verificacionForm.Codigo
+            );
+
+            if (confirmado)
+            {
+                MostrarMensaje("success", "¡Email verificado! Redirigiendo al login...");
+                await Task.Delay(2000);
+                Navigation.NavigateTo($"/buscarcurp/{Curp}", forceLoad: true);
+            }
+            else
+            {
+                MostrarMensaje("danger", "Código incorrecto. Verifique e intente nuevamente.");
             }
         }
         catch (Exception ex)
@@ -623,9 +884,176 @@
         }
         finally
         {
-            enviandoRecuperacion = false;
+            verificandoCodigo = false;
             StateHasChanged();
         }
+    }
+
+    // NUEVO: Enviar código automáticamente al detectar email no confirmado
+    private async Task EnviarCodigoAutomaticamente()
+    {
+        Console.WriteLine("📧 Enviando código automáticamente...");
+        
+        try
+        {
+            var enviado = await AccesoWebService.EnviarCodigoVerificacion(
+                candidatoEncontrado?.CorreoAcceso ?? ""
+            );
+
+            if (enviado)
+            {
+                Console.WriteLine("✅ Código enviado automáticamente");
+                MostrarMensaje("info", "📧 Se ha enviado un código de verificación a su correo.");
+                IniciarTemporizadorReenvio(60);
+            }
+            else
+            {
+                Console.WriteLine("❌ No se pudo enviar el código automáticamente");
+                MostrarMensaje("warning", "⚠️ No se pudo enviar el código. Use el botón de reenviar.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR al enviar código automáticamente: {ex.Message}");
+            MostrarMensaje("warning", "⚠️ Use el botón de reenviar para obtener el código.");
+        }
+    }
+
+    // NUEVO: Método específico para reenviar código de verificación inicial
+    private async Task ReenviarCodigoVerificacion()
+    {
+        Console.WriteLine("=== REENVIAR CÓDIGO VERIFICACIÓN ===");
+        
+        if (tiempoEsperaReenvio > 0)
+        {
+            MostrarMensaje("warning", $"Debe esperar {tiempoEsperaReenvio} segundos.");
+            return;
+        }
+
+        reenviandoCodigo = true;
+        StateHasChanged();
+
+        try
+        {
+            var enviado = await AccesoWebService.EnviarCodigoVerificacion(
+                candidatoEncontrado?.CorreoAcceso ?? ""
+            );
+
+            if (enviado)
+            {
+                MostrarMensaje("success", "✅ Código reenviado. Revise su correo.");
+                verificacionForm.Codigo = string.Empty;
+                IniciarTemporizadorReenvio(60);
+            }
+            else
+            {
+                MostrarMensaje("danger", "❌ No se pudo reenviar el código.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            reenviandoCodigo = false;
+            StateHasChanged();
+        }
+    }
+
+    // MEJORAR el método IniciarTemporizadorReenvio con logging
+    private void IniciarTemporizadorReenvio(int segundos)
+    {
+        Console.WriteLine($"Iniciando temporizador: {segundos} segundos");
+
+        tiempoEsperaReenvio = segundos;
+
+        // Cancelar temporizador anterior si existe
+        temporizadorReenvio?.Dispose();
+
+        // Crear nuevo temporizador que decrementa cada segundo
+        temporizadorReenvio = new System.Threading.Timer(_ =>
+        {
+            tiempoEsperaReenvio--;
+
+            Console.WriteLine($"Temporizador: {tiempoEsperaReenvio} segundos restantes");
+
+            if (tiempoEsperaReenvio <= 0)
+            {
+                Console.WriteLine("Temporizador finalizado");
+                temporizadorReenvio?.Dispose();
+                temporizadorReenvio = null;
+            }
+
+            InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    // AGREGAR: Limpiar temporizador al destruir componente
+    public void Dispose()
+    {
+        temporizadorReenvio?.Dispose();
+    }
+
+    private async void RecuperarContrasenaClick()
+    {
+        Console.WriteLine("🔴 CLICK DETECTADO");
+        await RecuperarContrasena();
+    }
+
+    private async Task RecuperarContrasena()
+    {
+        Console.WriteLine("=== INICIO RecuperarContrasena ===");
+        
+        enviandoRecuperacion = true;
+        StateHasChanged();
+
+        try
+        {
+            if (candidatoEncontrado == null || string.IsNullOrEmpty(candidatoEncontrado.CorreoAcceso))
+            {
+                Console.WriteLine("ERROR: Sin candidato o correo");
+                MostrarMensaje("danger", "No se encontró el correo.");
+                return;
+            }
+
+            Console.WriteLine($"Enviando a: {candidatoEncontrado.CorreoAcceso}");
+            
+            var enviado = await AccesoWebService.EnviarCodigoVerificacion(candidatoEncontrado.CorreoAcceso);
+            
+            Console.WriteLine($"Resultado: {enviado}");
+
+            if (enviado)
+            {
+                GenerarTokenRecuperacion();
+                MostrarMensaje("success", "Código enviado a su correo.");
+                mostrarFormularioRecuperacion = true;
+            }
+            else
+            {
+                MostrarMensaje("danger", "No se pudo enviar el código.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"EXCEPCIÓN en RecuperarContrasena: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            enviandoRecuperacion = false;
+            Console.WriteLine("Estado cambiado: enviandoRecuperacion = false");
+            Console.WriteLine("=== FIN RecuperarContrasena ===");
+            StateHasChanged();
+        }
+    }
+
+    void GenerarTokenRecuperacion()
+    {
+        tokenRecuperacion = new Random().Next(100000, 999999).ToString();
+        Console.WriteLine($"Token de recuperación: {tokenRecuperacion}");
     }
 
     private async Task VerificarTokenYCambiarContrasena()
@@ -744,5 +1172,13 @@
         [Required(ErrorMessage = "Debe confirmar la contraseña")]
         [Compare(nameof(Contrasena), ErrorMessage = "Las contraseñas no coinciden")]
         public string ConfirmarContrasena { get; set; } = string.Empty;
+    }
+
+    public class VerificacionEmailModel
+    {
+        [Required(ErrorMessage = "El código es obligatorio")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "El código debe tener 6 dígitos")]
+        [RegularExpression(@"^\d{6}$", ErrorMessage = "Solo números")]
+        public string Codigo { get; set; } = string.Empty;
     }
 }
