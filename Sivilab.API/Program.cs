@@ -50,10 +50,10 @@ builder.Services.AddScoped<ICandidatoCrpRepository, CandidatoCrpRepository>();
 // CONFIGURACIÓN DE EMAIL
 // ============================================
 // OPCIÓN 1: Para desarrollo - Usar MOCK (sin SMTP real)
-builder.Services.AddScoped<IEmailService, MockEmailService>();
+//builder.Services.AddScoped<IEmailService, MockEmailService>();
 
 // OPCIÓN 2: Para producción - Usar EmailService real (descomentar cuando tengas SMTP configurado)
-// builder.Services.AddScoped<IEmailService, EmailService>();
+ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // Agregar la conexión a la base de datos

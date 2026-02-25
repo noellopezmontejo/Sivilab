@@ -321,7 +321,8 @@
                                     <small>Se envió un código de verificación al correo: <strong>@candidatoEncontrado?.CorreoAcceso</strong></small>
                                 </div>
 
-                                <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo">
+                                <!-- AGREGAR FormName="VerificacionEmailForm" -->
+                                <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo" FormName="VerificacionEmailForm">
                                     <DataAnnotationsValidator />
 
                                     <div class="mb-3">
@@ -550,8 +551,8 @@
                                         <small><strong>¡Acceso creado!</strong> Se ha enviado un código de verificación al correo: <strong>@(candidatoEncontrado?.CorreoAcceso)</strong></small>
                                     </div>
 
-                                    <!-- REEMPLAZAR TODO DESDE <EditForm Model="@verificacionForm"> hasta </EditForm> -->
-                                    <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo">
+                                    <!-- AGREGAR FormName="VerificacionCrearForm" -->
+                                    <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo" FormName="VerificacionCrearForm">
                                         <DataAnnotationsValidator />
 
                                         <div class="mb-3">
@@ -585,7 +586,7 @@
                                         </div>
                                     </EditForm>
 
-                                    <!-- BOTÓN DE REENVIAR FUERA DEL EDITFORM -->
+                                    <!-- Botón de reenviar fuera del EditForm -->
                                     <div class="d-grid mt-2">
                                         <button type="button"
                                                 class="btn btn-outline-secondary btn-sm"
@@ -663,8 +664,13 @@
     [SupplyParameterFromForm]
     private RegistroAccesoModel registroAccesoForm { get; set; } = new();
 
-    // CAMBIAR: Quitar [SupplyParameterFromForm] del formulario de verificación
-    private VerificacionEmailModel verificacionForm { get; set; } = new();
+    // CAMBIAR: Agregar [SupplyParameterFromForm] con FormName
+    [SupplyParameterFromForm(FormName = "VerificacionEmailForm")]
+    private VerificacionEmailModel? verificacionForm { get; set; }
+    
+    // Modelo alternativo para el segundo formulario (opcional)
+    [SupplyParameterFromForm(FormName = "VerificacionCrearForm")]
+    private VerificacionEmailModel? verificacionFormCrear { get; set; }
 
     private string mensaje = string.Empty;
     private string tipoMensaje = string.Empty;
@@ -692,6 +698,13 @@
         {
             await BuscarCandidato();
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Inicializar los modelos si son null
+        verificacionForm ??= new();
+        verificacionFormCrear ??= new();
     }
 
     private async Task BuscarCandidato()
