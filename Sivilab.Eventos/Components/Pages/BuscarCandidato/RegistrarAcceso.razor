@@ -1,0 +1,166 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Sivilab.Eventos.Services
+@using Sivilab.Models.Models
+@inject IAccesoWebService AccesoWebService
+
+<div class="card border-primary mb-3">
+    <div class="card-header bg-primary text-white">
+        <h6 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i>Registrar Acceso al Sistema
+        </h6>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @GetAlertClass() alert-dismissible fade show py-2" role="alert">
+                <small><i class="fas @GetAlertIcon() me-2"></i>@mensaje</small>
+                <button type="button" class="btn-close btn-sm" @onclick="CerrarMensaje"></button>
+            </div>
+        }
+
+        <div class="alert alert-info border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+            <i class="fas fa-info-circle me-2"></i>
+            <small>Cree sus credenciales de acceso para poder actualizar su información y consultar oportunidades laborales.</small>
+        </div>
+
+        <EditForm Model="@registroModel" OnValidSubmit="CrearAcceso" FormName="RegistroAccesoForm">
+            <DataAnnotationsValidator />
+
+            <div class="row g-3 mb-3">
+                <div class="col-12">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-id-card me-1 text-primary"></i>CURP
+                    </label>
+                    <input type="text" class="form-control form-control-sm bg-light text-uppercase" 
+                           value="@Candidato.Curp" disabled 
+                           style="font-family: 'Courier New', monospace; letter-spacing: 1px;" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-envelope me-1 text-primary"></i>CORREO ELECTRÓNICO
+                    </label>
+                    <input type="email" class="form-control form-control-sm bg-light" 
+                           value="@Candidato.CorreoAcceso" disabled />
+                    <div class="form-text small">
+                        <i class="fas fa-info-circle me-1"></i>Se usará este correo para el acceso
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-lock me-1 text-primary"></i>CONTRASEÑA <span class="text-danger">*</span>
+                    </label>
+                    <InputText @bind-Value="registroModel.Contrasena"
+                               type="password"
+                               class="form-control form-control-sm"
+                               placeholder="Mínimo 8 caracteres" />
+                    <ValidationMessage For="@(() => registroModel.Contrasena)" class="text-danger small" />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-lock me-1 text-primary"></i>CONFIRMAR <span class="text-danger">*</span>
+                    </label>
+                    <InputText @bind-Value="registroModel.ConfirmarContrasena"
+                               type="password"
+                               class="form-control form-control-sm"
+                               placeholder="Repita la contraseña" />
+                    <ValidationMessage For="@(() => registroModel.ConfirmarContrasena)" class="text-danger small" />
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success" disabled="@creando">
+                    @if (creando)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <small>CREANDO...</small>
+                    }
+                    else
+                    {
+                        <i class="fas fa-user-plus me-2"></i>
+                        <small>CREAR ACCESO</small>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CandidatoCrp Candidato { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnRegistroExitoso { get; set; }
+
+    [SupplyParameterFromForm(FormName = "RegistroAccesoForm")]
+    private RegistroModel registroModel { get; set; } = new();
+
+    private string mensaje = string.Empty;
+    private string tipoMensaje = string.Empty;
+    private bool creando = false;
+
+    private async Task CrearAcceso()
+    {
+        if (registroModel.Contrasena != registroModel.ConfirmarContrasena)
+        {
+            MostrarMensaje("danger", "Las contraseñas no coinciden.");
+            return;
+        }
+
+        creando = true;
+
+        try
+        {
+            Candidato.Contrasena = registroModel.Contrasena;
+            Candidato.ConfirmarContrasena = registroModel.ConfirmarContrasena;
+
+            var nuevoId = await AccesoWebService.CrearAcceso(Candidato);
+            
+            if (nuevoId > 0)
+            {
+                MostrarMensaje("success", "✅ Acceso creado! Verifique su correo.");
+                await Task.Delay(1500);
+                await OnRegistroExitoso.InvokeAsync();
+            }
+            else
+            {
+                MostrarMensaje("danger", "❌ No se pudo crear el acceso.");
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            creando = false;
+        }
+    }
+
+    private void MostrarMensaje(string tipo, string msg)
+    {
+        tipoMensaje = tipo;
+        mensaje = msg;
+        StateHasChanged();
+    }
+
+    private void CerrarMensaje() => mensaje = string.Empty;
+
+    private string GetAlertClass() => tipoMensaje switch { "success" => "alert-success", "danger" => "alert-danger", _ => "alert-info" };
+    private string GetAlertIcon() => tipoMensaje switch { "success" => "fa-check-circle", "danger" => "fa-exclamation-triangle", _ => "fa-info-circle" };
+
+    public class RegistroModel
+    {
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [MinLength(8, ErrorMessage = "Mínimo 8 caracteres")]
+        public string Contrasena { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Debe confirmar la contraseña")]
+        [Compare(nameof(Contrasena), ErrorMessage = "Las contraseñas no coinciden")]
+        public string ConfirmarContrasena { get; set; } = string.Empty;
+    }
+}

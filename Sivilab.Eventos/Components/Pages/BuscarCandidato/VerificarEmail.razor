@@ -1,0 +1,417 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Sivilab.Eventos.Services
+@inject IAccesoWebService AccesoWebService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="card border-warning mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h6 class="mb-0">
+            <i class="fas fa-envelope-open-text me-2"></i>Verificar Correo Electrónico
+        </h6>
+    </div>
+    <div class="card-body">
+        
+        @if (enviandoCodigoInicial)
+        {
+            <div class="alert alert-info border-0 mb-3 text-center">
+                <div class="spinner-border spinner-border-sm me-2"></div>
+                <small>Enviando código de verificación...</small>
+            </div>
+        }
+        else if (codigoEnviadoExitosamente)
+        {
+            <div class="alert alert-success border-0 mb-3">
+                <i class="fas fa-check-circle me-2"></i>
+                <small>
+                    ✅ <strong>Código enviado</strong> al correo: <strong>@Email</strong>
+                    <br />
+                    Revise su bandeja de entrada y carpeta de spam.
+                </small>
+            </div>
+        }
+        else if (!EnviarCodigoAutomaticamente)
+        {
+            <div class="alert alert-info border-0 mb-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <small>
+                    Ya se ha enviado un código al correo: <strong>@Email</strong>
+                    <br />
+                    Si no lo recibió, use el botón "REENVIAR CÓDIGO".
+                </small>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning border-0 mb-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <small>
+                    ⚠️ No se pudo enviar el código automáticamente.
+                    <br />
+                    Use el botón "REENVIAR CÓDIGO" para intentar nuevamente.
+                </small>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @GetAlertClass() alert-dismissible fade show py-2" role="alert">
+                <small>
+                    <i class="fas @GetAlertIcon() me-2"></i>
+                    @mensaje
+                </small>
+                <button type="button" class="btn-close btn-sm" @onclick="CerrarMensaje"></button>
+            </div>
+        }
+
+        <EditForm Model="@verificacionForm" OnValidSubmit="VerificarCodigo" FormName="VerificacionEmailForm">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label fw-bold small">
+                    <i class="fas fa-key me-1 text-primary"></i>CÓDIGO DE VERIFICACIÓN (6 DÍGITOS)
+                </label>
+                <InputText @bind-Value="verificacionForm.Codigo"
+                           class="form-control text-center"
+                           placeholder="000000"
+                           maxlength="6"
+                           style="font-size: 1.5rem; letter-spacing: 0.5rem; font-family: monospace;" />
+                <ValidationMessage For="@(() => verificacionForm.Codigo)" class="text-danger small" />
+                <div class="form-text small">
+                    <i class="fas fa-info-circle me-1"></i>Ingrese el código recibido por correo
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success" disabled="@verificandoCodigo">
+                    @if (verificandoCodigo)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <small>VERIFICANDO...</small>
+                    }
+                    else
+                    {
+                        <i class="fas fa-check-circle me-2"></i>
+                        <small>VERIFICAR CÓDIGO</small>
+                    }
+                </button>
+            </div>
+        </EditForm>
+
+        @if (tiempoEspera > 0)
+        {
+            <div class="card bg-light mt-3 border-0">
+                <div class="card-body text-center py-3">
+                    <div class="mb-2">
+                        <i class="fas fa-clock fa-2x text-warning"></i>
+                    </div>
+                    <h3 class="mb-1 text-dark font-monospace">
+                        @FormatearTiempo(tiempoEspera)
+                    </h3>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Tiempo restante para reenviar código
+                    </small>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar bg-warning" 
+                             role="progressbar" 
+                             style="width: @ObtenerPorcentajeProgreso()%"></div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="d-grid mt-2">
+            <button type="button"
+                    class="btn @(tiempoEspera > 0 ? "btn-secondary" : "btn-outline-primary") btn-sm"
+                    @onclick="ReenviarCodigo"
+                    disabled="@(reenviandoCodigo || tiempoEspera > 0)">
+                @if (reenviandoCodigo)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <small>REENVIANDO...</small>
+                }
+                else if (tiempoEspera > 0)
+                {
+                    <i class="fas fa-ban me-2"></i>
+                    <small>BLOQUEADO (@FormatearTiempo(tiempoEspera))</small>
+                }
+                else
+                {
+                    <i class="fas fa-redo me-2"></i>
+                    <small>REENVIAR CÓDIGO</small>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Email { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Curp { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool EnviarCodigoAutomaticamente { get; set; } = true; // NUEVO parámetro
+
+    [SupplyParameterFromForm(FormName = "VerificacionEmailForm")]
+    private VerificacionModel verificacionForm { get; set; } = new();
+
+    private string mensaje = string.Empty;
+    private string tipoMensaje = string.Empty;
+    private bool verificandoCodigo = false;
+    private bool reenviandoCodigo = false;
+    private bool enviandoCodigoInicial = false;
+    private bool codigoEnviadoExitosamente = false;
+    private int tiempoEspera = 0;
+    private System.Threading.Timer? temporizador;
+    private const int TIEMPO_ESPERA_SEGUNDOS = 120;
+
+    // ENVIAR CÓDIGO SOLO SI EL PARÁMETRO LO PERMITE
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"📧 VerificarEmail.OnInitializedAsync - EnviarCodigoAutomaticamente: {EnviarCodigoAutomaticamente}");
+        
+        if (EnviarCodigoAutomaticamente)
+        {
+            await EnviarCodigoInicial();
+        }
+        else
+        {
+            Console.WriteLine("ℹ️ Código NO se enviará automáticamente (ya fue enviado anteriormente)");
+            codigoEnviadoExitosamente = false; // Mostrar mensaje de código ya enviado
+        }
+    }
+
+    private async Task EnviarCodigoInicial()
+    {
+        enviandoCodigoInicial = true;
+        StateHasChanged();
+
+        try
+        {
+            Console.WriteLine($"📤 Enviando código inicial a {Email}");
+            
+            var enviado = await AccesoWebService.EnviarCodigoVerificacion(Email);
+
+            Console.WriteLine($"Resultado envío automático: {enviado}");
+
+            if (enviado)
+            {
+                codigoEnviadoExitosamente = true;
+                IniciarTemporizador(TIEMPO_ESPERA_SEGUNDOS);
+                Console.WriteLine("✅ Código enviado exitosamente");
+            }
+            else
+            {
+                codigoEnviadoExitosamente = false;
+                Console.WriteLine("❌ No se pudo enviar el código");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR al enviar código automático: {ex.Message}");
+            codigoEnviadoExitosamente = false;
+        }
+        finally
+        {
+            enviandoCodigoInicial = false;
+            StateHasChanged();
+        }
+    }
+
+    // VERIFICAR Y REDIRIGIR SIN FORCE RELOAD
+    private async Task VerificarCodigo()
+    {
+        Console.WriteLine("🔍 ═══ VERIFICAR CÓDIGO INICIADO ═══");
+        Console.WriteLine($"Código ingresado: {verificacionForm?.Codigo}");
+        
+        verificandoCodigo = true;
+        StateHasChanged();
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(verificacionForm?.Codigo))
+            {
+                MostrarMensaje("danger", "Por favor ingrese el código.");
+                return;
+            }
+
+            Console.WriteLine($"Enviando a API - Email: {Email}, Código: {verificacionForm.Codigo}");
+
+            var confirmado = await AccesoWebService.ConfirmarEmail(Email, verificacionForm.Codigo);
+
+            Console.WriteLine($"✅ Resultado API ConfirmarEmail: {confirmado}");
+
+            if (confirmado)
+            {
+                // Limpiar temporizador
+                temporizador?.Dispose();
+                temporizador = null;
+                
+                MostrarMensaje("success", "✅ Email verificado exitosamente!");
+                StateHasChanged();
+                
+                Console.WriteLine("⏱️ Esperando 2 segundos antes de redirigir...");
+                await Task.Delay(2000);
+                
+                // CAMBIO: Usar NavigateTo SIN forceLoad
+                Console.WriteLine($"🔄 Redirigiendo a /buscarcurp/{Curp} SIN forceLoad");
+                Navigation.NavigateTo($"/buscarcurp/{Curp}", forceLoad: false);
+            }
+            else
+            {
+                Console.WriteLine("❌ Código incorrecto según API");
+                MostrarMensaje("danger", "❌ Código incorrecto. Verifique e intente nuevamente.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ EXCEPCIÓN en VerificarCodigo: {ex.Message}");
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            verificandoCodigo = false;
+            Console.WriteLine("🔍 ═══ VERIFICAR CÓDIGO FINALIZADO ═══");
+            StateHasChanged();
+        }
+    }
+
+    private async Task ReenviarCodigo()
+    {
+        Console.WriteLine($"📮 REENVIAR - tiempoEspera: {tiempoEspera}");
+
+        if (tiempoEspera > 0)
+        {
+            MostrarMensaje("warning", $"Debe esperar {FormatearTiempo(tiempoEspera)}.");
+            return;
+        }
+
+        reenviandoCodigo = true;
+        StateHasChanged();
+
+        try
+        {
+            Console.WriteLine($"📤 Reenviando código a {Email}");
+            
+            var enviado = await AccesoWebService.EnviarCodigoVerificacion(Email);
+
+            Console.WriteLine($"Resultado reenvío: {enviado}");
+
+            if (enviado)
+            {
+                codigoEnviadoExitosamente = true;
+                MostrarMensaje("success", "✅ Código reenviado. Revise su correo.");
+                
+                if (verificacionForm != null)
+                {
+                    verificacionForm.Codigo = string.Empty;
+                }
+                
+                IniciarTemporizador(TIEMPO_ESPERA_SEGUNDOS);
+            }
+            else
+            {
+                MostrarMensaje("danger", "❌ No se pudo reenviar el código.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR al reenviar: {ex.Message}");
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            reenviandoCodigo = false;
+            StateHasChanged();
+        }
+    }
+
+    private void IniciarTemporizador(int segundos)
+    {
+        Console.WriteLine($"🕐 Iniciando temporizador: {segundos} segundos ({segundos/60} minutos)");
+        
+        temporizador?.Dispose();
+        
+        tiempoEspera = segundos;
+        StateHasChanged();
+        
+        temporizador = new System.Threading.Timer(async _ =>
+        {
+            tiempoEspera--;
+            
+            if (tiempoEspera % 10 == 0 || tiempoEspera <= 5)
+            {
+                Console.WriteLine($"⏱️ {FormatearTiempo(tiempoEspera)}");
+            }
+            
+            if (tiempoEspera <= 0)
+            {
+                Console.WriteLine("✅ Temporizador finalizado - Botón habilitado");
+                temporizador?.Dispose();
+                temporizador = null;
+            }
+            
+            await InvokeAsync(StateHasChanged);
+            
+        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private string FormatearTiempo(int segundos)
+    {
+        int minutos = segundos / 60;
+        int segs = segundos % 60;
+        return $"{minutos:D2}:{segs:D2}";
+    }
+
+    private double ObtenerPorcentajeProgreso()
+    {
+        if (tiempoEspera <= 0) return 0;
+        return ((double)tiempoEspera / TIEMPO_ESPERA_SEGUNDOS) * 100;
+    }
+
+    private void MostrarMensaje(string tipo, string msg)
+    {
+        tipoMensaje = tipo;
+        mensaje = msg;
+        StateHasChanged();
+    }
+
+    private void CerrarMensaje() => mensaje = string.Empty;
+
+    private string GetAlertClass() => tipoMensaje switch 
+    { 
+        "success" => "alert-success", 
+        "danger" => "alert-danger", 
+        "info" => "alert-info", 
+        "warning" => "alert-warning",
+        _ => "alert-info" 
+    };
+
+    private string GetAlertIcon() => tipoMensaje switch 
+    { 
+        "success" => "fa-check-circle", 
+        "danger" => "fa-exclamation-triangle", 
+        "info" => "fa-info-circle", 
+        "warning" => "fa-exclamation-circle",
+        _ => "fa-info-circle" 
+    };
+
+    public void Dispose()
+    {
+        Console.WriteLine("🗑️ VerificarEmail.Dispose - Limpiando temporizador");
+        temporizador?.Dispose();
+    }
+
+    public class VerificacionModel
+    {
+        [Required(ErrorMessage = "El código es obligatorio")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "El código debe tener 6 dígitos")]
+        [RegularExpression(@"^\d{6}$", ErrorMessage = "Solo números")]
+        public string Codigo { get; set; } = string.Empty;
+    }
+}

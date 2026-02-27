@@ -1,0 +1,158 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Sivilab.Eventos.Services
+@inject IAccesoWebService AccesoWebService
+@inject NavigationManager Navigation
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @GetAlertClass() alert-dismissible fade show py-2" role="alert">
+                <small>
+                    <i class="fas @GetAlertIcon() me-2"></i>
+                    @mensaje
+                </small>
+                <button type="button" class="btn-close btn-sm" @onclick="CerrarMensaje"></button>
+            </div>
+        }
+
+        <EditForm Model="@loginModel" OnValidSubmit="IniciarSesion" FormName="LoginForm">
+            <DataAnnotationsValidator />
+
+            <div class="section-header mb-3">
+                <h6 class="text-primary border-bottom pb-2">
+                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                </h6>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-12">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-id-card me-1 text-primary"></i>CURP
+                    </label>
+                    <input type="text" 
+                           class="form-control form-control-sm bg-light text-uppercase" 
+                           value="@Curp" 
+                           disabled 
+                           style="font-family: 'Courier New', monospace; letter-spacing: 1px;" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-envelope me-1 text-primary"></i>CORREO ELECTRÓNICO
+                    </label>
+                    <input type="email" 
+                           class="form-control form-control-sm bg-light" 
+                           value="@Email" 
+                           disabled />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold small">
+                        <i class="fas fa-lock me-1 text-primary"></i>CONTRASEÑA <span class="text-danger">*</span>
+                    </label>
+                    <InputText @bind-Value="loginModel.Contrasena"
+                               type="password"
+                               class="form-control form-control-sm"
+                               placeholder="Ingrese su contraseña" />
+                    <ValidationMessage For="@(() => loginModel.Contrasena)" class="text-danger small" />
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit"
+                        class="btn btn-primary"
+                        style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;"
+                        disabled="@validando">
+                    @if (validando)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        <small>VALIDANDO...</small>
+                    }
+                    else
+                    {
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        <small>INICIAR SESIÓN</small>
+                    }
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Curp { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Email { get; set; } = string.Empty;
+
+    [SupplyParameterFromForm(FormName = "LoginForm")]
+    private LoginModel loginModel { get; set; } = new();
+
+    private string mensaje = string.Empty;
+    private string tipoMensaje = string.Empty;
+    private bool validando = false;
+
+    private async Task IniciarSesion()
+    {
+        validando = true;
+
+        try
+        {
+            var valido = await AccesoWebService.ValidarCredenciales(Email, loginModel.Contrasena);
+
+            if (valido)
+            {
+                MostrarMensaje("success", "✅ Inicio exitoso. Redirigiendo...");
+                await Task.Delay(1500);
+                Navigation.NavigateTo($"/dashboard?curp={Curp}");
+            }
+            else
+            {
+                MostrarMensaje("danger", "❌ Contraseña incorrecta.");
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje("danger", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            validando = false;
+        }
+    }
+
+    private void MostrarMensaje(string tipo, string msg)
+    {
+        tipoMensaje = tipo;
+        mensaje = msg;
+        StateHasChanged();
+    }
+
+    private void CerrarMensaje() => mensaje = string.Empty;
+
+    private string GetAlertClass() => tipoMensaje switch 
+    { 
+        "success" => "alert-success", 
+        "danger" => "alert-danger", 
+        "info" => "alert-info", 
+        _ => "alert-info" 
+    };
+
+    private string GetAlertIcon() => tipoMensaje switch 
+    { 
+        "success" => "fa-check-circle", 
+        "danger" => "fa-exclamation-triangle", 
+        "info" => "fa-info-circle", 
+        _ => "fa-info-circle" 
+    };
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [MinLength(8, ErrorMessage = "Mínimo 8 caracteres")]
+        public string Contrasena { get; set; } = string.Empty;
+    }
+}

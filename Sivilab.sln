@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivilab.Web", "Sivilab.Web\Sivilab.Web.csproj", "{0A31DF37-AC5E-470C-AA58-86788F80B93B}"
 EndProject
@@ -16,8 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivilab.Portal", "Sivilab.Portal\Sivilab.Portal.csproj", "{55AC4B37-B9B3-4919-9472-5015D4E34CD3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivilab.PortalEmpleo", "Sivilab.PortalEmpleo\Sivilab.PortalEmpleo.csproj", "{729A2224-A390-4508-A383-0A271C41E407}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Registro_Evento", "..\Registro_Evento\Registro_Evento\Registro_Evento.csproj", "{818ED9DE-C20B-50DE-69E6-391353F12334}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivilab.Eventos", "Sivilab.Eventos\Sivilab.Eventos.csproj", "{01428C7B-E9C0-4037-97AD-E0DF504F56E0}"
 EndProject
@@ -55,10 +53,6 @@ Global
 		{729A2224-A390-4508-A383-0A271C41E407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{729A2224-A390-4508-A383-0A271C41E407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{729A2224-A390-4508-A383-0A271C41E407}.Release|Any CPU.Build.0 = Release|Any CPU
-		{818ED9DE-C20B-50DE-69E6-391353F12334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{818ED9DE-C20B-50DE-69E6-391353F12334}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{818ED9DE-C20B-50DE-69E6-391353F12334}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{818ED9DE-C20B-50DE-69E6-391353F12334}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01428C7B-E9C0-4037-97AD-E0DF504F56E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{01428C7B-E9C0-4037-97AD-E0DF504F56E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01428C7B-E9C0-4037-97AD-E0DF504F56E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
