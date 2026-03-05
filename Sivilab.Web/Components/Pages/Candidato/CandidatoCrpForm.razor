@@ -25,11 +25,11 @@ else
         </div>
         <div class="mb-2">
             <label>Apellido Paterno</label>
-            <InputText class="form-control" @bind-Value="model.ApellidoPaterno" />
+            <InputText class="form-control" @bind-Value="model.Paterno" />
         </div>
         <div class="mb-2">
             <label>Apellido Materno</label>
-            <InputText class="form-control" @bind-Value="model.ApellidoMaterno" />
+            <InputText class="form-control" @bind-Value="model.Materno" />
         </div>
         <div class="mb-2">
             <label>Fecha Nacimiento</label>
@@ -62,7 +62,7 @@ else
     {
         if (Id.HasValue)
         {
-            var item = await CandidatoService.ObtenerPorIdAsync(Id.Value);
+            var item = await CandidatoService.ob(Id.Value);
             if (item != null) model = item;
         }
         isLoading = false;

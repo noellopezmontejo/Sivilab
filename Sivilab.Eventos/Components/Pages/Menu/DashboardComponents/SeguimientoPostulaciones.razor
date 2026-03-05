@@ -1,0 +1,55 @@
+<div class="alert alert-info border-0 mb-3">
+    <i class="fas fa-info-circle me-2"></i>
+    <small>Tienes <strong>5 postulaciones</strong> activas</small>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th><small>EMPRESA</small></th>
+                <th><small>PUESTO</small></th>
+                <th><small>FECHA</small></th>
+                <th><small>ESTADO</small></th>
+                <th><small>ACCIONES</small></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><small>Tech Solutions MX</small></td>
+                <td><small>Desarrollador Full Stack</small></td>
+                <td><small>15/01/2025</small></td>
+                <td>
+                    <span class="badge bg-warning text-dark">
+                        <i class="fas fa-hourglass-half me-1"></i>En revisión
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td><small>Comercial del Sur</small></td>
+                <td><small>Ejecutivo de Ventas</small></td>
+                <td><small>14/01/2025</small></td>
+                <td>
+                    <span class="badge bg-info">
+                        <i class="fas fa-paper-plane me-1"></i>Enviada
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public string Curp { get; set; } = string.Empty;
+}

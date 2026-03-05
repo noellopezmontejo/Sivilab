@@ -97,30 +97,47 @@
 
     private async Task IniciarSesion()
     {
+        Console.WriteLine("🔐 LoginForm - IniciarSesion iniciado");
         validando = true;
+        StateHasChanged();
 
         try
         {
+            Console.WriteLine($"Validando credenciales para: {Email}");
+            
             var valido = await AccesoWebService.ValidarCredenciales(Email, loginModel.Contrasena);
+
+            Console.WriteLine($"Resultado validación: {valido}");
 
             if (valido)
             {
                 MostrarMensaje("success", "✅ Inicio exitoso. Redirigiendo...");
-                await Task.Delay(1500);
-                Navigation.NavigateTo($"/dashboard?curp={Curp}");
+                
+                await Task.Delay(1000);
+                
+                // CORRECCIÓN: Navegar a /menu/dashboard
+                var urlDestino = $"/menu/dashboard?curp={Uri.EscapeDataString(Curp)}";
+                Console.WriteLine($"🔄 Navegando a: {urlDestino}");
+                
+                Navigation.NavigateTo(urlDestino, forceLoad: true);
             }
             else
             {
+                Console.WriteLine("❌ Credenciales inválidas");
                 MostrarMensaje("danger", "❌ Contraseña incorrecta.");
+                validando = false;
             }
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"❌ ERROR en IniciarSesion: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             MostrarMensaje("danger", $"Error: {ex.Message}");
+            validando = false;
         }
         finally
         {
-            validando = false;
+            StateHasChanged();
         }
     }
 

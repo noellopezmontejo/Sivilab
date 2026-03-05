@@ -6,10 +6,14 @@ namespace Sivilab.Eventos.Services
     public class AccesoWebService : IAccesoWebService
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<AccesoWebService>? _logger;
 
-        public AccesoWebService(IHttpClientFactory httpClientFactory)
+        public AccesoWebService(
+            IHttpClientFactory httpClientFactory,
+            ILogger<AccesoWebService>? logger = null)
         {
             _httpClient = httpClientFactory.CreateClient("SivilabAPI");
+            _logger = logger;
         }
 
         public async Task<AccesoWeb?> ValidarAcceso(string correo, string contrasena)

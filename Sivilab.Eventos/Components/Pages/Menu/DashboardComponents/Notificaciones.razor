@@ -1,0 +1,21 @@
+<div class="list-group">
+    <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+            <h6 class="mb-1"><i class="fas fa-briefcase text-primary me-2"></i>Nueva oferta disponible</h6>
+            <small class="text-muted">Hace 1 hora</small>
+        </div>
+        <p class="mb-1 small">Desarrollador Web - Tech Solutions</p>
+    </div>
+    <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+            <h6 class="mb-1"><i class="fas fa-check text-success me-2"></i>Postulación aceptada</h6>
+            <small class="text-muted">Hace 2 horas</small>
+        </div>
+        <p class="mb-1 small">Tu postulación fue aceptada por Grupo Industrial</p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string UsuarioEmail { get; set; } = string.Empty;
+}

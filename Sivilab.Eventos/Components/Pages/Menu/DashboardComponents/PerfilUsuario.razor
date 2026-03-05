@@ -1,0 +1,154 @@
+@using Sivilab.Models.Models
+
+@if (Candidato != null || Usuario != null)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                    <h5>@(Candidato?.NombreCompleto ?? $"{Usuario?.Nombre} {Usuario?.Paterrno}")</h5>
+                    <p class="text-muted small">@(Candidato?.CorreoAcceso ?? Usuario?.Email)</p>
+                    @if (Usuario?.IsEmailConfirmed == true)
+                    {
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Cuenta Verificada
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Verificación Pendiente
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-primary mb-3">
+                        <i class="fas fa-chart-line me-2"></i>Estadísticas
+                    </h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <small class="text-muted">Postulaciones:</small>
+                        <strong>5</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <small class="text-muted">En proceso:</small>
+                        <strong>2</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">Completado:</small>
+                        <strong class="text-success">3</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-id-card me-2"></i>Información Personal
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">CURP</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                   value="@(Candidato?.Curp ?? Usuario?.Curp)" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">NOMBRE COMPLETO</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                   value="@(Candidato?.NombreCompleto ?? $"{Usuario?.Nombre} {Usuario?.Paterrno} {Usuario?.Materno}")" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">EMAIL</label>
+                            <input type="email" class="form-control form-control-sm" 
+                                   value="@(Candidato?.CorreoAcceso ?? Usuario?.Email)" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">ROL</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                   value="@(Usuario?.Role ?? "Candidato")" readonly />
+                        </div>
+                        
+                        @if (Candidato != null)
+                        {
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">SEXO</label>
+                                <input type="text" class="form-control form-control-sm" 
+                                       value="@Candidato.Genero" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">FECHA DE NACIMIENTO</label>
+                                <input type="text" class="form-control form-control-sm" 
+                                       value="@Candidato.FechaNacimiento.ToString()" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">ESTADO CIVIL</label>
+                                <input type="text" class="form-control form-control-sm" 
+                                       value="@Candidato.Genero" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">TELÉFONO</label>
+                                <input type="text" class="form-control form-control-sm" 
+                                       value="@Candidato.Telefono" readonly />
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit me-2"></i>Editar Información
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Actividad Reciente
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        @if (Usuario?.IsEmailConfirmed == true)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <small><i class="fas fa-check text-success me-2"></i>Email verificado</small>
+                                    <small class="text-muted">Verificado</small>
+                                </div>
+                            </div>
+                        }
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <small><i class="fas fa-user-plus text-primary me-2"></i>Perfil registrado</small>
+                                <small class="text-muted">Activo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2">Cargando perfil...</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public AccesoWeb? Usuario { get; set; }
+
+    [Parameter]
+    public CandidatoCrp? Candidato { get; set; }
+}

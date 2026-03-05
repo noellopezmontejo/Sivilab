@@ -6,27 +6,39 @@ namespace Sivilab.Eventos.Services
     public class CandidatoCrpService : ICandidatoCrpService
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<CandidatoCrpService>? _logger;
 
-        public CandidatoCrpService(IHttpClientFactory httpClientFactory)
+        public CandidatoCrpService(
+            IHttpClientFactory httpClientFactory,
+            ILogger<CandidatoCrpService>? logger = null)
         {
             _httpClient = httpClientFactory.CreateClient("SivilabAPI");
+            _logger = logger;
         }
 
         public async Task<CandidatoCrp?> ObtenerPorCurp(string curp)
         {
             try
             {
+                _logger?.LogInformation("🔍 Obteniendo candidato por CURP: {Curp}", curp);
+                
                 var response = await _httpClient.GetAsync($"api/CandidatoCrp/curp/{curp}");
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<CandidatoCrp>();
+                    var candidato = await response.Content.ReadFromJsonAsync<CandidatoCrp>();
+                    _logger?.LogInformation("✅ Candidato encontrado: {Nombre}", candidato?.NombreCompleto);
+                    return candidato;
                 }
                 
+                _logger?.LogWarning("❌ Candidato no encontrado para CURP: {Curp} - StatusCode: {StatusCode}", 
+                    curp, response.StatusCode);
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger?.LogError(ex, "❌ Error al obtener candidato por CURP: {Curp}", curp);
+                Console.WriteLine($"ERROR CandidatoCrpService.ObtenerPorCurp: {ex.Message}");
                 return null;
             }
         }
@@ -35,18 +47,24 @@ namespace Sivilab.Eventos.Services
         {
             try
             {
+                _logger?.LogInformation("➕ Agregando candidato: {Nombre}", candidato.NombreCompleto);
+                
                 var response = await _httpClient.PostAsJsonAsync("api/CandidatoCrp", candidato);
                 
                 if (response.IsSuccessStatusCode)
                 {
                     var resultado = await response.Content.ReadFromJsonAsync<CandidatoCrp>();
+                    _logger?.LogInformation("✅ Candidato agregado con ID: {Id}", resultado?.CandidatoId);
                     return resultado?.CandidatoId ?? 0;
                 }
                 
+                _logger?.LogWarning("❌ No se pudo agregar candidato - StatusCode: {StatusCode}", response.StatusCode);
                 return 0;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger?.LogError(ex, "❌ Error al agregar candidato");
+                Console.WriteLine($"ERROR CandidatoCrpService.AgregarCandidato: {ex.Message}");
                 return 0;
             }
         }
@@ -55,23 +73,35 @@ namespace Sivilab.Eventos.Services
         {
             try
             {
+                _logger?.LogInformation("🔄 Actualizando candidato ID: {Id}", candidato.CandidatoId);
+                
                 var response = await _httpClient.PutAsJsonAsync($"api/CandidatoCrp/{candidato.CandidatoId}", candidato);
-                return response.IsSuccessStatusCode;
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger?.LogInformation("✅ Candidato actualizado exitosamente");
+                    return true;
+                }
+                
+                _logger?.LogWarning("❌ No se pudo actualizar candidato - StatusCode: {StatusCode}", response.StatusCode);
+                return false;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger?.LogError(ex, "❌ Error al actualizar candidato");
+                Console.WriteLine($"ERROR CandidatoCrpService.ActualizarCandidato: {ex.Message}");
                 return false;
             }
         }
 
-        Task<IEnumerable<CandidatoCrp>> ICandidatoCrpService.ObtenerTodos()
+        public Task<IEnumerable<CandidatoCrp>> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("ObtenerTodos no está implementado");
         }
 
-        Task<CandidatoCrp?> ICandidatoCrpService.ObtenerPorId(int id)
+        public Task<CandidatoCrp?> ObtenerPorId(int id)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("ObtenerPorId no está implementado");
         }
     }
 }

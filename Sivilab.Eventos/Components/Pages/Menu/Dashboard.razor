@@ -1,0 +1,371 @@
+@page "/menu/dashboard"
+@using Sivilab.Models.Models
+@using Sivilab.Eventos.Services
+@using Sivilab.Eventos.Components.Pages.Menu.DashboardComponents
+@inject NavigationManager Navigation
+@inject IAccesoWebService AccesoWebService
+@inject ICandidatoCrpService CandidatoService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Dashboard - Subsecretaría del Servicio Nacional de Empleo Chiapas</PageTitle>
+
+@if (cargando)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" style="width: 4rem; height: 4rem;"></div>
+            <h5 class="text-muted">Cargando Dashboard...</h5>
+            <p class="text-muted small">CURP: @curpActual</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar @(sidebarVisible ? "show" : "")">
+            <div class="sidebar-header">
+                <div class="text-center py-3">
+                    <div class="user-avatar mb-2">
+                        <i class="fas fa-user-circle fa-4x text-white"></i>
+                    </div>
+                    @if (candidato != null)
+                    {
+                        <h6 class="text-white mb-1">@candidato.Nombre @candidato.Paterno</h6>
+                        <small class="text-white-50">@candidato.CorreoAcceso</small>
+                    }
+                    else if (usuario != null)
+                    {
+                        <h6 class="text-white mb-1">@usuario.Nombre @usuario.Paterrno</h6>
+                        <small class="text-white-50">@usuario.Email</small>
+                    }
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="nav-item @GetActiveClass("perfil")" @onclick='() => CambiarSeccion("perfil")'>
+                    <i class="fas fa-user me-2"></i>
+                    <span>Mi Perfil</span>
+                </a>
+                <a class="nav-item @GetActiveClass("ofertas")" @onclick='() => CambiarSeccion("ofertas")'>
+                    <i class="fas fa-briefcase me-2"></i>
+                    <span>Ofertas de Empleo</span>
+                    <span class="badge bg-danger ms-auto">12</span>
+                </a>
+                <a class="nav-item @GetActiveClass("seguimiento")" @onclick='() => CambiarSeccion("seguimiento")'>
+                    <i class="fas fa-tasks me-2"></i>
+                    <span>Seguimiento</span>
+                </a>
+                <a class="nav-item @GetActiveClass("documentos")" @onclick='() => CambiarSeccion("documentos")'>
+                    <i class="fas fa-file-alt me-2"></i>
+                    <span>Mis Documentos</span>
+                </a>
+                <a class="nav-item @GetActiveClass("notificaciones")" @onclick='() => CambiarSeccion("notificaciones")'>
+                    <i class="fas fa-bell me-2"></i>
+                    <span>Notificaciones</span>
+                    <span class="badge bg-warning text-dark ms-auto">3</span>
+                </a>
+                <a class="nav-item @GetActiveClass("configuracion")" @onclick='() => CambiarSeccion("configuracion")'>
+                    <i class="fas fa-cog me-2"></i>
+                    <span>Configuración</span>
+                </a>
+                <hr class="my-2 border-secondary" />
+                <a class="nav-item text-danger" @onclick="CerrarSesion">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="content-header">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary btn-sm me-3 d-md-none" @onclick="ToggleSidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h4 class="mb-0">
+                        <i class="@GetSeccionIcon() me-2"></i>
+                        @GetSeccionTitulo()
+                    </h4>
+                </div>
+                <div class="header-actions">
+                    <span class="text-muted small d-none d-md-inline">
+                        CURP: <strong class="font-monospace">@curpActual</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-body">
+                @switch (seccionActual)
+                {
+                    case "perfil":
+                        <PerfilUsuario Usuario="@usuario" Candidato="@candidato" />
+                        break;
+                    case "ofertas":
+                        <OfertasEmpleo Curp="@curpActual" Candidato="@candidato" />
+                        break;
+                    case "seguimiento":
+                        <SeguimientoPostulaciones Curp="@curpActual" Candidato="@candidato" />
+                        break;
+                    case "documentos":
+                        <MisDocumentos Curp="@curpActual" Candidato="@candidato" />
+                        break;
+                    case "notificaciones":
+                        <Notificaciones UsuarioEmail="@(candidato?.CorreoAcceso ?? usuario?.Email ?? "")" />
+                        break;
+                    case "configuracion":
+                        <Configuracion Usuario="@usuario" Candidato="@candidato" />
+                        break;
+                    default:
+                        <PerfilUsuario Usuario="@usuario" Candidato="@candidato" />
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .sidebar {
+        width: 280px;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+
+    .sidebar-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-nav {
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .nav-item.active {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: white;
+        border-left-color: #ffc107;
+        font-weight: 600;
+    }
+
+    .main-content {
+        margin-left: 280px;
+        flex: 1;
+        padding: 2rem;
+        transition: all 0.3s;
+        width: 100%;
+    }
+
+    .content-header {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .content-body {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-height: 500px;
+    }
+
+    @@media (max-width: 768px) {
+        .sidebar {
+            margin-left: -280px;
+        }
+
+        .sidebar.show {
+            margin-left: 0;
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? curp { get; set; }
+
+    private string curpActual = string.Empty;
+    private string seccionActual = "perfil";
+    private AccesoWeb? usuario;
+    private CandidatoCrp? candidato;
+    private bool sidebarVisible = false;
+    private bool cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"📊 Dashboard iniciado - CURP: {curp}");
+        
+        curpActual = curp ?? "";
+
+        if (string.IsNullOrEmpty(curpActual))
+        {
+            Console.WriteLine("❌ No se proporcionó CURP - Redirigiendo");
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        await CargarDatosCompletos();
+    }
+
+    private async Task CargarDatosCompletos()
+    {
+        cargando = true;
+        StateHasChanged();
+
+        try
+        {
+            Console.WriteLine($"🔍 Cargando datos para CURP: {curpActual}");
+
+            // 1. Cargar candidato por CURP
+            candidato = await CandidatoService.ObtenerPorCurp(curpActual);
+            
+            if (candidato == null)
+            {
+                Console.WriteLine("❌ No se encontró candidato con ese CURP");
+                await MostrarAlerta("No se encontró información del candidato", "error");
+                await Task.Delay(2000);
+                Navigation.NavigateTo("/");
+                return;
+            }
+
+            Console.WriteLine($"✅ Candidato encontrado: {candidato.NombreCompleto}");
+            Console.WriteLine($"📧 Email: {candidato.CorreoAcceso}");
+
+            // 2. Cargar datos de acceso por email
+            if (!string.IsNullOrEmpty(candidato.CorreoAcceso))
+            {
+                usuario = await AccesoWebService.ObtenerPorEmail(candidato.CorreoAcceso);
+                
+                if (usuario != null)
+                {
+                    Console.WriteLine($"✅ Acceso encontrado - Email confirmado: {usuario.IsEmailConfirmed}");
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ No se encontró registro de acceso");
+                }
+            }
+
+            Console.WriteLine("✅ Datos cargados exitosamente");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al cargar datos: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            await MostrarAlerta($"Error al cargar datos: {ex.Message}", "error");
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task MostrarAlerta(string mensaje, string tipo)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("alert", mensaje);
+        }
+        catch
+        {
+            Console.WriteLine($"Alerta: {mensaje}");
+        }
+    }
+
+    private void CambiarSeccion(string seccion)
+    {
+        Console.WriteLine($"📍 Cambiando a sección: {seccion}");
+        seccionActual = seccion;
+        
+        if (sidebarVisible)
+        {
+            sidebarVisible = false;
+        }
+        
+        StateHasChanged();
+    }
+
+    private string GetActiveClass(string seccion) => seccionActual == seccion ? "active" : "";
+
+    private string GetSeccionIcon() => seccionActual switch
+    {
+        "perfil" => "fas fa-user",
+        "ofertas" => "fas fa-briefcase",
+        "seguimiento" => "fas fa-tasks",
+        "documentos" => "fas fa-file-alt",
+        "notificaciones" => "fas fa-bell",
+        "configuracion" => "fas fa-cog",
+        _ => "fas fa-home"
+    };
+
+    private string GetSeccionTitulo() => seccionActual switch
+    {
+        "perfil" => "Mi Perfil",
+        "ofertas" => "Ofertas de Empleo",
+        "seguimiento" => "Seguimiento de Postulaciones",
+        "documentos" => "Mis Documentos",
+        "notificaciones" => "Notificaciones",
+        "configuracion" => "Configuración",
+        _ => "Dashboard"
+    };
+
+    private void ToggleSidebar()
+    {
+        sidebarVisible = !sidebarVisible;
+        StateHasChanged();
+    }
+
+    private void CerrarSesion()
+    {
+        Console.WriteLine("👋 Cerrando sesión");
+        Navigation.NavigateTo("/");
+    }
+}
