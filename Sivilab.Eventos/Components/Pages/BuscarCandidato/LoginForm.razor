@@ -78,6 +78,16 @@
                 </button>
             </div>
         </EditForm>
+
+        @if (debeNavegar)
+        {
+            <a href="@urlDestino" id="linkNavegacion" style="display:none;">Navegar</a>
+            <script>
+                setTimeout(function() {
+                    document.getElementById('linkNavegacion').click();
+                }, 100);
+            </script>
+        }
     </div>
 </div>
 
@@ -94,6 +104,8 @@
     private string mensaje = string.Empty;
     private string tipoMensaje = string.Empty;
     private bool validando = false;
+    private bool debeNavegar = false;
+    private string urlDestino = string.Empty;
 
     private async Task IniciarSesion()
     {
@@ -115,11 +127,11 @@
                 
                 await Task.Delay(1000);
                 
-                // CORRECCIÓN: Navegar a /menu/dashboard
-                var urlDestino = $"/menu/dashboard?curp={Uri.EscapeDataString(Curp)}";
+                urlDestino = $"/menu/dashboard?curp={Uri.EscapeDataString(Curp)}";
                 Console.WriteLine($"🔄 Navegando a: {urlDestino}");
                 
-                Navigation.NavigateTo(urlDestino, forceLoad: true);
+                debeNavegar = true;
+                StateHasChanged();
             }
             else
             {
@@ -131,7 +143,6 @@
         catch (Exception ex)
         {
             Console.WriteLine($"❌ ERROR en IniciarSesion: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             MostrarMensaje("danger", $"Error: {ex.Message}");
             validando = false;
         }

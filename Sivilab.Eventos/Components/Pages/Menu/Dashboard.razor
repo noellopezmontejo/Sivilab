@@ -4,23 +4,22 @@
 @using Sivilab.Eventos.Components.Pages.Menu.DashboardComponents
 @inject NavigationManager Navigation
 @inject IAccesoWebService AccesoWebService
-@inject ICandidatoCrpService CandidatoService
-@inject IJSRuntime JSRuntime
 
 <PageTitle>Dashboard - Subsecretaría del Servicio Nacional de Empleo Chiapas</PageTitle>
 
-@if (cargando)
-{
-    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="text-center">
-            <div class="spinner-border text-primary mb-3" style="width: 4rem; height: 4rem;"></div>
-            <h5 class="text-muted">Cargando Dashboard...</h5>
-            <p class="text-muted small">CURP: @curpActual</p>
-        </div>
-    </div>
-}
-else
-{
+<style>
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden;
+    }
+
+    .blazor-error-ui {
+        display: none !important;
+    }
+</style>
+
+<div class="dashboard-wrapper">
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar @(sidebarVisible ? "show" : "")">
@@ -29,12 +28,7 @@ else
                     <div class="user-avatar mb-2">
                         <i class="fas fa-user-circle fa-4x text-white"></i>
                     </div>
-                    @if (candidato != null)
-                    {
-                        <h6 class="text-white mb-1">@candidato.Nombre @candidato.Paterno</h6>
-                        <small class="text-white-50">@candidato.CorreoAcceso</small>
-                    }
-                    else if (usuario != null)
+                    @if (usuario != null)
                     {
                         <h6 class="text-white mb-1">@usuario.Nombre @usuario.Paterrno</h6>
                         <small class="text-white-50">@usuario.Email</small>
@@ -102,51 +96,58 @@ else
                 @switch (seccionActual)
                 {
                     case "perfil":
-                        <PerfilUsuario Usuario="@usuario" Candidato="@candidato" />
+                        <PerfilUsuario Usuario="@usuario" />
                         break;
                     case "ofertas":
-                        <OfertasEmpleo Curp="@curpActual" Candidato="@candidato" />
+                        <OfertasEmpleo Curp="@curpActual" />
                         break;
                     case "seguimiento":
-                        <SeguimientoPostulaciones Curp="@curpActual" Candidato="@candidato" />
+                        <SeguimientoPostulaciones Curp="@curpActual" />
                         break;
                     case "documentos":
-                        <MisDocumentos Curp="@curpActual" Candidato="@candidato" />
+                        <MisDocumentos Curp="@curpActual" />
                         break;
                     case "notificaciones":
-                        <Notificaciones UsuarioEmail="@(candidato?.CorreoAcceso ?? usuario?.Email ?? "")" />
+                        <Notificaciones UsuarioEmail="@(usuario?.Email ?? "")" />
                         break;
                     case "configuracion":
-                        <Configuracion Usuario="@usuario" Candidato="@candidato" />
+                        <Configuracion Usuario="@usuario" />
                         break;
                     default:
-                        <PerfilUsuario Usuario="@usuario" Candidato="@candidato" />
+                        <PerfilUsuario Usuario="@usuario" />
                         break;
                 }
             </div>
         </div>
     </div>
-}
+</div>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    .dashboard-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
     }
 
     .dashboard-container {
         display: flex;
-        min-height: 100vh;
+        height: 100vh;
         background-color: #f5f5f5;
         margin: 0;
         padding: 0;
+        width: 100%;
+        overflow: hidden;
     }
 
     .sidebar {
         width: 280px;
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         position: fixed;
+        left: 0;
+        top: 0;
         height: 100vh;
         overflow-y: auto;
         transition: all 0.3s;
@@ -188,8 +189,9 @@ else
         margin-left: 280px;
         flex: 1;
         padding: 2rem;
+        height: 100vh;
+        overflow-y: auto;
         transition: all 0.3s;
-        width: 100%;
     }
 
     .content-header {
@@ -222,6 +224,7 @@ else
 
         .main-content {
             margin-left: 0;
+            width: 100%;
         }
     }
 </style>
@@ -234,9 +237,7 @@ else
     private string curpActual = string.Empty;
     private string seccionActual = "perfil";
     private AccesoWeb? usuario;
-    private CandidatoCrp? candidato;
     private bool sidebarVisible = false;
-    private bool cargando = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -251,72 +252,28 @@ else
             return;
         }
 
-        await CargarDatosCompletos();
+        await CargarUsuario();
     }
 
-    private async Task CargarDatosCompletos()
+    private async Task CargarUsuario()
     {
-        cargando = true;
-        StateHasChanged();
-
         try
         {
-            Console.WriteLine($"🔍 Cargando datos para CURP: {curpActual}");
-
-            // 1. Cargar candidato por CURP
-            candidato = await CandidatoService.ObtenerPorCurp(curpActual);
-            
-            if (candidato == null)
+            usuario = new AccesoWeb
             {
-                Console.WriteLine("❌ No se encontró candidato con ese CURP");
-                await MostrarAlerta("No se encontró información del candidato", "error");
-                await Task.Delay(2000);
-                Navigation.NavigateTo("/");
-                return;
-            }
+                Nombre = "Usuario",
+                Paterrno = "Demo",
+                Materno = "Prueba",
+                Email = "usuario@example.com",
+                Curp = curpActual,
+                Role = "Candidato"
+            };
 
-            Console.WriteLine($"✅ Candidato encontrado: {candidato.NombreCompleto}");
-            Console.WriteLine($"📧 Email: {candidato.CorreoAcceso}");
-
-            // 2. Cargar datos de acceso por email
-            if (!string.IsNullOrEmpty(candidato.CorreoAcceso))
-            {
-                usuario = await AccesoWebService.ObtenerPorEmail(candidato.CorreoAcceso);
-                
-                if (usuario != null)
-                {
-                    Console.WriteLine($"✅ Acceso encontrado - Email confirmado: {usuario.IsEmailConfirmed}");
-                }
-                else
-                {
-                    Console.WriteLine("⚠️ No se encontró registro de acceso");
-                }
-            }
-
-            Console.WriteLine("✅ Datos cargados exitosamente");
+            await Task.CompletedTask;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Error al cargar datos: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            await MostrarAlerta($"Error al cargar datos: {ex.Message}", "error");
-        }
-        finally
-        {
-            cargando = false;
-            StateHasChanged();
-        }
-    }
-
-    private async Task MostrarAlerta(string mensaje, string tipo)
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("alert", mensaje);
-        }
-        catch
-        {
-            Console.WriteLine($"Alerta: {mensaje}");
+            Console.WriteLine($"Error al cargar usuario: {ex.Message}");
         }
     }
 
