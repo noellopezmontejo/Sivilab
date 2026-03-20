@@ -19,6 +19,11 @@ builder.Services.AddHttpClient("SivilabAPI", client =>
 // REGISTRAR SERVICIOS DEL PROYECTO EVENTOS
 builder.Services.AddScoped<ICandidatoCrpService, CandidatoCrpService>();
 builder.Services.AddScoped<IAccesoWebService, AccesoWebService>();
+builder.Services.AddScoped<IVacanteService, VacanteService>();
+
+// NOTA: IVacanteRepository y VacanteRepository NO deben registrarse aquí
+// porque este proyecto es un frontend que consume la API.
+// Los repositorios van en el proyecto Sivilab.API.
 
 var app = builder.Build();
 

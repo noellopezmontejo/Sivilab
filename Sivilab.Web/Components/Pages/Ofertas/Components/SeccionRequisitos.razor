@@ -1,0 +1,221 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="card mb-4">
+    <div class="card-header">
+        Requisitos
+    </div>
+    <div class="card-body">
+        <h6>Conocimientos y herramientas*</h6>
+        <div class="row mb-2">
+            <div class="col-md-8">
+                <input class="form-control" @bind="nuevoConocimiento.Nombre" placeholder="Ej. MANEJO DE CAJA REGISTRADORA" />
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" @bind="nuevoConocimiento.Experiencia">
+                    <option value="">Experiencia*</option>
+                    <option value="Sin experiencia">Sin experiencia</option>
+                    <option value="6m - 1 año">6m - 1 año</option>
+                    <option value="1 - 2 años">1 - 2 años</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-primary" @onclick="AgregarConocimiento">+</button>
+            </div>
+        </div>
+        
+        @if (Oferta.Conocimientos.Any())
+        {
+            <ul class="list-group mb-3">
+                @foreach (var c in Oferta.Conocimientos)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @c.Nombre - @c.Experiencia
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoverConocimiento(c)">x</button>
+                    </li>
+                }
+            </ul>
+        }
+
+        <h6 class="mt-4">Idiomas</h6>
+        <div class="row mb-2">
+                <div class="col-md-4">
+                <select class="form-select" @bind="nuevoIdioma.Nombre">
+                    <option value="">Idioma</option>
+                    <option value="Inglés">Inglés</option>
+                    <option value="Francés">Francés</option>
+                </select>
+            </div>
+                <div class="col-md-4">
+                <select class="form-select" @bind="nuevoIdioma.Nivel">
+                    <option value="">Nivel</option>
+                    <option value="Básico">Básico</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                </select>
+            </div>
+                <div class="col-md-3">
+                <input class="form-control" @bind="nuevoIdioma.Certificacion" placeholder="Certificación" />
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-primary" @onclick="AgregarIdioma">+</button>
+            </div>
+        </div>
+            @if (Oferta.Idiomas.Any())
+        {
+            <ul class="list-group mb-3">
+                @foreach (var i in Oferta.Idiomas)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @i.Nombre - @i.Nivel (@i.Certificacion)
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoverIdioma(i)">x</button>
+                    </li>
+                }
+            </ul>
+        }
+        
+        <h6 class="mt-4">Habilidades o competencias*</h6>
+        <div class="mb-3">
+             <div class="dropdown @(dropdownOpen ? "show" : "")">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" 
+                        type="button" 
+                        @onclick="ToggleDropdown"
+                        aria-expanded="@dropdownOpen">
+                    Seleccionar habilidades
+                </button>
+                <ul class="dropdown-menu w-100 p-2 @(dropdownOpen ? "show" : "")" style="max-height: 200px; overflow-y: auto;">
+                    @foreach (var habilidad in listaHabilidades)
+                    {
+                        var isChecked = Oferta.Habilidades.Contains(habilidad);
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="@habilidad" 
+                                       checked="@isChecked" 
+                                       @onchange="@(e => ToggleHabilidad(habilidad, e.Value))" />
+                                <label class="form-check-label w-100" for="@habilidad">
+                                    @habilidad
+                                </label>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="input-group mb-2">
+            <input class="form-control" @bind="nuevaHabilidad" placeholder="Agregar otra habilidad" />
+            <button type="button" class="btn btn-primary" @onclick="AgregarNuevaHabilidad">+</button>
+        </div>
+        @if (Oferta.Habilidades.Any())
+        {
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var h in Oferta.Habilidades)
+                {
+                    <span class="badge bg-info text-dark">
+                        @h <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close" @onclick="@(() => RemoverHabilidad(h))"></button>
+                    </span>
+                }
+            </div>
+        }
+
+        <div class="mt-4">
+            <label class="form-label">Disponibilidad de la persona</label>
+            <div class="form-check form-switch">
+                <InputCheckbox class="form-check-input" id="viajar" @bind-Value="Oferta.DisponibilidadViajar" />
+                <label class="form-check-label" for="viajar">¿Es necesario viajar?</label>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+
+    private ConocimientoDto nuevoConocimiento = new();
+    private IdiomaDto nuevoIdioma = new();
+    private string nuevaHabilidad = string.Empty;
+    private bool dropdownOpen = false;
+
+    private List<string> listaHabilidades = new()
+    {
+        "Orientación al cliente",
+        "Compromiso",
+        "Calidad en el trabajo",
+        "Trabajo en equipo",
+        "Motivación",
+        "Orientación a resultados",
+        "Liderazgo",
+        "Comunicación efectiva",
+        "Resolución de problemas",
+        "Adaptabilidad"
+    };
+
+    private void ToggleDropdown()
+    {
+        dropdownOpen = !dropdownOpen;
+    }
+
+    private void AgregarConocimiento()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoConocimiento.Nombre) && !string.IsNullOrWhiteSpace(nuevoConocimiento.Experiencia))
+        {
+            Oferta.Conocimientos.Add(new ConocimientoDto 
+            { 
+                Nombre = nuevoConocimiento.Nombre, 
+                Experiencia = nuevoConocimiento.Experiencia 
+            });
+            nuevoConocimiento = new();
+        }
+    }
+
+    private void RemoverConocimiento(ConocimientoDto c) => Oferta.Conocimientos.Remove(c);
+
+    private void AgregarIdioma()
+    {
+         if (!string.IsNullOrWhiteSpace(nuevoIdioma.Nombre) && !string.IsNullOrWhiteSpace(nuevoIdioma.Nivel))
+        {
+            Oferta.Idiomas.Add(new IdiomaDto
+            {
+                Nombre = nuevoIdioma.Nombre,
+                Nivel = nuevoIdioma.Nivel,
+                Certificacion = nuevoIdioma.Certificacion
+            });
+            nuevoIdioma = new();
+        }
+    }
+
+    private void RemoverIdioma(IdiomaDto i) => Oferta.Idiomas.Remove(i);
+
+    private void AgregarHabilidad(string habilidad)
+    {
+        if (!Oferta.Habilidades.Contains(habilidad))
+        {
+            Oferta.Habilidades.Add(habilidad);
+        }
+    }
+
+    private void ToggleHabilidad(string habilidad, object? isChecked)
+    {
+         if (isChecked is bool check && check)
+        {
+            if (!Oferta.Habilidades.Contains(habilidad)) Oferta.Habilidades.Add(habilidad);
+        }
+        else
+        {
+            Oferta.Habilidades.Remove(habilidad);
+        }
+    }
+
+    private void AgregarNuevaHabilidad()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevaHabilidad))
+        {
+            AgregarHabilidad(nuevaHabilidad);
+            nuevaHabilidad = string.Empty;
+        }
+    }
+
+    private void RemoverHabilidad(string h) => Oferta.Habilidades.Remove(h);
+}

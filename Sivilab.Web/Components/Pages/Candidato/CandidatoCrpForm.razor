@@ -62,7 +62,7 @@ else
     {
         if (Id.HasValue)
         {
-            var item = await CandidatoService.ob(Id.Value);
+            var item = await CandidatoService.ObtenerPorId(Id.Value);
             if (item != null) model = item;
         }
         isLoading = false;
@@ -72,7 +72,7 @@ else
     {
         if (IsNew)
         {
-            var newId = await CandidatoService.CrearAsync(model);
+            var newId = await CandidatoService.Crear(model);
             // Navegar a lista o a editar con id nuevo — por simplicidad ir a lista
             NavManager.NavigateTo("/candidatos");
         }
@@ -80,7 +80,7 @@ else
         {
             if (Id.HasValue)
             {
-                await CandidatoService.ActualizarAsync(Id.Value, model);
+                await CandidatoService.Actualizar(Id.Value, model);
                 NavManager.NavigateTo("/candidatos");
             }
         }

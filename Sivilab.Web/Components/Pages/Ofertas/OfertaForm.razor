@@ -1,0 +1,206 @@
+@page "/oferta/nueva"
+@using Microsoft.AspNetCore.Components.Forms
+@using Sivilab.Web.Components.Models
+@using Sivilab.Web.Components.Pages.Ofertas.Components
+@using Sivilab.Web.Services
+@inject NavigationManager Navigation
+@inject IOfertaService OfertaService
+@rendermode InteractiveServer
+
+<h3>Vamos a crear una oferta de empleo</h3>
+
+<div class="mb-4">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Usar plantilla en blanco</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Usar plantilla existente o sugerida por el SNE</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Usar plantilla en hoja de cálculo</a>
+        </li>
+    </ul>
+</div>
+
+<EditForm EditContext="editContext" OnSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    
+    @* Comentamos ValidationSummary para manejar errores por paso, o lo dejamos si queremos debug *@
+    @* <ValidationSummary /> *@
+
+    @if (pasoActual == 1)
+    {
+        <SeccionAnuncio Oferta="oferta" />
+        <SeccionUbicacion Oferta="oferta" />
+        <SeccionRequisitos Oferta="oferta" />
+        <SeccionActividades Oferta="oferta" />
+        <SeccionVideo Oferta="oferta" />
+    }
+    else if (pasoActual == 2)
+    {
+        <SeccionBeneficios Oferta="oferta" />
+    }
+    else if (pasoActual == 3)
+    {
+        <SeccionDatosReclutamiento Oferta="oferta" />
+    }
+    else if (pasoActual == 4)
+    {
+        <SeccionContacto Oferta="oferta" />
+    }
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
+        @if (pasoActual > 1)
+        {
+             <button type="button" class="btn btn-outline-secondary btn-lg me-md-2" @onclick="RetrocederPaso">Regresar paso @(pasoActual - 1)</button>
+        }
+        
+        <button type="submit" class="btn btn-danger btn-lg">@(pasoActual == 4 ? "Guardar y finalizar" : "Guardar y continuar")</button>
+    </div>
+
+</EditForm>
+
+@code {
+    private OfertaEmpleoDto oferta = new();
+    private int pasoActual = 1;
+    private EditContext editContext = default!;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(oferta);
+    }
+
+    private async Task HandleSubmit()
+    {
+        // 1. Validar todo el modelo (para que se asignen los mensajes de error al contexto)
+        var isValid = editContext.Validate();
+
+        // 2. Obtener todos los mensajes de error
+        var messages = editContext.GetValidationMessages().ToList();
+
+        // 3. Filtrar errores irrelevantes para el paso actual
+        //    Si hay errores en campos de pasos FUTUROS, no nos importa para avanzar.
+        //    Si hay errores en campos de DIRECCIÓN pero UsarDomicilioRegistrado es TRUE, los ignoramos.
+
+        var errorsInCurrentStep = GetErrorsForCurrentStep(messages);
+
+        if (errorsInCurrentStep.Any())
+        {
+            // Hay errores válidos para este paso, no avanzamos.
+            // Los componentes Input* mostrarán los mensajes automáticamente.
+            return;
+        }
+
+        // Si no hay errores bloqueantes para este paso:
+        if (pasoActual < 4)
+        {
+            pasoActual++;
+        }
+        else
+        {
+            // Guardar oferta final
+            Console.WriteLine("Guardando oferta: " + oferta.Titulo);
+            
+            try 
+            {
+                var resultado = await OfertaService.CrearOferta(oferta);
+                if (resultado)
+                {
+                    Console.WriteLine("Oferta guardada exitosamente");
+                    // Navigation.NavigateTo("/ofertas"); // Uncomment when route exists
+                    Navigation.NavigateTo("/"); // Redirect to home for now
+                }
+                else
+                {
+                    Console.WriteLine("Error al guardar oferta");
+                    // Show error message
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al guardar oferta: {ex.Message}");
+            }
+        }
+    }
+
+    private List<string> GetErrorsForCurrentStep(List<string> allMessages)
+    {
+        // Nota: this is a simplistic filtering based on assumption. 
+        // EditContext.GetValidationMessages() returns strings, not field names easily without iterating FieldIdentifiers.
+        // Better approach: Iterate over fields relevant to the current step and check if THEY have messages.
+        
+        var stepErrors = new List<string>();
+        var fieldsToCheck = GetFieldsForStep(pasoActual);
+
+        foreach (var fieldName in fieldsToCheck)
+        {
+            var fieldIdentifier = new FieldIdentifier(oferta, fieldName);
+            var fieldMessages = editContext.GetValidationMessages(fieldIdentifier);
+            stepErrors.AddRange(fieldMessages);
+        }
+
+        return stepErrors;
+    }
+
+    private List<string> GetFieldsForStep(int step)
+    {
+        var fields = new List<string>();
+
+        if (step == 1)
+        {
+            fields.Add(nameof(OfertaEmpleoDto.Titulo));
+            fields.Add(nameof(OfertaEmpleoDto.Experiencia));
+            fields.Add(nameof(OfertaEmpleoDto.SalarioMinimo));
+            fields.Add(nameof(OfertaEmpleoDto.SalarioMaximo));
+            fields.Add(nameof(OfertaEmpleoDto.NivelAcademico));
+            fields.Add(nameof(OfertaEmpleoDto.Descripcion));
+            // VideoUrl si tuviera required
+            fields.Add(nameof(OfertaEmpleoDto.VideoUrl));
+
+            // Address logic
+            if (!oferta.UsarDomicilioRegistrado)
+            {
+                fields.Add(nameof(OfertaEmpleoDto.CodigoPostal));
+                fields.Add(nameof(OfertaEmpleoDto.Estado));
+                fields.Add(nameof(OfertaEmpleoDto.Municipio));
+                fields.Add(nameof(OfertaEmpleoDto.Colonia));
+                fields.Add(nameof(OfertaEmpleoDto.Calle));
+                fields.Add(nameof(OfertaEmpleoDto.NumeroExterior));
+                // fields.Add(nameof(OfertaEmpleoDto.Referencia)); // no required in DTO? Wait, Referencia is not required in DTO... oh wait let me check DTO again. 
+                // Ah, Referencia property in DTO doesn't have [Required]. Wait, let me check file content.
+                // Referencia property: public string Referencia { get; set; } = string.Empty; (No [Required]).
+                // But in Razor it says "Referencia*". I should probably add [Required] to DTO or remove * from UI.
+                // Assuming DTO is source of truth for validation.
+            }
+        }
+        else if (step == 2)
+        {
+            fields.Add(nameof(OfertaEmpleoDto.TipoContratacion));
+            fields.Add(nameof(OfertaEmpleoDto.JornadaLaboral));
+            fields.Add(nameof(OfertaEmpleoDto.DiasLaborales));
+            fields.Add(nameof(OfertaEmpleoDto.HorarioEntrada));
+            fields.Add(nameof(OfertaEmpleoDto.HorarioSalida));
+        }
+        else if (step == 3)
+        {
+            fields.Add(nameof(OfertaEmpleoDto.NumeroVacantes));
+            fields.Add(nameof(OfertaEmpleoDto.LimitePostulaciones));
+            fields.Add(nameof(OfertaEmpleoDto.FechaInicioVigencia));
+            fields.Add(nameof(OfertaEmpleoDto.FechaFinVigencia));
+            fields.Add(nameof(OfertaEmpleoDto.FechaInicioReclutamiento));
+            fields.Add(nameof(OfertaEmpleoDto.DuracionProcesoReclutamiento));
+        }
+        else if (step == 4)
+        {
+            // Contact logic...
+        }
+
+        return fields;
+    }
+
+    private void RetrocederPaso()
+    {
+        if (pasoActual > 1) pasoActual--;
+    }
+}

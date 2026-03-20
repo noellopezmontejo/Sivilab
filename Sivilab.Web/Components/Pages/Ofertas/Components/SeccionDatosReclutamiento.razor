@@ -1,0 +1,189 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Paso 3 de 4</h3>
+<h4>Estás por finalizar</h4>
+<p class="text-muted">Datos de reclutamiento</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        
+        <div class="mb-4">
+            <label class="form-label fw-bold">¿Quieres que tu vacante?:*</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="publicacion" id="redesSociales" 
+                       checked="@(!Oferta.PublicarEnPortal)" 
+                       @onchange="@(() => Oferta.PublicarEnPortal = false)" />
+                <label class="form-check-label" for="redesSociales">
+                    No se publique en el portal del empleo, que la gestione una oficina del SNE.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="publicacion" id="portalEmpleo" 
+                       checked="@(Oferta.PublicarEnPortal)" 
+                       @onchange="@(() => Oferta.PublicarEnPortal = true)" />
+                <label class="form-check-label" for="portalEmpleo">
+                    Se publique en el portal del empleo y de ser posible se promocione en redes sociales por el SNE.
+                </label>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Número de vacantes disponibles*</label>
+                <InputNumber class="form-control" @bind-Value="Oferta.NumeroVacantes" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Limite de postulaciones*</label>
+                <InputNumber class="form-control" @bind-Value="Oferta.LimitePostulaciones" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Elige la fecha inicio de vigencia de tu oferta</label>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label small">Inicia*</label>
+                    <InputDate class="form-control" @bind-Value="Oferta.FechaInicioVigencia" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">Finaliza*</label>
+                    <InputDate class="form-control" @bind-Value="Oferta.FechaFinVigencia" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Fecha de inicio de tu proceso de reclutamiento*</label>
+            <InputDate class="form-control" @bind-Value="Oferta.FechaInicioReclutamiento" style="max-width: 300px;" />
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">Personas Extranjeras</h5>
+        
+        <div class="row align-items-center mb-3">
+            <div class="col-auto">
+                <div class="form-check">
+                    <InputCheckbox id="extranjeros" class="form-check-input" @bind-Value="Oferta.ContrataExtranjeros" />
+                    <label class="form-check-label" for="extranjeros">
+                        Soy incluyente, estoy abierto en contratar personas extranjeras
+                    </label>
+                </div>
+            </div>
+            @if(Oferta.ContrataExtranjeros)
+            {
+                <div class="col-auto">
+                    <label class="form-label small me-2">¿Cuántas... serían para contratar a personas extranjeras?*</label>
+                    <InputNumber @bind-Value="Oferta.NumeroVacantesExtranjeros" style="width: 80px; display: inline-block;" class="form-control form-control-sm" />
+                </div>
+            }
+        </div>
+
+        @if(Oferta.ContrataExtranjeros)
+        {
+            <div class="mb-3">
+                <div class="form-check">
+                    <InputCheckbox id="constancia" class="form-check-input" @bind-Value="Oferta.TieneConstanciaMigracion" />
+                    <label class="form-check-label" for="constancia">
+                        Has tramitado la Constancia de Inscripción del Empleador ante el Instituto Nacional de Migración (CIE)*
+                    </label>
+                </div>
+            </div>
+            @if(Oferta.TieneConstanciaMigracion)
+            {
+                 <div class="mb-3">
+                    <div class="form-check">
+                        <InputCheckbox id="cieVigente" class="form-check-input" @bind-Value="Oferta.CIEVigente" />
+                        <label class="form-check-label" for="cieVigente">
+                            La CIE de tu empresa sigue vigente*
+                        </label>
+                    </div>
+                </div>
+            }
+        }
+
+        <hr />
+
+        <h5 class="mb-3">Deseas agregar algún proceso de reclutamiento</h5>
+        
+        <div class="row mb-2">
+            <div class="col-md-5">
+                <label class="form-label small">Nombre de la etapa</label>
+                <input class="form-control" @bind="nuevaEtapa.Nombre" placeholder="Ej. Entrevista, Pruebas..." />
+            </div>
+             <div class="col-md-6">
+                <label class="form-label small">Descripción</label>
+                <input class="form-control" @bind="nuevaEtapa.Descripcion" placeholder="Ej. Presencial, De 9:00 a 14:00..." />
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-primary" @onclick="AgregarEtapa">+</button>
+            </div>
+        </div>
+
+        @if (Oferta.EtapasReclutamiento.Any())
+        {
+            <div class="mb-3">
+                <ol class="list-group list-group-numbered">
+                    @foreach (var etapa in Oferta.EtapasReclutamiento)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">@etapa.Nombre</div>
+                                @etapa.Descripcion
+                            </div>
+                            <button type="button" class="btn btn-sm btn-link text-danger" @onclick="() => RemoverEtapa(etapa)">
+                                <i class="bi bi-trash-fill"></i> Eliminar
+                            </button>
+                        </li>
+                    }
+                </ol>
+            </div>
+        }
+        <button type="button" class="btn btn-link text-decoration-none p-0 mb-3" @onclick="PrepareNuevaEtapa">
+            <span class="text-success fs-5 fw-bold">+</span> Agregar otra etapa
+        </button>
+
+        <div class="mt-3">
+            <label class="form-label">¿Qué tiempo dura tu proceso de reclutamiento... a partir de la fecha que nos indicaste arriba?*</label>
+            <InputSelect class="form-select" @bind-Value="Oferta.DuracionProcesoReclutamiento" style="max-width: 200px;">
+                <option value="">Seleccione...</option>
+                <option value="1 semana">1 semana</option>
+                <option value="2 semanas">2 semanas</option>
+                <option value="1 mes">1 mes</option>
+                <option value="2 meses">2 meses</option>
+            </InputSelect>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+
+    private EtapaReclutamientoDto nuevaEtapa = new();
+
+    private void AgregarEtapa()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevaEtapa.Nombre))
+        {
+            Oferta.EtapasReclutamiento.Add(new EtapaReclutamientoDto 
+            { 
+                Nombre = nuevaEtapa.Nombre, 
+                Descripcion = nuevaEtapa.Descripcion 
+            });
+            nuevaEtapa = new();
+        }
+    }
+
+    private void RemoverEtapa(EtapaReclutamientoDto etapa)
+    {
+        Oferta.EtapasReclutamiento.Remove(etapa);
+    }
+    
+    private void PrepareNuevaEtapa()
+    {
+        // Focus logic could leverage JS interop if needed, for now acts as visual cue or we could pre-fill
+    }
+}

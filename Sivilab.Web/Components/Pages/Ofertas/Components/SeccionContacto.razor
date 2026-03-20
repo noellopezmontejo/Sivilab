@@ -1,0 +1,99 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Paso 4 de 4</h3>
+<h4>¿Listo para publicar?</h4>
+<p class="text-muted">Define quién será el contacto con el SNE.</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+         <h5 class="mb-3">Datos de contacto</h5>
+         <p class="text-muted small">Suele ser un reclutador o un área de la empresa</p>
+
+         <div class="mb-3">
+             <div class="form-check">
+                <input class="form-check-input" type="radio" name="contacto" id="contactoRegistrado" 
+                       checked="@(Oferta.UsarContactoRegistrado)" 
+                       @onchange="@(() => Oferta.UsarContactoRegistrado = true)" />
+                <label class="form-check-label fw-bold" for="contactoRegistrado">
+                    Usar la información registrada
+                </label>
+            </div>
+            
+            @if(Oferta.UsarContactoRegistrado)
+            {
+                <div class="ms-4 mt-2">
+                    <p class="mb-1"><strong>Cargo:</strong> @Oferta.ContactoCargo (Info mock)</p>
+                    <p class="mb-1"><strong>Correo electrónico:</strong> @Oferta.ContactoCorreo (Info mock)</p>
+                    <p class="mb-1"><strong>Tel.</strong> @Oferta.ContactoTelefono (Info mock)</p>
+                </div>
+            }
+         </div>
+
+         <div class="mb-3">
+             <div class="form-check">
+                <input class="form-check-input" type="radio" name="contacto" id="contactoAlterno" 
+                       checked="@(!Oferta.UsarContactoRegistrado)" 
+                       @onchange="@(() => Oferta.UsarContactoRegistrado = false)" />
+                <label class="form-check-label fw-bold" for="contactoAlterno">
+                    Otro contacto
+                </label>
+            </div>
+
+            @if(!Oferta.UsarContactoRegistrado)
+            {
+                <div class="ms-4 mt-3">
+                    <div class="mb-2">
+                        <label class="form-label">Nombre</label>
+                        <InputText class="form-control" @bind-Value="Oferta.NombreContactoAlterno" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Cargo</label>
+                        <InputText class="form-control" @bind-Value="Oferta.CargoContactoAlterno" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Correo electrónico</label>
+                        <InputText class="form-control" @bind-Value="Oferta.CorreoContactoAlterno" />
+                    </div>
+                     <div class="mb-2">
+                        <label class="form-label">Teléfono</label>
+                        <InputText class="form-control" @bind-Value="Oferta.TelefonoContactoAlterno" />
+                    </div>
+                </div>
+            }
+         </div>
+
+         <div class="mb-3">
+             <a href="#" class="text-info text-decoration-none fw-bold">
+                 <i class="bi bi-search"></i> Revisa tu oferta, así la verán los candidatos
+             </a>
+         </div>
+
+         <hr />
+
+         <div class="mb-3">
+             <label class="form-label fw-bold">¿Quieres registrar esta oferta en una feria de empleo?</label>
+             <InputSelect class="form-select" @bind-Value="Oferta.FeriaEmpleoId">
+                 <option value="">Seleccione una opción</option>
+                 <option value="1">Feria Nacional de Empleo 2024</option>
+                 <option value="2">Feria Virtual de Inclusión</option>
+             </InputSelect>
+         </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        // Mock data for registered contact info, in a real app this would come from a service
+        if (string.IsNullOrEmpty(Oferta.ContactoCargo)) {
+            Oferta.ContactoCargo = "RECLUTADOR";
+            Oferta.ContactoCorreo = "reclutamiento@empresa.com"; 
+            Oferta.ContactoTelefono = "5512345678";
+        }
+    }
+}

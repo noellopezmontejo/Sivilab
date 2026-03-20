@@ -1,0 +1,83 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="card mb-4">
+    <div class="card-header">
+        Anuncio de tu empleo
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="titulo" class="form-label">Título de la oferta*</label>
+                <InputText id="titulo" class="form-control" @bind-Value="Oferta.Titulo" placeholder="AYUDANTE DE TIENDA" />
+            </div>
+            <div class="col-md-3">
+                <label for="experiencia" class="form-label">Experiencia en el puesto*</label>
+                <InputSelect id="experiencia" class="form-select" @bind-Value="Oferta.Experiencia">
+                    <option value="">Seleccione...</option>
+                    <option value="Sin experiencia">Sin experiencia</option>
+                    <option value="Menos de 1 año">Menos de 1 año</option>
+                    <option value="1 a 2 años">1 a 2 años</option>
+                    <option value="2 a 4 años">2 a 4 años</option>
+                    <option value="5 años o más">5 años o más</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Salario mensual neto ofrecido*</label>
+                <div class="input-group mb-2">
+                    <span class="input-group-text">$</span>
+                    <InputNumber class="form-control" @bind-Value="Oferta.SalarioMinimo" placeholder="0.00" />
+                    @if (Oferta.HabilitarRangoSalario)
+                    {
+                        <span class="input-group-text">-</span>
+                        <InputNumber class="form-control" @bind-Value="Oferta.SalarioMaximo" placeholder="0.00" />
+                    }
+                </div>
+                <div class="form-check">
+                    <InputCheckbox id="rangoSalario" class="form-check-input" @bind-Value="Oferta.HabilitarRangoSalario" />
+                    <label class="form-check-label" for="rangoSalario">Habilitar un rango de salario</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="nivelAcademico" class="form-label">Nivel académico requerido*</label>
+                <InputSelect id="nivelAcademico" class="form-select" @bind-Value="Oferta.NivelAcademico">
+                    <option value="">Seleccione...</option>
+                    <option value="Primaria">Primaria</option>
+                    <option value="Secundaria">Secundaria</option>
+                    <option value="Media Superior">Media Superior</option>
+                    <option value="Superior">Superior</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">¿Empleas personas con discapacidad?*</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="discapacidad" id="discapacidadSi" 
+                               checked="@(Oferta.EmpleaPersonasConDiscapacidad)" 
+                               @onchange="@(() => Oferta.EmpleaPersonasConDiscapacidad = true)" />
+                        <label class="form-check-label" for="discapacidadSi">SÍ</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="discapacidad" id="discapacidadNo" 
+                               checked="@(!Oferta.EmpleaPersonasConDiscapacidad)" 
+                               @onchange="@(() => Oferta.EmpleaPersonasConDiscapacidad = false)" />
+                        <label class="form-check-label" for="discapacidadNo">NO</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Describir la oferta*</label>
+            <InputTextArea id="descripcion" class="form-control" @bind-Value="Oferta.Descripcion" rows="4" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+}

@@ -39,7 +39,7 @@ else
                     <td>@c.CandidatoId</td>
                     <td>@c.Curp</td>
                     <td>@c.Nombre</td>
-                    <td>@c.ApellidoPaterno</td>
+                    <td>@c.Paterno</td>
                     <td>@c.CorreoElectronico</td>
                     <td>
                         <a class="btn btn-sm btn-primary" href="@($"/candidato/{c.CandidatoId}")">Editar</a>
@@ -64,7 +64,7 @@ else
     private async Task CargarTodos()
     {
         isLoading = true;
-        candidatos = await CandidatoService.ObtenerTodosAsync();
+        candidatos = await CandidatoService.ObtenerTodos();
         isLoading = false;
     }
 
@@ -77,14 +77,14 @@ else
         }
 
         isLoading = true;
-        var item = await CandidatoService.ObtenerPorCurpAsync(searchCurp.Trim());
+        var item = await CandidatoService.ObtenerPorCurp(searchCurp.Trim());
         candidatos = item is null ? new List<CandidatoCrp>() : new List<CandidatoCrp> { item };
         isLoading = false;
     }
 
     private async Task Eliminar(int id)
     {
-        var ok = await CandidatoService.EliminarAsync(id);
+        var ok = await CandidatoService.Eliminar(id);
         if (ok) await CargarTodos();
         else /* mostrar mensaje error */ ;
     }

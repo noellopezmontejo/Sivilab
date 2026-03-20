@@ -1,0 +1,170 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Paso 2 de 4</h3>
+<h4>Atrae a tus candidatos</h4>
+<p class="text-muted">Compártenos los beneficios de la empresa</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="tipoContratacion" class="form-label">Contratación*</label>
+                <InputSelect id="tipoContratacion" class="form-select" @bind-Value="Oferta.TipoContratacion">
+                    <option value="">Seleccione...</option>
+                    <option value="Contrato por tiempo indeterminado">Contrato por tiempo indeterminado</option>
+                    <option value="Contrato por tiempo determinado">Contrato por tiempo determinado</option>
+                    <option value="Otro">Otro</option>
+                </InputSelect>
+            </div>
+            @if (Oferta.TipoContratacion == "Otro")
+            {
+                <div class="col-md-6">
+                    <label for="otroTipoContratacion" class="form-label">Otro tipo de contratación</label>
+                    <InputText id="otroTipoContratacion" class="form-control" @bind-Value="Oferta.OtroTipoContratacion" />
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">La empresa ofrece*</label>
+            <div class="input-group mb-2">
+                <input class="form-control" @bind="nuevoBeneficio" placeholder="PRIMA VACACIONAL" />
+                <button type="button" class="btn btn-primary" @onclick="AgregarBeneficio">+</button>
+            </div>
+                @if (Oferta.Beneficios.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var ben in Oferta.Beneficios)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @ben
+                            <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoverBeneficio(ben)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+            <button type="button" class="btn btn-link mt-2" @onclick='() => AgregarBeneficioDefault("AGUINALDO")'>+ Agregar otro beneficio</button>
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">Jornada laboral*</h5>
+        <div class="mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="jornada" id="tiempoCompleto" 
+                        checked="@(Oferta.JornadaLaboral == "Tiempo completo")" 
+                        @onchange='@(() => Oferta.JornadaLaboral = "Tiempo completo")' />
+                <label class="form-check-label" for="tiempoCompleto">Tiempo completo</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="jornada" id="medioTiempo" 
+                        checked="@(Oferta.JornadaLaboral == "Medio tiempo")" 
+                        @onchange='@(() => Oferta.JornadaLaboral = "Medio tiempo")' />
+                <label class="form-check-label" for="medioTiempo">Medio tiempo</label>
+            </div>
+                <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="jornada" id="finesSemana" 
+                        checked="@(Oferta.JornadaLaboral == "Fines de semana")" 
+                        @onchange='@(() => Oferta.JornadaLaboral = "Fines de semana")' />
+                <label class="form-check-label" for="finesSemana">Fines de semana</label>
+            </div>
+                <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="jornada" id="teletrabajo" 
+                        checked="@(Oferta.JornadaLaboral == "Teletrabajo")" 
+                        @onchange='@(() => Oferta.JornadaLaboral = "Teletrabajo")' />
+                <label class="form-check-label" for="teletrabajo">Teletrabajo</label>
+            </div>
+                <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="jornada" id="mixta" 
+                        checked="@(Oferta.JornadaLaboral == "Modalidad mixta")" 
+                        @onchange='@(() => Oferta.JornadaLaboral = "Modalidad mixta")' />
+                <label class="form-check-label" for="mixta">Modalidad mixta (presencial y teletrabajo)</label>
+            </div>
+        </div>
+
+        <h5 class="mb-3">Horario</h5>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="diasLaborales" class="form-label">Días laborales*</label>
+                <InputSelect id="diasLaborales" class="form-select" @bind-Value="Oferta.DiasLaborales">
+                    <option value="">Seleccione...</option>
+                    <option value="Lunes a Viernes">Lunes a Viernes</option>
+                    <option value="Lunes a Sábado">Lunes a Sábado</option>
+                    <option value="Sólo algunos días">Sólo algunos días</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-8">
+                    <label class="form-label">Selecciona los días</label>
+                    <div>
+                        @foreach (var dia in diasSemana)
+                        {
+                            <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="@dia" 
+                                    checked="@(Oferta.DiasSeleccionados.Contains(dia))"
+                                    @onchange="@(e => ToggleDia(dia, e.Value))" />
+                            <label class="form-check-label" for="@dia">@dia</label>
+                        </div>
+                        }
+                    </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="horarioEntrada" class="form-label">Horario de entrada*</label>
+                <InputText type="time" id="horarioEntrada" class="form-control" @bind-Value="Oferta.HorarioEntrada" />
+            </div>
+            <div class="col-md-6">
+                <label for="horarioSalida" class="form-label">Horario de salida*</label>
+                    <InputText type="time" id="horarioSalida" class="form-control" @bind-Value="Oferta.HorarioSalida" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="aclaraciones" class="form-label">Aclaraciones de horario</label>
+            <InputTextArea id="aclaraciones" class="form-control" @bind-Value="Oferta.AclaracionesHorario" rows="3" placeholder="EL DIA DE DESCANSO ES ROTATIVO" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+
+    private string nuevoBeneficio = string.Empty;
+    private List<string> diasSemana = new() { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+
+    private void AgregarBeneficio()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoBeneficio))
+        {
+            Oferta.Beneficios.Add(nuevoBeneficio);
+            nuevoBeneficio = string.Empty;
+        }
+    }
+
+    private void AgregarBeneficioDefault(string beneficio)
+    {
+        if (!Oferta.Beneficios.Contains(beneficio))
+        {
+            Oferta.Beneficios.Add(beneficio);
+        }
+    }
+
+    private void RemoverBeneficio(string b) => Oferta.Beneficios.Remove(b);
+
+    private void ToggleDia(string dia, object? isChecked)
+    {
+        if (isChecked is bool check && check)
+        {
+            if (!Oferta.DiasSeleccionados.Contains(dia)) Oferta.DiasSeleccionados.Add(dia);
+        }
+        else
+        {
+            Oferta.DiasSeleccionados.Remove(dia);
+        }
+    }
+}

@@ -1,0 +1,44 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="card mb-4">
+    <div class="card-header">
+        Actividades* (Registre una actividad por cada renglón)
+    </div>
+    <div class="card-body">
+        <div class="input-group mb-2">
+            <input class="form-control" @bind="nuevaActividad" placeholder="Escribe una actividad..." />
+            <button type="button" class="btn btn-primary" @onclick="AgregarActividad">+</button>
+        </div>
+            @if (Oferta.Actividades.Any())
+        {
+            <ul class="list-group">
+                @foreach (var act in Oferta.Actividades)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @act
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => RemoverActividad(act))">x</button>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+
+    private string nuevaActividad = string.Empty;
+
+    private void AgregarActividad()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevaActividad))
+        {
+            Oferta.Actividades.Add(nuevaActividad);
+            nuevaActividad = string.Empty;
+        }
+    }
+
+    private void RemoverActividad(string a) => Oferta.Actividades.Remove(a);
+}

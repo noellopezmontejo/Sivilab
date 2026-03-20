@@ -6,9 +6,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7264/") });
-// después de builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7264/") });
+builder.Services.AddHttpClient("SivilabApi", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7264/");
+});
+
+// Registrar para inyectar HttpClient directamente si es necesario, aunque lo ideal es usar IHttpClientFactory
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("SivilabApi"));
+
 builder.Services.AddScoped<Sivilab.Web.Services.ICandidatoCrpService, Sivilab.Web.Services.CandidatoCrpService>();
+builder.Services.AddScoped<Sivilab.Web.Services.IOfertaService, Sivilab.Web.Services.OfertaService>();
 
 var app = builder.Build();
 

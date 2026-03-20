@@ -1,0 +1,101 @@
+@using Sivilab.Web.Components.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="card mb-4">
+    <div class="card-header">
+        Ubicación del empleo
+    </div>
+    <div class="card-body">
+        <InputRadioGroup @bind-Value="Oferta.UsarDomicilioRegistrado">
+            <div class="form-check">
+                <InputRadio Value="true" class="form-check-input" id="domicilioRegistrado" />
+                <label class="form-check-label" for="domicilioRegistrado">
+                    Domicilio registrado<br />
+                    <span class="text-muted small">Col. Este Potrero, Tapachula, C.P. 30770, Chiapas</span>
+                </label>
+            </div>
+            <div class="form-check mt-2">
+                <InputRadio Value="false" class="form-check-input" id="otroDomicilio" />
+                <label class="form-check-label" for="otroDomicilio">Otro domicilio</label>
+            </div>
+        </InputRadioGroup>
+
+        @if (!Oferta.UsarDomicilioRegistrado)
+        {
+            <div class="row mb-3 mt-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="cp" class="form-label">Código Postal*</label>
+                    <div class="input-group">
+                        <InputText id="cp" class="form-control" @bind-Value="Oferta.CodigoPostal" placeholder="30710" />
+                        <button class="btn btn-danger" type="button" style="background-color: #A02142; border-color: #A02142;">Validar</button>
+                    </div>
+                </div>
+                <div class="col-md-8 d-flex align-items-center">
+                     <button class="btn btn-link text-decoration-none p-0 me-3" style="color: #009B94;" type="button">
+                         <i class="bi bi-geo-alt-fill"></i> Usar mi ubicación
+                     </button>
+                      
+                     <a href="#" class="text-decoration-none" style="color: #009B94;">
+                         <i class="bi bi-question-circle-fill"></i> ¿Cómo activar tu ubicación?
+                     </a>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="estado" class="form-label">Entidad Federativa*</label>
+                    <InputSelect id="estado" class="form-select" @bind-Value="Oferta.Estado">
+                        <option value="">Seleccione...</option>
+                        <option value="Chiapas">Chiapas</option>
+                        <option value="Ciudad de México">Ciudad de México</option>
+                        <option value="Jalisco">Jalisco</option>
+                        <option value="Nuevo León">Nuevo León</option>
+                    </InputSelect>
+                </div>
+                <div class="col-md-4">
+                    <label for="municipio" class="form-label">Municipio o alcaldía*</label>
+                    <InputSelect id="municipio" class="form-select" @bind-Value="Oferta.Municipio">
+                        <option value="">Seleccione...</option>
+                        <option value="Tapachula">Tapachula</option>
+                        <option value="Tuxtla Gutiérrez">Tuxtla Gutiérrez</option>
+                        <option value="San Cristóbal de las Casas">San Cristóbal de las Casas</option>
+                    </InputSelect>
+                </div>
+                <div class="col-md-4">
+                    <label for="colonia" class="form-label">Colonia*</label>
+                    <InputSelect id="colonia" class="form-select" @bind-Value="Oferta.Colonia">
+                        <option value="">Seleccione...</option>
+                        <option value="5 de Febrero">5 de Febrero</option>
+                        <option value="Centro">Centro</option>
+                        <option value="Las Palmas">Las Palmas</option>
+                    </InputSelect>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="calle" class="form-label">Calle*</label>
+                    <InputText id="calle" class="form-control" @bind-Value="Oferta.Calle" placeholder="7 AVENIDA NORTE" />
+                </div>
+                <div class="col-md-3">
+                    <label for="numExt" class="form-label">Número exterior*</label>
+                    <InputText id="numExt" class="form-control" @bind-Value="Oferta.NumeroExterior" placeholder="SN" />
+                </div>
+                <div class="col-md-3">
+                    <label for="numInt" class="form-label">Número interior</label>
+                    <InputText id="numInt" class="form-control" @bind-Value="Oferta.NumeroInterior" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="referencia" class="form-label">Entre qué calles se encuentra o alguna referencia*</label>
+                <InputText id="referencia" class="form-control" @bind-Value="Oferta.Referencia" placeholder="CONOCIDO" />
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfertaEmpleoDto Oferta { get; set; } = default!;
+}

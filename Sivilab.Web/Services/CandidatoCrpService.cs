@@ -52,10 +52,5 @@ namespace Sivilab.Web.Services
             var resp = await _http.DeleteAsync($"api/CandidatoCrp/{id}");
             return resp.IsSuccessStatusCode;
         }
-
-        Task<CandidatoCrp?> ICandidatoCrpService.ObtenerPorIdA(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

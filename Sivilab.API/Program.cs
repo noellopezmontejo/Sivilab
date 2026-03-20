@@ -45,6 +45,10 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 // Registra el repositorio de candidatos
 builder.Services.AddScoped<ICandidatoCrpRepository, CandidatoCrpRepository>();
+builder.Services.AddScoped<IOfertaRepository, OfertaRepository>();
+
+// Agregar repositorio de vacantes
+builder.Services.AddScoped<IVacanteRepository, VacanteRepository>();
 
 // ============================================
 // CONFIGURACIÓN DE EMAIL
@@ -73,7 +77,6 @@ builder.Services.AddOpenApi();
 
 // Configuración para JWT
 builder.Services.AddSingleton<IJwtService>(new JwtService(builder.Configuration["Jwt:SecretKey"]));
-
 
 var app = builder.Build();
 

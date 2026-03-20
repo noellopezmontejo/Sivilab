@@ -1,73 +1,213 @@
+@using Sivilab.Models.Models
+@using Sivilab.Eventos.Services
+@inject IVacanteService VacanteService
+
 <div class="row mb-3">
     <div class="col-md-8">
         <div class="input-group">
             <span class="input-group-text">
                 <i class="fas fa-search"></i>
             </span>
-            <input type="text" class="form-control" placeholder="Buscar ofertas..." />
-            <button class="btn btn-primary">Buscar</button>
+            <input type="text" class="form-control" placeholder="Buscar por puesto o empresa..." @bind="busqueda" @bind:event="oninput" />
         </div>
     </div>
     <div class="col-md-4">
-        <select class="form-select">
-            <option>Todas las categorías</option>
-            <option>Tecnología</option>
-            <option>Ventas</option>
-            <option>Administrativo</option>
+        <select class="form-select" @bind="filtroCategoria">
+            <option value="">Todos los tipos</option>
+            <option value="Operativa">Operativa</option>
+            <option value="Técnica">Técnica</option>
+            <option value="Profesional">Profesional</option>
         </select>
     </div>
 </div>
 
-<div class="row">
-    @for (int i = 1; i <= 6; i++)
-    {
-        <div class="col-md-6 mb-3">
-            <div class="card h-100 hover-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title text-primary mb-0">Desarrollador Web Jr.</h6>
-                        <span class="badge bg-success">Nuevo</span>
+<!-- MENSAJE DE ERROR VISIBLE -->
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger mb-3">
+        <i class="fas fa-exclamation-triangle me-2"></i>@mensajeError
+        <button class="btn btn-sm btn-outline-danger ms-3" @onclick="CargarVacantes">Reintentar</button>
+    </div>
+}
+
+@if (cargando)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary mb-3"></div>
+        <p>Cargando ofertas de empleo...</p>
+    </div>
+}
+else if (!VacantesFiltradas.Any() && string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle fa-2x mb-2"></i>
+        <p class="mb-0">No hay ofertas de empleo disponibles que coincidan con tu búsqueda.</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var vacante in VacantesFiltradas)
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 hover-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title text-primary mb-0 fw-bold">@vacante.PuestoOfrecido</h6>
+                            <span class="badge bg-light text-dark border">@vacante.FolioSIVILAB</span>
+                        </div>
+                        
+                        <p class="text-dark small mb-1 fw-bold">
+                            <i class="fas fa-building me-1 text-muted"></i>@vacante.NombreEmpresa
+                        </p>
+                        
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-map-marker-alt me-1"></i>@vacante.UnidadEnlace
+                        </p>
+                        
+                        <p class="text-success small mb-2 fw-bold">
+                            <i class="fas fa-dollar-sign me-1"></i>@vacante.Salario
+                        </p>
+
+                        <p class="card-text small mb-3 text-muted">
+                            @if (!string.IsNullOrEmpty(vacante.Actividades) && vacante.Actividades.Length > 120)
+                            {
+                                @(vacante.Actividades.Substring(0, 120) + "...")
+                            }
+                            else
+                            {
+                                @vacante.Actividades
+                            }
+                        </p>
+                        
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            @if (!string.IsNullOrEmpty(vacante.TipoVacante))
+                            {
+                                <span class="badge bg-secondary">@vacante.TipoVacante</span>
+                            }
+                            @if (!string.IsNullOrEmpty(vacante.Escolaridad))
+                            {
+                                <span class="badge bg-info text-dark">@vacante.Escolaridad</span>
+                            }
+                        </div>
+
+                        <div class="mt-auto">
+                            <button class="btn btn-primary btn-sm me-2 w-100 mb-2" @onclick="() => Postular(vacante.FolioSIVILAB)">
+                                <i class="fas fa-paper-plane me-1"></i>Postularme
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm w-100" @onclick="() => VerDetalles(vacante.FolioSIVILAB)">
+                                <i class="fas fa-eye me-1"></i>Ver Detalles
+                            </button>
+                        </div>
                     </div>
-                    <p class="text-muted small mb-2">
-                        <i class="fas fa-building me-1"></i>Empresa Ejemplo S.A.
-                    </p>
-                    <p class="text-muted small mb-2">
-                        <i class="fas fa-map-marker-alt me-1"></i>Tuxtla Gutiérrez, Chiapas
-                    </p>
-                    <p class="text-muted small mb-3">
-                        <i class="fas fa-dollar-sign me-1"></i>$8,000 - $12,000/mes
-                    </p>
-                    <div class="mt-3">
-                        <button class="btn btn-primary btn-sm me-2">
-                            <i class="fas fa-paper-plane me-1"></i>Postularme
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-eye me-1"></i>Detalles
-                        </button>
+                    <div class="card-footer bg-light py-2">
+                       <small class="text-muted d-block text-center">
+                           <i class="fas fa-hashtag me-1"></i>Folio SNE: @vacante.FolioSIISNE
+                       </small>
                     </div>
-                </div>
-                <div class="card-footer bg-light">
-                    <small class="text-muted">
-                        <i class="fas fa-clock me-1"></i>Publicado hace 2 días
-                    </small>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
 
 <style>
     .hover-card {
         transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid rgba(0,0,0,0.08);
     }
 
     .hover-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 </style>
 
 @code {
     [Parameter]
     public string Curp { get; set; } = string.Empty;
+    
+    [Parameter]
+    public CandidatoCrp? Candidato { get; set; }
+
+    private List<Vacante> vacantes = new();
+    private bool cargando = true;
+    private string busqueda = string.Empty;
+    private string filtroCategoria = string.Empty;
+    private string mensajeError = string.Empty; // Variable para mensajes de error UI
+
+    private IEnumerable<Vacante> VacantesFiltradas =>
+        vacantes.Where(v =>
+            (string.IsNullOrEmpty(busqueda) ||
+             (v.PuestoOfrecido?.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ?? false) ||
+             (v.NombreEmpresa?.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+            (string.IsNullOrEmpty(filtroCategoria) || (v.TipoVacante?.Contains(filtroCategoria, StringComparison.OrdinalIgnoreCase) ?? false))
+        );
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarVacantes();
+    }
+
+    private async Task CargarVacantes()
+    {
+        cargando = true;
+        mensajeError = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var resultado = await VacanteService.ObtenerVacantesVigentes();
+            
+            if (resultado != null)
+            {
+                vacantes = resultado.ToList();
+                Console.WriteLine($"✅ {vacantes.Count} vacantes cargadas desde SP.");
+            }
+            else
+            {
+                vacantes = new List<Vacante>();
+                Console.WriteLine("⚠️ El servicio retornó null.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al cargar vacantes: {ex.Message}");
+            mensajeError = $"Error de conexión con el servicio de vacantes. ({ex.Message})";
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Postular(int vacanteId)
+    {
+        Console.WriteLine($"Postulando a vacante {vacanteId} - CURP: {Curp}");
+        
+        try
+        {
+            var resultado = await VacanteService.PostularVacante(vacanteId, Curp);
+            
+            if (resultado)
+            {
+                Console.WriteLine("✅ Postulación exitosa");
+                // Implementar notificación visual aquí
+            }
+            else
+            {
+                Console.WriteLine("❌ Error en postulación");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al postular: {ex.Message}");
+        }
+    }
+
+    private void VerDetalles(int vacanteId)
+    {
+        Console.WriteLine($"Ver detalles de vacante Folio SIVILAB: {vacanteId}");
+    }
 }

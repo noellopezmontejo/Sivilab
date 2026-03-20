@@ -7,7 +7,7 @@ namespace Sivilab.Web.Services
     public interface ICandidatoCrpService
     {
         Task<IEnumerable<CandidatoCrp>> ObtenerTodos();
-        Task<CandidatoCrp?> ObtenerPorIdA(int id);
+        Task<CandidatoCrp?> ObtenerPorId(int id);
         Task<CandidatoCrp?> ObtenerPorCurp(string curp);
         Task<int> Crear(CandidatoCrp model);
         Task<bool> Actualizar(int id, CandidatoCrp model);
