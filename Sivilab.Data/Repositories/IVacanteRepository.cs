@@ -6,5 +6,6 @@ namespace Sivilab.Data.Repositories
     {
         Task<IEnumerable<Vacante>> ObtenerVacantesVigentes();
         Task<Vacante?> ObtenerPorId(int id);
+        Task<IEnumerable<Categoria>> ObtenerCategorias();
     }
 }

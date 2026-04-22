@@ -1,6 +1,8 @@
 ﻿@page "/categoria/{nombreCategoria}"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+@inject ApiService ApiService
+@using Sivilab.PortalEmpleo.Models
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
@@ -724,37 +726,94 @@
     [Parameter]
     public string nombreCategoria { get; set; } = string.Empty;
 
-    private List<OfertaModel> ofertasFiltradas = new();
-    private OfertaModel? ofertaSeleccionada;
+    private List<Sivilab.PortalEmpleo.Models.OfertaModel> todasLasOfertas = new();
+    private List<Sivilab.PortalEmpleo.Models.OfertaModel> ofertasFiltradas = new();
+    private Sivilab.PortalEmpleo.Models.OfertaModel? ofertaSeleccionada;
 
     private string salarioSeleccionado = "";
     private string contratacionSeleccionada = "";
     private string categoriaSeleccionada = "";
 
-    private List<CategoriaModel> categorias = new()
-    {
-        new CategoriaModel { Titulo = "Desarrollo de Negocios" },
-        new CategoriaModel { Titulo = "Atención al Cliente" },
-        new CategoriaModel { Titulo = "Marketing" },
-        new CategoriaModel { Titulo = "Gestión de Producto" },
-        new CategoriaModel { Titulo = "Contabilidad" },
-        new CategoriaModel { Titulo = "Soporte Técnico" },
-        new CategoriaModel { Titulo = "Recursos Humanos" },
-		new CategoriaModel { Titulo = "Tecnología y Sistemas" }
-    };
+    private List<CategoriaModel> categorias = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         categoriaSeleccionada = nombreCategoria;
-        var todas = ObtenerTodasLasOfertas();
-        ofertasFiltradas = todas
-            .Where(o => o.Categoria.Equals(nombreCategoria, StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        
+        var vacantesApi = await ApiService.GetVacantesVigentesAsync();
+        
+        // Filtrar validando que sea visible usando la nueva regla de negocio del modelo
+        var vacantesVigentes = vacantesApi.Where(v => v.EsVisibleEnPortal);
+        
+        todasLasOfertas = vacantesVigentes.Select(v => new Sivilab.PortalEmpleo.Models.OfertaModel
+        {
+            OfferName = !string.IsNullOrEmpty(v.PuestoOfrecido) ? v.PuestoOfrecido : "Sin Título",
+            Empresa = !string.IsNullOrEmpty(v.NombreEmpresa) ? v.NombreEmpresa : "Empresa Confidencial",
+            Ubicacion = !string.IsNullOrEmpty(v.Municipio) ? v.Municipio : "Ubicación no especificada",
+            Categoria = !string.IsNullOrEmpty(v.NombreCategoria) ? v.NombreCategoria : "Otros",
+            Subcategoria = "General",
+            Educacion = !string.IsNullOrEmpty(v.Escolaridad) ? v.Escolaridad : "No especificada",
+            Contratacion = "Tiempo Completo", 
+            Horario = $"{v.HorarioDe} a {v.HorarioA}",
+            Modalidad = "Presencial",
+            Salario = v.SalarioMax.HasValue ? (int)v.SalarioMax.Value : 0,
+            Beneficios = !string.IsNullOrEmpty(v.OtrasPrest) ? v.OtrasPrest.Split(',').Select(x => x.Trim()).ToList() : new List<string>(),
+            Descripcion = v.Actividades ?? "Sin descripción",
+            Requisitos = !string.IsNullOrEmpty(v.Requisitos) ? v.Requisitos.Split(',').Select(x => x.Trim()).ToList() : new List<string>(),
+            Funciones = !string.IsNullOrEmpty(v.Actividades) ? v.Actividades.Split(',').Select(x => x.Trim()).ToList() : new List<string>(),
+            Habilidades = !string.IsNullOrEmpty(v.Requisitos) ? v.Requisitos.Split(',').Select(x => x.Trim()).ToList() : new List<string>()
+        }).ToList();
+
+        if (!todasLasOfertas.Any())
+        {
+            todasLasOfertas = ObtenerTodasLasOfertasMock();
+        }
+
+        // Definimos las categorías estrictamente al catálogo oficial proporcionado
+        var apiCats = await ApiService.GetCategoriasAsync();
+        
+        if (apiCats != null && apiCats.Any())
+        {
+            categorias = apiCats.Select(c => new CategoriaModel { Titulo = c.NombreCategoria }).ToList();
+        }
+        else
+        {
+            // Fallback
+            categorias = new List<CategoriaModel>
+            {
+                new CategoriaModel { Titulo = "Contabilidad y Finanzas" },
+                new CategoriaModel { Titulo = "Administración y Auditorias" },
+                new CategoriaModel { Titulo = "Atención a Clientes y Ventas" },
+                new CategoriaModel { Titulo = "Tecnología y Sistemas" },
+                new CategoriaModel { Titulo = "Recursos Humanos" },
+                new CategoriaModel { Titulo = "Distribución y Logistica" },
+                new CategoriaModel { Titulo = "Oficios" },
+                new CategoriaModel { Titulo = "Educación y Capacitación" },
+                new CategoriaModel { Titulo = "Salud" },
+                new CategoriaModel { Titulo = "Seguridad" },
+                new CategoriaModel { Titulo = "Técnicos Especializados" },
+                new CategoriaModel { Titulo = "Industria" },
+                new CategoriaModel { Titulo = "Otros" }
+            };
+        }
+
+        // Si entran como "todas", ignoramos el filtro inicial
+        if (nombreCategoria.Equals("todas", StringComparison.OrdinalIgnoreCase))
+        {
+            ofertasFiltradas = todasLasOfertas.ToList();
+            categoriaSeleccionada = "";
+        }
+        else 
+        {
+            ofertasFiltradas = todasLasOfertas
+                .Where(o => o.Categoria.Equals(nombreCategoria, StringComparison.OrdinalIgnoreCase) || o.Categoria == "Otros") // Fallback
+                .ToList();
+        }
 
         ofertaSeleccionada = ofertasFiltradas.FirstOrDefault();
     }
 
-    private void SeleccionarOferta(OfertaModel oferta)
+    private void SeleccionarOferta(Sivilab.PortalEmpleo.Models.OfertaModel oferta)
     {
         ofertaSeleccionada = oferta;
     }
@@ -770,11 +829,11 @@
 
     private void AplicarFiltros()
     {
-        var todas = ObtenerTodasLasOfertas();
+        var todas = todasLasOfertas;
 
         ofertasFiltradas = todas
             .Where(o =>
-                o.Categoria.Equals(nombreCategoria, StringComparison.OrdinalIgnoreCase) &&
+                (string.IsNullOrEmpty(nombreCategoria) || nombreCategoria == "todas" || o.Categoria.Equals(nombreCategoria, StringComparison.OrdinalIgnoreCase) || o.Categoria == "Otros") &&
                 (string.IsNullOrEmpty(contratacionSeleccionada) || o.Contratacion.Equals(contratacionSeleccionada, StringComparison.OrdinalIgnoreCase)) &&
                 (string.IsNullOrEmpty(salarioSeleccionado) || ValidarSalario(o, salarioSeleccionado))
             )
@@ -783,7 +842,7 @@
         ofertaSeleccionada = ofertasFiltradas.FirstOrDefault();
     }
 
-    private bool ValidarSalario(OfertaModel oferta, string filtro)
+    private bool ValidarSalario(Sivilab.PortalEmpleo.Models.OfertaModel oferta, string filtro)
     {
         return filtro switch
         {
@@ -796,33 +855,15 @@
         };
     }
 
+    // OfertaModel exists globally now
     public class CategoriaModel
     {
-        public string Titulo { get; set; } = "";
+        public string Titulo { get; set; } = string.Empty;
     }
 
-    public class OfertaModel
+    private List<Sivilab.PortalEmpleo.Models.OfertaModel> ObtenerTodasLasOfertasMock() => new()
     {
-        public string OfferName { get; set; } = string.Empty;
-        public string Empresa { get; set; } = string.Empty;
-        public string Ubicacion { get; set; } = string.Empty;
-        public string Categoria { get; set; } = string.Empty;
-        public string Subcategoria { get; set; } = string.Empty;
-        public string Educacion { get; set; } = string.Empty;
-        public string Contratacion { get; set; } = string.Empty;
-        public string Horario { get; set; } = string.Empty;
-        public string Modalidad { get; set; } = string.Empty;
-        public int Salario { get; set; }
-        public List<string> Beneficios { get; set; } = new();
-        public string Descripcion { get; set; } = string.Empty;
-        public List<string> Requisitos { get; set; } = new();
-        public List<string> Funciones { get; set; } = new();
-        public List<string> Habilidades { get; set; } = new();
-    }
-
-    private List<OfertaModel> ObtenerTodasLasOfertas() => new()
-    {
-        new OfertaModel {
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
             OfferName = "Ejecutivo de Desarrollo Comercial",
             Empresa = "Grupo Visionaria",
             Ubicacion = "Ciudad de México",
@@ -841,7 +882,7 @@
         },
 
 
-        new OfertaModel {
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
             OfferName = "Analista de Marketing Digital",
             Empresa = "Creativa Solutions",
             Ubicacion = "Guadalajara",
@@ -859,7 +900,7 @@
             Habilidades = new() { "Creatividad", "Análisis" }
         },
 
-         new OfertaModel {
+         new Sivilab.PortalEmpleo.Models.OfertaModel {
             OfferName = "Contador Público",
             Empresa = "Finanzas Globales",
             Ubicacion = "Puebla",
@@ -877,7 +918,7 @@
             Habilidades = new() { "Organización", "Precisión" }
         },
           
-        new OfertaModel {
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
             OfferName = "Especialista en Recursos Humanos",
             Empresa = "Grupo Talento Humano",
             Ubicacion = "Guadalajara",
@@ -896,7 +937,7 @@
         },
     
 
-        new OfertaModel {
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
             OfferName = "Desarrollador Full Stack .NET",
             Empresa = "Soluciones Tecnológicas MX",
             Ubicacion = "Monterrey",

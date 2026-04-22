@@ -16,6 +16,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 
 builder.Services.AddScoped<Sivilab.Web.Services.ICandidatoCrpService, Sivilab.Web.Services.CandidatoCrpService>();
 builder.Services.AddScoped<Sivilab.Web.Services.IOfertaService, Sivilab.Web.Services.OfertaService>();
+builder.Services.AddScoped<Sivilab.Web.Services.IEmpresaService, Sivilab.Web.Services.EmpresaService>();
 
 var app = builder.Build();
 

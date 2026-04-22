@@ -1,0 +1,497 @@
+@page "/ofertas"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+@inject Sivilab.PortalEmpleo.ApiService ApiService
+
+@using Sivilab.PortalEmpleo.Models
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Patria&display=swap');
+
+    :root {
+        --primary: #235B4E;
+        --gray-600: #4b5563;
+        --gray-800: #235B4E;
+        --gray-100: #f3f4f6;
+        --gray-300: #d1d5db;
+        --gray-500: #6b7280;
+        --primary-color: #235B4E;
+        --secondary-color: #BC955C;
+        --bg-light: var(--gray-100);
+        --text-dark: var(--gray-800);
+        --text-light: #ffffff;
+    }
+
+    body {
+        font-family: 'Noto Sans', sans-serif;
+        background-color: var(--bg-light);
+        color: var(--gray-600);
+    }
+
+    .lista-filtros {
+        background: var(--text-light);
+        padding: 1.2rem 1.5rem;
+        margin: 1.5rem auto;
+        border: 1.5px solid var(--primary-color);
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(35, 91, 78, 0.1);
+        color: var(--primary-color);
+        max-width: 1080px;
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .lista-filtros h4 {
+        color: var(--primary-color);
+        font-family: 'Patria', sans-serif;
+    }
+
+    .filtros {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .filtros label {
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .filtros select {
+        width: 100%;
+        padding: 0.45rem 0.6rem;
+        font-size: 0.9rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        color: var(--text-dark);
+        background-color: var(--bg-light);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+        transition: border-color 0.2s;
+    }
+
+    .filtros select:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 2px rgba(188, 149, 92, 0.2);
+    }
+
+    .btn-postular {
+        background-color: var(--primary-color);
+        color: var(--text-light);
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        align-self: flex-end;
+        margin-top: 0.5rem;
+    }
+
+    .btn-postular:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(35, 91, 78, 0.2);
+    }
+
+    .categoria-container {
+        display: flex;
+        gap: 1.5rem;
+        margin: 0 2rem 2rem 2rem;
+        flex-wrap: nowrap;
+    }
+
+    .lista-ofertas {
+        flex: 1 1 30%;
+        max-width: 400px;
+        background: var(--text-light);
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(35, 91, 78, 0.08);
+        overflow-y: auto;
+        max-height: 90vh;
+        border: 1px solid var(--gray-300);
+    }
+
+    .oferta-item {
+        padding: 1rem;
+        background-color: var(--bg-light);
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid var(--gray-300);
+    }
+
+    .oferta-item:hover, .oferta-item.active {
+        background-color: var(--text-light);
+        border-left-color: var(--secondary-color);
+        transform: translateX(2px);
+        box-shadow: 0 4px 12px rgba(35, 91, 78, 0.1);
+    }
+
+    .oferta-item h4 {
+        color: var(--primary-color);
+        margin: 0.5rem 0;
+        font-family: 'Patria', serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        line-height: 1.3;
+        position: relative;
+        padding-bottom: 0.3rem;
+    }
+
+    .oferta-item h4::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--secondary-color), transparent);
+        border-radius: 1px;
+    }
+
+    .empresa-nombre {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+        margin: 0.3rem 0;
+        position: relative;
+        display: inline-block;
+    }
+
+    .empresa-nombre::before {
+        content: '??';
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+
+    .info-badge {
+        background: linear-gradient(135deg, var(--secondary-color), #d4af71);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        margin: 0.2rem 0.3rem 0.2rem 0;
+        box-shadow: 0 2px 4px rgba(188, 149, 92, 0.3);
+        letter-spacing: 0.2px;
+    }
+
+    .nav-links {
+        background-color:#BC955C;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        box-shadow: 0 2px 4px rgba(35, 91, 78, 0.1);
+    }
+
+    .nav-links a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .nav-links a:hover {
+        color: var(--text-light);
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+    }
+
+    @@media (max-width: 768px) {
+        .categoria-container {
+            flex-direction: column;
+            margin: 0 1rem 1rem 1rem;
+        }
+        .lista-ofertas {
+            max-width: none;
+            max-height: 50vh;
+        }
+    }
+</style>
+
+@using Sivilab.PortalEmpleo.Models
+<div class="nav-links">
+    <a href="/">Inicio</a>
+    <a href="/#ofertas">Ofertas</a>
+    <a href="/#eventos">Eventos</a>
+    <a href="/#programas">Programas</a>
+</div>
+
+<!-- Filtros -->
+<div class="lista-filtros">
+    <h4 style="margin-bottom: 0.5rem;">Buscador y filtro de ofertas</h4>
+    <div class="filtros">
+        <div>
+            <label>Rango salarial</label>
+            <select @bind="salarioSeleccionado">
+                <option value="">Todos</option>
+                <option value="0-10000">10,000 o menos</option>
+                <option value="10001-20001">10,001 a 20,001</option>
+                <option value="20001-30000">20,001 a 30,000</option>
+                <option value="30001-40000">30,001 a 40,000</option>
+                <option value="40000+">40,000 o más</option>
+            </select>
+        </div>
+        <div>
+            <label>Tipo de contratación</label>
+            <select @bind="contratacionSeleccionada">
+                <option value="">Todos</option>
+                <option value="Tiempo Completo">Tiempo Completo</option>
+                <option value="Indeterminado">Indeterminado</option>
+                <option value="Medio tiempo">Medio Tiempo</option>
+                <option value="Temporal">Temporal</option>
+                <option value="Becario">Becario / Prácticas</option>
+                <option value="Honorarios">Honorarios</option>
+            </select>
+        </div>
+        <div>
+            <label>Categoría</label>
+            <select @bind="categoriaSeleccionada">
+                <option value="">Todas las categorías</option>
+                @foreach (var cat in categoriasNombres)
+                {
+                    <option value="@cat">@cat</option>
+                }
+            </select>
+        </div>
+    </div>
+    <button class="btn-postular" @onclick="AplicarFiltros">Encontrar Empleos</button>
+</div>
+
+<!-- Contenido -->
+<div class="categoria-container">
+    <div class="lista-ofertas">
+        @if (ofertasFiltradas.Any())
+        {
+            @foreach (var oferta in ofertasFiltradas)
+            {
+                <div class="oferta-item @(oferta == ofertaSeleccionada ? "active" : "")" @onclick="() => SeleccionarOferta(oferta)">
+                    <p style="font-size: 0.8rem; color: var(--gray-500);">Hoy</p>
+                    <h4>@oferta.OfferName</h4>
+                    <p class="empresa-nombre">@oferta.Empresa</p>
+                    <p style="font-size: 0.85rem; color: var(--gray-500);">@oferta.Ubicacion</p>
+                    <div style="margin-top: 0.5rem;">
+                        <span class="info-badge">$@oferta.Salario.ToString("N0") MXN</span>
+                        <span class="info-badge">@oferta.Contratacion</span>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info text-center mt-3">No se encontraron ofertas con los filtros aplicados.</div>
+        }
+    </div>
+
+    <!-- AQUÍ SE MUESTRA EL COMPONENTE DETALLE -->
+    @if(ofertaSeleccionada != null)
+    {
+        <DetailOferts Oferta="ofertaSeleccionada" />
+    }
+</div>
+
+@code {
+    private List<Sivilab.PortalEmpleo.Models.OfertaModel> ofertasFiltradas = new();
+    private Sivilab.PortalEmpleo.Models.OfertaModel? ofertaSeleccionada;
+
+    private string salarioSeleccionado = "";
+    private string contratacionSeleccionada = "";
+    private string categoriaSeleccionada = "";
+
+    private List<string> categoriasNombres = new()
+    {
+        "Contabilidad y Finanzas",
+        "Administración y Auditorias",
+        "Atención a Clientes y Ventas",
+        "Tecnología y Sistemas",
+        "Recursos Humanos",
+        "Distribución y Logistica",
+        "Oficios",
+        "Educación y Capacitación",
+        "Salud",
+        "Seguridad",
+        "Técnicos Especializados",
+        "Industria",
+        "Otros"
+    };
+
+    private List<Sivilab.PortalEmpleo.Models.OfertaModel> todasLasOfertas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var vacantesApi = await ApiService.GetVacantesVigentesAsync();
+        
+        // Filtrar validando que estén Activas y dentro de la Fecha de Vigencia
+        var vacantesVigentes = vacantesApi.Where(v => v.EsVisibleEnPortal);
+        
+        todasLasOfertas = vacantesVigentes.Select(v => new Sivilab.PortalEmpleo.Models.OfertaModel 
+        {
+            OfferName = !string.IsNullOrEmpty(v.PuestoOfrecido) ? v.PuestoOfrecido : "Sin Título",
+            Empresa = !string.IsNullOrEmpty(v.NombreEmpresa) ? v.NombreEmpresa : "Empresa Confidencial",
+            Ubicacion = !string.IsNullOrEmpty(v.Municipio) ? v.Municipio : "Ubicación no especificada",
+            Categoria = !string.IsNullOrEmpty(v.NombreCategoria) ? v.NombreCategoria : "Otros",
+            Subcategoria = "General",
+            Educacion = !string.IsNullOrEmpty(v.Escolaridad) ? v.Escolaridad : "No especificada",
+            Contratacion = "Tiempo Completo", 
+            Horario = $"{v.HorarioDe} a {v.HorarioA}",
+            Modalidad = "Presencial",
+            Salario = v.SalarioMax.HasValue ? (int)v.SalarioMax.Value : 0,
+            Beneficios = !string.IsNullOrEmpty(v.OtrasPrest) ? v.OtrasPrest.Split(',').Select(x => x.Trim()).ToList() : new List<string>(),
+            Descripcion = v.Actividades ?? "Sin descripción",
+            Requisitos = !string.IsNullOrEmpty(v.Requisitos) ? v.Requisitos.Split(',').Select(x => x.Trim()).ToList() : new List<string>(),
+            Funciones = !string.IsNullOrEmpty(v.Actividades) ? v.Actividades.Split(',').Select(x => x.Trim()).ToList() : new List<string>(),
+            Habilidades = !string.IsNullOrEmpty(v.Requisitos) ? v.Requisitos.Split(',').Select(x => x.Trim()).ToList() : new List<string>()
+        }).ToList();
+        
+        if (!todasLasOfertas.Any())
+        {
+            todasLasOfertas = ObtenerTodasLasOfertasMock(); // Fallback si la API no devuelve aún o falla
+        }
+
+        ofertasFiltradas = todasLasOfertas.ToList();
+        ofertaSeleccionada = ofertasFiltradas.FirstOrDefault();
+    }
+
+    private void SeleccionarOferta(Sivilab.PortalEmpleo.Models.OfertaModel oferta)
+    {
+        ofertaSeleccionada = oferta;
+    }
+
+    private void AplicarFiltros()
+    {
+        var todas = todasLasOfertas;
+
+        ofertasFiltradas = todas
+            .Where(o =>
+                (string.IsNullOrEmpty(categoriaSeleccionada) || o.Categoria.Equals(categoriaSeleccionada, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(contratacionSeleccionada) || o.Contratacion.Equals(contratacionSeleccionada, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(salarioSeleccionado) || ValidarSalario(o, salarioSeleccionado))
+            )
+            .ToList();
+
+        ofertaSeleccionada = ofertasFiltradas.FirstOrDefault();
+    }
+
+    private bool ValidarSalario(Sivilab.PortalEmpleo.Models.OfertaModel oferta, string filtro)
+    {
+        return filtro switch
+        {
+            "0-10000" => oferta.Salario <= 10000,
+            "10001-20001" => oferta.Salario >= 10001 && oferta.Salario <= 20001,
+            "20001-30000" => oferta.Salario >= 20001 && oferta.Salario <= 30000,
+            "30001-40000" => oferta.Salario >= 30001 && oferta.Salario <= 40000,
+            "40000+" => oferta.Salario > 40000,
+            _ => true
+        };
+    }
+
+    // Model extracted
+
+
+    private List<Sivilab.PortalEmpleo.Models.OfertaModel> ObtenerTodasLasOfertasMock() => new()
+    {
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
+            OfferName = "Ejecutivo de Desarrollo Comercial",
+            Empresa = "Grupo Visionaria",
+            Ubicacion = "Ciudad de México",
+            Categoria = "Desarrollo de Negocios",
+            Subcategoria = "Ventas B2B",
+            Educacion = "Universitario titulado",
+            Contratacion = "Tiempo Completo",
+            Horario = "Tiempo completo",
+            Modalidad = "Presencial",
+            Salario = 25000,
+            Beneficios = new() { "Prestaciones superiores a las de la ley", "Plan de crecimiento personal y laboral" },
+            Descripcion = "Gestión financiera eficiente...",
+            Requisitos = new() { "Lic o Ing concluida", "4 años de experiencia" },
+            Funciones = new() { "Supervisar registros", "Iniciativas de ahorro" },
+            Habilidades = new() { "Liderazgo", "Visión estratégica" }
+        },
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
+            OfferName = "Analista de Marketing Digital",
+            Empresa = "Creativa Solutions",
+            Ubicacion = "Guadalajara",
+            Categoria = "Marketing",
+            Subcategoria = "Digital",
+            Educacion = "Lic. en Marketing",
+            Contratacion = "Temporal",
+            Horario = "Medio tiempo",
+            Modalidad = "Remoto",
+            Salario = 12000,
+            Beneficios = new() { "Horario flexible", "Capacitación" },
+            Descripcion = "Campañas digitales y SEO",
+            Requisitos = new() { "SEO", "Google Ads" },
+            Funciones = new() { "Crear contenido", "Analizar métricas" },
+            Habilidades = new() { "Creatividad", "Análisis" }
+        },
+         new Sivilab.PortalEmpleo.Models.OfertaModel {
+            OfferName = "Contador Público",
+            Empresa = "Finanzas Globales",
+            Ubicacion = "Puebla",
+            Categoria = "Contabilidad",
+            Subcategoria = "Contabilidad",
+            Educacion = "CP Titulado",
+            Contratacion = "Permanente",
+            Horario = "Tiempo completo",
+            Modalidad = "Presencial",
+            Salario = 18000,
+            Beneficios = new() { "Seguro médico", "Prestaciones de ley" },
+            Descripcion = "Control contable y fiscal",
+            Requisitos = new() { "3 años de experiencia", "Normatividad fiscal" },
+            Funciones = new() { "Declaraciones fiscales", "Auditorías" },
+            Habilidades = new() { "Organización", "Precisión" }
+        },
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
+            OfferName = "Especialista en Recursos Humanos",
+            Empresa = "Grupo Talento Humano",
+            Ubicacion = "Guadalajara",
+            Categoria = "Recursos Humanos",
+            Subcategoria = "Gestión de Personal",
+            Educacion = "Licenciatura en Psicología, Administración o afín",
+            Contratacion = "Indefinido",
+            Horario = "Tiempo completo",
+            Modalidad = "Híbrido",
+            Salario = 16000,
+            Beneficios = new() { "Vales de despensa", "Días adicionales de vacaciones", "Seguro de vida" },
+            Descripcion = "Encargado de procesos de reclutamiento, selección y desarrollo organizacional.",
+            Requisitos = new() { "2 años en áreas de RH", "Conocimiento en NOM-035" },
+            Funciones = new() { "Publicación de vacantes", "Aplicación de pruebas psicométricas", "Onboarding" },
+            Habilidades = new() { "Comunicación efectiva", "Empatía", "Resolución de conflictos" }
+        },
+        new Sivilab.PortalEmpleo.Models.OfertaModel {
+            OfferName = "Desarrollador Full Stack .NET",
+            Empresa = "Soluciones Tecnológicas MX",
+            Ubicacion = "Monterrey",
+            Categoria = "Tecnologías y Sistemas",
+            Subcategoria = "Desarrollo de Software",
+            Educacion = "Ingeniería en Sistemas Computacionales o afín",
+            Contratacion = "Tiempo Completo",
+            Horario = "Tiempo completo",
+            Modalidad = "Remoto",
+            Salario = 25000,
+            Beneficios = new() { "Home office", "Cursos y certificaciones pagadas", "Bonos por desempeño" },
+            Descripcion = "Desarrollo de aplicaciones web con tecnologías Microsoft y modernas prácticas de desarrollo ágil.",
+            Requisitos = new() { "3 años con .NET y Blazor", "Manejo de SQL Server", "Experiencia con Git" },
+            Funciones = new() { "Análisis, desarrollo y pruebas de módulos", "Documentación técnica", "Participación en sprints" },
+            Habilidades = new() { "Trabajo en equipo", "Pensamiento lógico", "Autogestión" }
+        }
+    };
+}

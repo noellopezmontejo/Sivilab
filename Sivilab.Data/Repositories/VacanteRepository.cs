@@ -66,5 +66,21 @@ namespace Sivilab.Data.Repositories
                 return null;
             }
         }
+
+        public async Task<IEnumerable<Categoria>> ObtenerCategorias()
+        {
+            try
+            {
+                var sql = "SELECT CveCategoria, NombreCategoria, Activo, ImagenUrl FROM dbo.CatCategorias WHERE Activo = 1 ORDER BY CveCategoria";
+                // Ajustar si la tabla pertenece a otro esquema (e.g. dbo o dbempleos)
+                var categorias = await _db.QueryAsync<Categoria>(sql, commandType: CommandType.Text);
+                return categorias;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ObtenerCategorias: {ex.Message}");
+                return new List<Categoria>();
+            }
+        }
     }
 }

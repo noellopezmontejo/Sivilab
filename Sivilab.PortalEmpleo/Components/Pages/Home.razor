@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager Navigation
+@inject ApiService ApiService
 
 <div class="nav-links">
     <a href="#">Inicio</a>
@@ -9,6 +10,144 @@
     <a href="#eventos">Eventos</a>
     <a href="#programas">Programas</a>
 </div>
+
+<style>
+    /* Estilos añadidos para las Card de Vacantes */
+    .vacantes-section {
+        padding: 4rem 2rem;
+        background-color: #f8fafc;
+    }
+
+    .vacantes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vacante-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .vacante-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-color: #BC955C;
+    }
+
+    .empresa-logo-placeholder {
+        width: 48px;
+        height: 48px;
+        background-color: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #235B4E;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .vacante-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .vacante-titulo {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.3;
+    }
+
+    .vacante-empresa {
+        font-size: 0.95rem;
+        color: #4b5563;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+
+    .vacante-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tag {
+        background-color: #f3f4f6;
+        color: #4b5563;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .tag-salario {
+        background-color: #ecfdf5;
+        color: #0369a1;
+    }
+
+    .tag-lugar {
+        background-color: #fef3c7;
+        color: #b45309;
+    }
+
+    .vacante-desc {
+        font-size: 0.9rem;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .vacante-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #f3f4f6;
+        padding-top: 1rem;
+    }
+
+    .tiempo-pub {
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    .btn-ver-mas {
+        background-color: #BC955C;
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+
+    .btn-ver-mas:hover {
+        background-color: #a38150;
+        color: white;
+    }
+</style>
 
 <section class="main-banner">
     <h2>PORTAL DEL EMPLEO</h2>
@@ -98,46 +237,49 @@
     </div>
 </section>
 
-<!-- SECCIÓN DE OFERTAS CON CARRUSEL COMPLETO -->
-<section id="ofertas">
-    <h3>Ofertas de empleo actuales</h3>
+<section id="ofertas" class="vacantes-section">
+    <h2 class="seccion-titulo text-center my-4" style="color: #235B4E; font-family: 'Patria', serif; font-weight: bold;">Ofertas de empleo actuales</h2>
+    
+    <div class="vacantes-grid">
+        @for (int i = 0; i < ofertas.Count; i++)
+        {
+            var oferta = ofertas[i];
+            <!-- Generar iniciales de la empresa o título (simulado) -->
+            var iniciales = string.Join("", oferta.OfferName.Split(' ').Take(2).Select(w => w[0])).ToUpper();
 
-    <div class="carousel-container">
-        <div class="carousel-wrapper">
-            <div class="carousel-slides" id="carouselSlides">
-                @for (int i = 0; i < ofertas.Count; i++)
-                {
-                    var oferta = ofertas[i];
-                    <div class="carousel-slide @(i == 0 ? "active" : "")">
-                        <div class="carousel-content">
-                            <div class="carousel-left">
-                                <img src="@oferta.ImageURL" alt="@oferta.OfferName" />
-                            </div>
-                            <div class="carousel-right">
-                                <h2>@oferta.OfferName</h2>
-                                <p>@oferta.Description</p>
-                                <p class="detalle">
-                                    <strong>Experiencia:</strong> @oferta.Experience años<br />
-                                    <strong>Salario:</strong> $@oferta.Salary MXN
-                                </p>
-                            </div>
-                        </div>
+            <div class="vacante-card">
+                <div>
+                    <div class="vacante-header">
+                        <div class="empresa-logo-placeholder">@iniciales</div>
+                        @if(i == 0) {
+                            <span class="tag" style="background-color:#e0e7ff; color:#1d4ed8;">Nuevo</span>
+                        }
                     </div>
-                }
+                    <h3 class="vacante-titulo">@oferta.OfferName</h3>
+                    <div class="vacante-empresa">Empresa Confidencial</div> <!-- Simulado, ya que el modelo actual no tiene empresa -->
+                    
+                    <div class="vacante-tags">
+                        <span class="tag tag-lugar"><i class="bi bi-geo-alt-fill"></i> Chiapas</span> <!-- Simulado -->
+                        <span class="tag tag-salario"><i class="bi bi-currency-dollar"></i> $@oferta.Salary MXN</span>
+                        <span class="tag"><i class="bi bi-briefcase"></i> Exp: @oferta.Experience años</span>
+                    </div>
+                    
+                    <p class="vacante-desc" title="@oferta.Description">
+                        @oferta.Description
+                    </p>
+                </div>
+                
+                <div class="vacante-footer">
+                    <span class="tiempo-pub">Ver más sobre los requisitos...</span>
+                    <!-- Reemplaza con el enlace real a detalles -->
+                    <a href="#" class="btn-ver-mas">Ver detalles</a>
+                </div>
             </div>
-
-            <!-- Flechas de navegación -->
-            <button class="carousel-btn carousel-btn-prev" onclick="changeSlide(-1)">‹</button>
-            <button class="carousel-btn carousel-btn-next" onclick="changeSlide(1)">›</button>
-
-            <!-- Indicadores -->
-            <div class="carousel-indicators">
-                @for (int i = 0; i < ofertas.Count; i++)
-                {
-                    <button class="indicator @(i == 0 ? "active" : "")" onclick="goToSlide(@i)"></button>
-                }
-            </div>
-        </div>
+        }
+    </div>
+    
+    <div style="text-align: center; margin-top: 3rem;">
+        <a href="/categoria/todas" style="color: #bc955c; font-weight: bold; text-decoration: underline; font-size: 1.1rem;">Ver todas las ofertas &rarr;</a>
     </div>
 </section>
 
@@ -191,9 +333,9 @@
 
 <!-- JAVASCRIPT DEL CARRUSEL -->
 <script>
-    let currentSlide = 0;
-    const totalSlides = @ofertas.Count;
-    let autoSlideInterval;
+let currentSlide = 0;
+const totalSlides = @(ofertas.Count);
+let autoSlideInterval;
 
     function updateCarousel() {
         const slidesContainer = document.getElementById('carouselSlides');
@@ -207,7 +349,7 @@
             indicator.classList.toggle('active', index === currentSlide);
         });
     }
-
+    
     function changeSlide(direction) {
         currentSlide += direction;
 
@@ -255,6 +397,7 @@
     private SearchModel searchModel = new();
     private List<EventoModel> eventos = new();
     private List<OfertaModel> ofertas = new();
+    private List<CategoriaModel> categorias = new();
 
     // Variables para el captcha
     private bool showCaptchaModal = false;
@@ -265,8 +408,37 @@
     private string captchaMessage = "";
     private bool captchaError = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        var apiCats = await ApiService.GetCategoriasAsync();
+        if (apiCats != null && apiCats.Any())
+        {
+            categorias = apiCats.Select(c => new CategoriaModel { 
+                Titulo = c.NombreCategoria,
+                ImageUrl = string.IsNullOrEmpty(c.ImagenUrl) ? "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" : c.ImagenUrl, // Fallback image si viene vacía
+                Puestos = 10 // Mock para Puestos, podrías obtenerlo de la API luego
+            }).ToList();
+        }
+        else
+        {
+            // Fallback si falla la API
+            categorias = new List<CategoriaModel>
+            {
+                new CategoriaModel { Titulo = "Contabilidad y Finanzas", Puestos = 85, ImageUrl = "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" },
+                new CategoriaModel { Titulo = "Administración y Auditorias", Puestos = 120, ImageUrl = "https://i.pinimg.com/1200x/1a/c9/25/1ac9253ba4768ccb45a1ef2d33ceb729.jpg" },
+                new CategoriaModel { Titulo = "Atención a Clientes y Ventas", Puestos = 370, ImageUrl = "https://i.pinimg.com/1200x/63/81/0d/63810d6fa154fbc0619ed63a804be28e.jpg" },
+                new CategoriaModel { Titulo = "Tecnología y Sistemas", Puestos = 189, ImageUrl = "https://i.pinimg.com/736x/90/56/d3/9056d37cff0fcead7492b2a4fb4b01cf.jpg" },
+                new CategoriaModel { Titulo = "Recursos Humanos", Puestos = 245, ImageUrl = "https://i.pinimg.com/1200x/91/03/0e/91030ef9d1686f97802c1840381ce2b8.jpg" },
+                new CategoriaModel { Titulo = "Distribución y Logistica", Puestos = 156, ImageUrl = "https://i.pinimg.com/736x/8b/6f/d1/8b6fd1da7cb3f0b7e9f7bceb5dd3a05d.jpg" },
+                new CategoriaModel { Titulo = "Oficios", Puestos = 210, ImageUrl = "https://i.pinimg.com/736x/2d/e8/ee/2de8eee50ae28888289fd67b920895a0.jpg" },
+                new CategoriaModel { Titulo = "Educación y Capacitación", Puestos = 95, ImageUrl = "https://i.pinimg.com/736x/f9/47/45/f94745921e7e5690f8de02aca6a353b7.jpg" },
+                new CategoriaModel { Titulo = "Salud", Puestos = 45, ImageUrl = "https://i.pinimg.com/1200x/1a/c9/25/1ac9253ba4768ccb45a1ef2d33ceb729.jpg" },
+                new CategoriaModel { Titulo = "Seguridad", Puestos = 88, ImageUrl = "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" },
+                new CategoriaModel { Titulo = "Técnicos Especializados", Puestos = 112, ImageUrl = "https://i.pinimg.com/736x/2d/e8/ee/2de8eee50ae28888289fd67b920895a0.jpg" },
+                new CategoriaModel { Titulo = "Industria", Puestos = 135, ImageUrl = "https://i.pinimg.com/736x/8b/6f/d1/8b6fd1da7cb3f0b7e9f7bceb5dd3a05d.jpg" }
+            };
+        }
+
         eventos = new List<EventoModel>
         {
             new EventoModel {
@@ -429,18 +601,6 @@
         public int Experience { get; set; }
         public double Salary { get; set; }
     }
-
-    private List<CategoriaModel> categorias = new()
-    {
-        new CategoriaModel { Titulo = "Desarrollo de Negocios", Puestos = 120, ImageUrl = "https://i.pinimg.com/1200x/1a/c9/25/1ac9253ba4768ccb45a1ef2d33ceb729.jpg" },
-        new CategoriaModel { Titulo = "Atención al Cliente", Puestos = 370, ImageUrl = "https://i.pinimg.com/1200x/63/81/0d/63810d6fa154fbc0619ed63a804be28e.jpg" },
-        new CategoriaModel { Titulo = "Marketing", Puestos = 743, ImageUrl = "https://i.pinimg.com/736x/f9/47/45/f94745921e7e5690f8de02aca6a353b7.jpg" },
-        new CategoriaModel { Titulo = "Gestión de Producto", Puestos = 156, ImageUrl = "https://i.pinimg.com/736x/8b/6f/d1/8b6fd1da7cb3f0b7e9f7bceb5dd3a05d.jpg" },
-        new CategoriaModel { Titulo = "Contabilidad", Puestos = 67, ImageUrl = "https://i.pinimg.com/1200x/b5/84/95/b5849532f8d1d05aaec70fb9d94b2739.jpg" },
-        new CategoriaModel { Titulo = "Soporte Técnico", Puestos = 140, ImageUrl = "https://i.pinimg.com/736x/2d/e8/ee/2de8eee50ae28888289fd67b920895a0.jpg" },
-        new CategoriaModel { Titulo = "Recursos Humanos", Puestos = 245, ImageUrl = "https://i.pinimg.com/1200x/91/03/0e/91030ef9d1686f97802c1840381ce2b8.jpg" },
-        new CategoriaModel { Titulo = "Tecnología y Sistemas", Puestos = 189, ImageUrl = "https://i.pinimg.com/736x/90/56/d3/9056d37cff0fcead7492b2a4fb4b01cf.jpg" }
-    };
 
     public class CategoriaModel
     {

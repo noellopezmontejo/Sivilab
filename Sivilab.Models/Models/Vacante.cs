@@ -19,7 +19,7 @@ namespace Sivilab.Models.Models
         public DateTime? FechaVigencia { get; set; }
         public string? Requisitos { get; set; }
         public string? Beneficios { get; set; }
-        public bool EsActiva { get; set; }
+        public int Estatus { get; set; }
         
         // Propiedades calculadas
         public string SalarioRango => $"${SalarioMin:N0} - ${SalarioMax:N0} MXN/mes";
@@ -45,8 +45,15 @@ namespace Sivilab.Models.Models
         public string? TipoVacante { get; set; }
         public string? UnidadEnlace { get; set; }
         public string? OtrasPrest { get; set; }
+        
+        // Nuevo campo para la relación con CatCategorias
+        public int? CveCategoria { get; set; }
+        public string? NombreCategoria { get; set; }
 
-        // Propiedades auxiliares para la UI (No vienen del SP directamente, se calculan o usan por defecto)
+        // Regla de Negocio Centralizada: Solo se muestra si Estatus es 1 o 2, y su Vigencia no ha expirado
+        public bool EsVisibleEnPortal => 
+            (Estatus == 1 || Estatus == 2) && 
+            (!FechaVigencia.HasValue || FechaVigencia.Value.Date >= DateTime.Today);
       
     }
 }

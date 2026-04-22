@@ -1,0 +1,910 @@
+@page "/empresa/nueva"
+@using Microsoft.AspNetCore.Components.Forms
+@using Sivilab.Web.Components.Models
+@using Sivilab.Web.Services
+@inject NavigationManager Navigation
+@inject IEmpresaService EmpresaService
+@rendermode InteractiveServer
+
+@if (pasoActual == 1)
+{
+    <h4>Comencemos</h4>
+    <p class="text-muted">Vamos a crear tu cuenta de Empleador</p>
+
+    <EditForm Model="empresa" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="card mb-4 border-0">
+            <div class="card-body p-0">
+                <h5 class="card-title fw-bold border-bottom pb-2">Datos de acceso</h5>
+                <p class="text-muted small">(*) Datos requeridos</p>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nombre*</label>
+                    <InputText class="form-control" @bind-Value="empresa.Nombre" placeholder="Nombre" />
+                    <ValidationMessage For="@(() => empresa.Nombre)" />
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between">
+                             <label class="form-label fw-bold">Correo electrónico*</label>
+                             <a href="#" class="small text-decoration-none" style="color: #009B94;">No tengo correo</a>
+                        </div>
+                        <InputText class="form-control" @bind-Value="empresa.CorreoElectronico" placeholder="ejemplo@correo.com" />
+                        <ValidationMessage For="@(() => empresa.CorreoElectronico)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Confirmar correo electrónico*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ConfirmarCorreo" placeholder="ejemplo@correo.com" onpaste="return false;" />
+                        <ValidationMessage For="@(() => empresa.ConfirmarCorreo)" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Contraseña*</label>
+                        <InputText type="password" class="form-control" @bind-Value="empresa.Contrasena" placeholder="..........." />
+                        <ValidationMessage For="@(() => empresa.Contrasena)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Confirmar contraseña*</label>
+                        <InputText type="password" class="form-control" @bind-Value="empresa.ConfirmarContrasena" placeholder="..........." />
+                         <ValidationMessage For="@(() => empresa.ConfirmarContrasena)" />
+                    </div>
+                </div>
+                
+                <p class="text-muted small">
+                    La contraseña deberá contener al menos ocho caracteres, una letra mayúscula y un número.
+                </p>
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;">Crear cuenta</button>
+        </div>
+    </EditForm>
+}
+else if (pasoActual == 2)
+{
+    <div class="card border-0 mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4><b>@empresa.Nombre, hemos creado tu cuenta</b></h4>
+                    <p class="fs-5">Para continuar con tu registro revisa tu correo <b>@empresa.CorreoElectronico</b></p>
+                    
+                    <p class="small text-dark mt-3"><b>¡Ojo!</b> revisa la bandeja de Correo no deseado (Spam).</p>
+                    
+                    <hr class="my-4"/>
+
+                    <p class="fw-bold text-muted">Toma en cuenta estos datos para continuar tu registro:</p>
+                    <ul class="list-unstyled ms-2">
+                        <li class="mb-2"><i class="bi bi-circle-fill" style="font-size: 0.5rem; vertical-align: middle;"></i> RFC</li>
+                        <li class="mb-2">
+                            <i class="bi bi-circle-fill" style="font-size: 0.5rem; vertical-align: middle;"></i> CURP si eres Persona Física 
+                            <a href="#" class="small text-decoration-none ms-1" style="color: #009B94;">Obtén tu CURP</a>
+                        </li>
+                        <li class="mb-2"><i class="bi bi-circle-fill" style="font-size: 0.5rem; vertical-align: middle;"></i> Razón Social si eres Persona Moral</li>
+                    </ul>
+
+                    <button class="btn btn-danger btn-lg text-white mt-4" style="background-color: #A02142; border-color: #A02142;" @onclick="AvanzarPaso3">Continuar</button>
+                </div>
+                <div class="col-md-4 d-flex align-items-center justify-content-center">
+                    <div class="position-relative">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 180px; height: 180px; background-color: #C19A6B;">
+                            <i class="bi bi-shop text-white" style="font-size: 5rem;"></i>
+                        </div>
+                        <div class="position-absolute bg-white rounded-circle d-flex align-items-center justify-content-center" 
+                             style="top: -10px; left: -10px; width: 60px; height: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                             <i class="bi bi-check-lg" style="font-size: 2.5rem; color: #008f85;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (pasoActual == 3)
+{
+    <div class="text-center mb-4">
+        <h4><b>¡Continuemos!</b></h4>
+        <p class="text-muted fs-5">Registra tu empresa.</p>
+    </div>
+
+    <EditForm Model="empresa" OnValidSubmit="AvanzarPaso4">
+        <DataAnnotationsValidator />
+        
+        <div class="card border-0">
+            <div class="card-body">
+                <div class="mb-3 text-center">
+                     <label class="form-label text-muted">Tipo de empresa</label>
+                     <InputSelect class="form-select w-50 mx-auto" @bind-Value="empresa.TipoEmpresa">
+                        <option value="">Selecciona un tipo de empresa</option>
+                        <option value="Pública">Pública</option>
+                        <option value="Privada">Privada</option>
+                        <option value="Organismo no gubernamental">Organismo no gubernamental</option>
+                     </InputSelect>
+                     <ValidationMessage For="@(() => empresa.TipoEmpresa)" />
+                </div>
+                
+                <div class="text-center mt-4">
+                     <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+else if (pasoActual == 4)
+{
+    <div>
+        <p class="text-muted small">Paso 1 de 5</p>
+        <h4>Cuéntanos de tu empresa</h4>
+        <p class="text-muted small">(*) Datos requeridos</p>
+
+        <h5 class="mt-4">Tipo de empresa</h5>
+        <div class="mb-4 border-bottom">
+            <ul class="nav nav-tabs border-0">
+                <li class="nav-item">
+                    <button class="nav-link @(empresa.EsPersonaMoral ? "" : "active fw-bold border-bottom border-3 border-success text-dark")" 
+                            style="@(!empresa.EsPersonaMoral ? "border-color: #009B94 !important;" : "color: #6c757d;")"
+                            @onclick="@(() => empresa.EsPersonaMoral = false)">
+                        Persona Física
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link @(empresa.EsPersonaMoral ? "active fw-bold border-bottom border-3 border-success text-dark" : "")" 
+                             style="@(empresa.EsPersonaMoral ? "border-color: #009B94 !important;" : "color: #6c757d;")"
+                            @onclick="@(() => empresa.EsPersonaMoral = true)">
+                        Persona Moral
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <EditForm Model="empresa" OnValidSubmit="AvanzarPaso5">
+            <DataAnnotationsValidator />
+            
+            @if (empresa.EsPersonaMoral)
+            {
+                <h6 class="mb-3">Datos de la Persona Moral</h6>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">RFC*</label>
+                        <InputText class="form-control" @bind-Value="empresa.RFC" placeholder="" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre, denominación o razón social*</label>
+                        <InputText class="form-control" @bind-Value="empresa.RazonSocial" placeholder="" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo de sociedad*</label>
+                        <InputSelect class="form-select" @bind-Value="empresa.TipoSociedad">
+                            <option value="">Seleccione...</option>
+                            <option value="Sociedad Anónima (S.A.)">Sociedad Anónima (S.A.)</option>
+                            <option value="Sociedad Civil (S.C.)">Sociedad Civil (S.C.)</option>
+                        </InputSelect>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h6 class="mb-3">Datos de la Persona Física</h6>
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-3">
+                        <label class="form-label d-block">¿Conoces tu CURP?*</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="conoceCurp" id="siCurp" value="si" checked>
+                            <label class="form-check-label" for="siCurp">SÍ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="conoceCurp" id="noCurp" value="no">
+                            <label class="form-check-label" for="noCurp">NO</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">CURP*</label>
+                        <div class="input-group">
+                            <InputText class="form-control" @bind-Value="empresa.Curp" />
+                            <button class="btn btn-info text-white" style="background-color: #009B94;" type="button">Validar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="alert alert-light text-center text-danger small border-0" role="alert">
+                    Intenta recuperar tu contraseña, o identifica tu correo electrónico si lo olvidaste. Para ello da clic <a href="#" class="text-danger">aquí</a>.
+                </div>
+
+                <p class="fw-bold small">No conoces tu CURP, <span class="fw-normal text-muted">ingresa tus datos personales:</span></p>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre*</label>
+                        <InputText class="form-control" @bind-Value="empresa.Nombre" disabled />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Primer apellido*</label>
+                        <InputText class="form-control" @bind-Value="empresa.PrimerApellido" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Segundo apellido</label>
+                        <InputText class="form-control" @bind-Value="empresa.SegundoApellido" />
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                     <div class="col-md-4">
+                        <label class="form-label">Sexo*</label>
+                         <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="sexo" id="hombre" value="Hombre" @onchange="@(() => empresa.Sexo = "Hombre")">
+                                <label class="form-check-label" for="hombre">Hombre</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="sexo" id="mujer" value="Mujer" @onchange="@(() => empresa.Sexo = "Mujer")">
+                                <label class="form-check-label" for="mujer">Mujer</label>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="col-md-4">
+                        <label class="form-label">Fecha de nacimiento*</label>
+                        <InputDate class="form-control" @bind-Value="empresa.FechaNacimiento" />
+                    </div>
+                     <div class="col-md-4">
+                        <label class="form-label">Lugar de nacimiento*</label>
+                        <InputSelect class="form-select" @bind-Value="empresa.LugarNacimiento">
+                             <option value="">Seleccione...</option>
+                             <option value="Chiapas">Chiapas</option>
+                        </InputSelect>
+                    </div>
+                     <div class="col-md-12 mt-3">
+                        <button class="btn btn-info text-white" style="background-color: #009B94;" type="button">Validar</button>
+                    </div>
+                </div>
+            }
+
+             @if (empresa.EsPersonaMoral || !string.IsNullOrEmpty(empresa.Curp)) // Moral siempre, Fisica si validó CURP (simplificado)
+             {
+                 <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Sector de actividad*</label>
+                        <InputSelect class="form-select" @bind-Value="empresa.SectorActividad">
+                            <option value="">Seleccione...</option>
+                            <option value="Servicios corporativos">Servicios corporativos</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Subsector*</label>
+                        <InputSelect class="form-select" @bind-Value="empresa.Subsector">
+                            <option value="">Seleccione...</option>
+                            <option value="Corporativos">Corporativos</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Actividad económica principal*</label>
+                        <InputSelect class="form-select" @bind-Value="empresa.ActividadEconomica">
+                            <option value="">Seleccione...</option>
+                            <option value="Edificación residencial">Edificación residencial</option>
+                        </InputSelect>
+                    </div>
+                </div>
+             }
+
+            <div class="d-flex justify-content-center gap-3 mt-5 mb-5">
+                <button type="button" class="btn btn-link text-decoration-none" style="color: #009B94;" @onclick="RetrocederPaso">Regresar</button>
+                <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #009B94; border-color: #009B94;">Guardar y continuar</button>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (pasoActual == 5)
+{
+    <div>
+        <h4>Cuéntanos de tu empresa</h4>
+        <p class="text-muted small">(*) Datos requeridos</p>
+
+        <p class="mb-2">Tu empresa se encuentra</p>
+        <div class="mb-3">
+             <button class="btn btn-link text-decoration-none p-0 me-3 d-block" style="color: #009B94;" type="button">
+                 <i class="bi bi-geo-alt-fill"></i> Usar mi ubicación
+             </button>
+              
+             <a href="#" class="text-decoration-none small" style="color: #009B94;">
+                 <i class="bi bi-question-circle-fill"></i> ¿Cómo activar tu ubicación?
+             </a>
+        </div>
+
+        <EditForm Model="empresa" OnValidSubmit="GuardarUbicacion">
+            <DataAnnotationsValidator />
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Código Postal*</label>
+                    <div class="input-group">
+                        <InputText class="form-control" @bind-Value="empresa.CodigoPostal" />
+                        <button class="btn btn-danger" type="button" style="background-color: #A02142; border-color: #A02142;">Validar</button>
+                    </div>
+                    <ValidationMessage For="@(() => empresa.CodigoPostal)" />
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Entidad Federativa*</label>
+                    <InputSelect class="form-select" @bind-Value="empresa.Estado">
+                        <option value="">Seleccione...</option>
+                        <option value="Chiapas">Chiapas</option>
+                        <option value="Ciudad de México">Ciudad de México</option>
+                        <option value="Jalisco">Jalisco</option>
+                        <option value="Nuevo León">Nuevo León</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => empresa.Estado)" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Municipio o alcaldía*</label>
+                    <InputSelect class="form-select" @bind-Value="empresa.Municipio">
+                        <option value="">Seleccione...</option>
+                        <option value="Tapachula">Tapachula</option>
+                        <option value="Tuxtla Gutiérrez">Tuxtla Gutiérrez</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => empresa.Municipio)" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Colonia*</label>
+                    <InputSelect class="form-select" @bind-Value="empresa.Colonia">
+                        <option value="">Seleccione...</option>
+                        <option value="Centro">Centro</option>
+                        <option value="5 de Febrero">5 de Febrero</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => empresa.Colonia)" />
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Calle*</label>
+                    <InputText class="form-control" @bind-Value="empresa.Calle" />
+                    <ValidationMessage For="@(() => empresa.Calle)" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Número exterior*</label>
+                    <InputText class="form-control" @bind-Value="empresa.NumeroExterior" />
+                    <ValidationMessage For="@(() => empresa.NumeroExterior)" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Número interior</label>
+                    <InputText class="form-control" @bind-Value="empresa.NumeroInterior" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Entre qué calles se encuentra o alguna referencia*</label>
+                <InputText class="form-control" @bind-Value="empresa.Referencia" />
+                <ValidationMessage For="@(() => empresa.Referencia)" />
+            </div>
+
+            <div class="d-flex justify-content-center mt-5 mb-5">
+                <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;">Guardar y continuar</button>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (pasoActual == 6)
+{
+    <div>
+        <p class="text-muted small">Paso 3 de 5</p>
+        <h4>Acerca de la empresa</h4>
+        <p class="text-muted small">(*) Datos requeridos</p>
+
+        <EditForm Model="empresa" OnValidSubmit="GuardarAcercaDe">
+            <DataAnnotationsValidator />
+            
+            <div class="mb-3">
+                 <label class="form-label d-block">¿La razón social es la misma al nombre comercial?</label>
+                 <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="mismaRazon" id="siRazon" 
+                           checked="@empresa.EsMismaRazonSocial" 
+                           @onchange="@(() => empresa.EsMismaRazonSocial = true)">
+                    <label class="form-check-label" for="siRazon">SÍ</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="mismaRazon" id="noRazon" 
+                           checked="@(!empresa.EsMismaRazonSocial)"
+                           @onchange="@(() => empresa.EsMismaRazonSocial = false)">
+                    <label class="form-check-label" for="noRazon">NO</label>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-8">
+                     @if (!empresa.EsMismaRazonSocial)
+                     {
+                        <InputText class="form-control mb-2" @bind-Value="empresa.NombreComercial" placeholder="Nombre Comercial" />
+                     }
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Número de empleados*</label>
+                    <InputText class="form-control" @bind-Value="empresa.NumeroEmpleados" placeholder="Número de empleados" />
+                    <ValidationMessage For="@(() => empresa.NumeroEmpleados)" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descripción de la empresa*</label>
+                <InputTextArea class="form-control" @bind-Value="empresa.DescripcionEmpresa" rows="3" placeholder="Descripción de la empresa (Presenta tu empresa a los candidatos)." />
+                <ValidationMessage For="@(() => empresa.DescripcionEmpresa)" />
+            </div>
+            
+            <div class="mb-3 border-bottom pb-4">
+                 <label class="form-label d-block">¿Tienes sucursales?</label>
+                 <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sucursales" id="siSucursal" 
+                           checked="@empresa.TieneSucursales" 
+                           @onchange="@(e => { empresa.TieneSucursales = true; mostrarModalSucursal = true; })">
+                    <label class="form-check-label" for="siSucursal">SÍ</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sucursales" id="noSucursal" 
+                           checked="@(!empresa.TieneSucursales)"
+                           @onchange="@(() => empresa.TieneSucursales = false)">
+                    <label class="form-check-label" for="noSucursal">NO</label>
+                </div>
+                
+                @if (empresa.Sucursales.Any())
+                {
+                    <div class="mt-3">
+                        <h6>Sucursales agregadas:</h6>
+                        <ul class="list-group">
+                            @foreach (var sucursal in empresa.Sucursales)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @sucursal.NombreSucursal (@sucursal.NumeroSucursal)
+                                    <button type="button" class="btn btn-sm btn-danger" @onclick="() => empresa.Sucursales.Remove(sucursal)">x</button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                
+                @if (empresa.TieneSucursales)
+                {
+                    <div class="mt-2">
+                         <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => mostrarModalSucursal = true">+ Agregar otra sucursal</button>
+                    </div>
+                }
+            </div>
+
+            <h6 class="mt-4">Imagen de tu empresa</h6>
+            <div class="row align-items-center mb-4 border-bottom pb-4">
+                <div class="col-md-3 text-center">
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white mx-auto" style="width: 100px; height: 100px;">
+                        100x100
+                    </div>
+                     <p class="small text-muted mt-2 text-center" style="font-size: 0.7rem;">
+                        Formatos permitidos *jpg, *png, *bmp<br>
+                        Tamaño máximo 500Kb y la altura no exceda los 100 píxeles
+                    </p>
+                </div>
+                <div class="col-md-9">
+                    <p class="text-muted small">¡Hey! Aquí puedes agregar el logotipo de tu negocio</p>
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm">Seleccionar archivo</button>
+                    </div>
+                    <button type="button" class="btn btn-danger text-white" style="background-color: #A02142; border-color: #A02142;">Subir imagen</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Video de la empresa</label>
+                    <a href="#" class="d-block small text-decoration-none mb-2" style="color: #009B94;">¿Cómo presentar a tu empresa y vacantes en video?</a>
+                    <label class="form-label text-muted small">Comparte el enlace del video de tu empresa(opcional)</label>
+                    <p class="small text-muted mb-1">Dirección electrónica en YouTube</p>
+                    <InputText class="form-control" @bind-Value="empresa.VideoEmpresaUrl" placeholder="https://www.youtube.com/" />
+                </div>
+                 <div class="col-md-6">
+                    <label class="form-label fw-bold">Tus redes sociales(opcional)</label>
+                     <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="bi bi-facebook"></i></span>
+                        <InputText class="form-control" @bind-Value="empresa.FacebookUrl" placeholder="https://www.facebook.com/" />
+                    </div>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="bi bi-linkedin"></i></span>
+                        <InputText class="form-control" @bind-Value="empresa.LinkedInUrl" placeholder="https://www.linkedin.com/in/" />
+                    </div>
+                     <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                        <InputText class="form-control" @bind-Value="empresa.SitioWebUrl" placeholder="Otra página de internet a compartir" />
+                    </div>
+                     <InputText class="form-control" @bind-Value="empresa.OtraRedSocial" placeholder="Otra red social" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-5 mb-5">
+                 <button type="button" class="btn btn-link text-decoration-none" style="color: #009B94;" @onclick="RetrocederPaso">Regresar</button>
+                <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;">Guardar y continuar</button>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (pasoActual == 7)
+{
+    <div>
+        <p class="text-muted small">Paso 4 de 5</p>
+        <h4>Define quién será el contacto con el SNE.</h4>
+        <p class="text-muted small">(*) Datos requeridos</p>
+
+        <EditForm Model="empresa" OnValidSubmit="GuardarContacto">
+            <DataAnnotationsValidator />
+            
+            <h5 class="mt-4">Datos de contacto</h5>
+            <div class="mb-3">
+                 <div class="form-check">
+                    <input class="form-check-input" type="radio" name="tipoContacto" id="contactoRegistrado" 
+                           checked="@empresa.EsContactoRegistrado" 
+                           @onchange="@(() => empresa.EsContactoRegistrado = true)">
+                    <label class="form-check-label fw-bold" for="contactoRegistrado">
+                        @empresa.Nombre (@empresa.CorreoElectronico)
+                    </label>
+                </div>
+            </div>
+
+            @if (empresa.EsContactoRegistrado)
+            {
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Apellido(s)*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoApellidos" />
+                        <ValidationMessage For="@(() => empresa.ContactoApellidos)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cargo del contacto*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoCargo" />
+                         <ValidationMessage For="@(() => empresa.ContactoCargo)" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Teléfono*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoTelefono" />
+                        <ValidationMessage For="@(() => empresa.ContactoTelefono)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Extensión</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoExtension" />
+                    </div>
+                </div>
+            }
+
+            <div class="mb-3 border-top pt-3">
+                 <div class="form-check">
+                    <input class="form-check-input" type="radio" name="tipoContacto" id="otroContacto" 
+                           checked="@(!empresa.EsContactoRegistrado)"
+                           @onchange="@(() => empresa.EsContactoRegistrado = false)">
+                    <label class="form-check-label" for="otroContacto">
+                        Otro contacto
+                    </label>
+                </div>
+            </div>
+
+           @if (!empresa.EsContactoRegistrado)
+            {
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre del contacto</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoNombre" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Correo electrónico</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoCorreo" />
+                    </div>
+                </div>
+                 <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Apellido(s)*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoApellidos" />
+                        <ValidationMessage For="@(() => empresa.ContactoApellidos)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cargo del contacto*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoCargo" />
+                         <ValidationMessage For="@(() => empresa.ContactoCargo)" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Teléfono*</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoTelefono" />
+                        <ValidationMessage For="@(() => empresa.ContactoTelefono)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Extensión</label>
+                        <InputText class="form-control" @bind-Value="empresa.ContactoExtension" />
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-end gap-3 mt-5 mb-5">
+                 <button type="button" class="btn btn-link text-decoration-none" style="color: #009B94;" @onclick="RetrocederPaso">Regresar</button>
+                <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;">Guardar y continuar</button>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (pasoActual == 8)
+{
+    <div>
+        <p class="text-muted small">Paso 5 de 5</p>
+        <h4>¡Casi terminamos!</h4>
+        <p class="text-muted fs-5">Acepta los términos y condiciones.</p>
+        <p class="text-muted small">(*) Datos requeridos</p>
+
+        <EditForm Model="empresa" OnValidSubmit="FinalizarRegistro">
+            <DataAnnotationsValidator />
+            
+            <div class="card p-4 mb-4">
+                <h5 class="fw-bold mb-3">Términos y Condiciones</h5>
+                
+                <div class="form-check mb-2">
+                    <InputCheckbox class="form-check-input" @bind-Value="empresa.AceptaTerminos" id="terminos" />
+                    <label class="form-check-label" for="terminos">
+                        He leído y acepto los <a href="#" style="color: #009B94; text-decoration: none;">Términos y condiciones*</a>.
+                    </label>
+                    <ValidationMessage For="@(() => empresa.AceptaTerminos)" />
+                </div>
+                
+                <div class="form-check mb-4">
+                    <InputCheckbox class="form-check-input" @bind-Value="empresa.AseguraDatosCorrectos" id="datosCorrectos" />
+                    <label class="form-check-label" for="datosCorrectos">
+                        Aseguro que los datos que he proporcionado son correctos*
+                    </label>
+                    <ValidationMessage For="@(() => empresa.AseguraDatosCorrectos)" />
+                </div>
+                
+                <p class="text-muted small" style="text-align: justify;">
+                    Atendiendo al principio de "consentimiento" consagrado en el artículo 16 y 20 de la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados (LGPDPPSO), en calidad de Empleador expreso mi voluntad, específica e informada, para que la STPS efectúe el tratamiento de mis datos personales para fines consistentes en la vinculación laboral, promoción de mis ofertas de empleo hasta la posible colocación de candidatos en mis vacantes de trabajo ofertadas. Asimismo, la <b>STPS</b> como Sujeto Obligado será el ente encargado de establecer los mecanismos necesarios para la protección de datos bajo su resguardo, así como aquellos mecanismos que aseguren la correcta transferencia de éstos a otra entidad.
+                </p>
+
+                <div class="form-check mb-4">
+                    <InputCheckbox class="form-check-input" @bind-Value="empresa.AceptaDerechosArco" id="derechosArco" />
+                    <label class="form-check-label text-muted small" for="derechosArco" style="text-align: justify;">
+                        He sido informado que podré ejercer los derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO), de conformidad con la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados, ante los Responsables de la posesión de dichos datos, entendiéndose que, para el caso, será la <b>STPS</b> el Sujeto obligado. También, me comprometo a garantizar la confidencialidad y protección de los datos personales que me sean proporcionados respecto a candidatos para cubrir las vacantes que oferté, que dichos datos únicamente los utilizaré para los fines para los que me fueron transferidos, y que estaré sujeto a la Ley Federal de Protección de Datos Personales en Posesión de Particulares.*
+                    </label>
+                     <ValidationMessage For="@(() => empresa.AceptaDerechosArco)" />
+                </div>
+                
+                <a href="#" class="d-block mb-4 small fw-bold" style="color: #009B94; text-decoration: none;">
+                    <i class="bi bi-arrow-right"></i> Aviso de privacidad simplificado para el registro como empleador en el SNE (Persona Física)
+                </a>
+
+                <h6 class="fw-bold">Permisos y notificaciones:</h6>
+                <div class="form-check">
+                    <InputCheckbox class="form-check-input" @bind-Value="empresa.RecibirCvCandidatos" id="recibirCv" />
+                    <label class="form-check-label" for="recibirCv">
+                        Deseo recibir por correo electrónico los CV de candidatos acordes a mis ofertas de empleo.
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-5 mb-5">
+                 <button type="button" class="btn btn-link text-decoration-none" style="color: #009B94;" @onclick="RetrocederPaso">Regresar</button>
+                <button type="submit" class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;">Guardar y continuar</button>
+            </div>
+        </EditForm>
+    </div>
+}
+else if (pasoActual == 9)
+{
+    <div>
+        <div class="card border-0 mt-4">
+            <div class="card-body">
+                <h4 class="fw-bold fs-3">¡Buen trabajo, @empresa.Nombre!</h4>
+                <p class="fs-5 mb-1">Tu empresa quedó registrada.</p>
+                <p class="text-muted small">Recibirás la información en tu correo electrónico</p>
+                
+                <hr class="my-4"/>
+
+                <p class="text-muted">Para contactar a candidatos y aceptar postulaciones debes crear una oferta de empleo.</p>
+
+                <div class="d-flex mt-4">
+                    <button class="btn btn-danger btn-lg text-white" style="background-color: #A02142; border-color: #A02142;" @onclick="IrACrearOferta">Crear oferta de empleo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalSucursal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background-color: #A02142;">
+                    <h5 class="modal-title"><i class="bi bi-arrow-left me-2 pointer" style="cursor: pointer;" @onclick="CerrarModalSucursal"></i> Regresar</h5>
+                     <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CerrarModalSucursal"></button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="mb-3">Datos de sucursal</h4>
+                    <p class="text-muted small">(*) Datos requeridos</p>
+
+                    <EditForm Model="nuevaSucursal" OnValidSubmit="AgregarSucursal">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Número de sucursal*</label>
+                                <InputText class="form-control" @bind-Value="nuevaSucursal.NumeroSucursal" />
+                                <ValidationMessage For="@(() => nuevaSucursal.NumeroSucursal)" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre de la sucursal*</label>
+                                <InputText class="form-control" @bind-Value="nuevaSucursal.NombreSucursal" />
+                                <ValidationMessage For="@(() => nuevaSucursal.NombreSucursal)" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre del responsable designado*</label>
+                                <InputText class="form-control" @bind-Value="nuevaSucursal.NombreResponsable" />
+                                <ValidationMessage For="@(() => nuevaSucursal.NombreResponsable)" />
+                            </div>
+                             <div class="col-md-6">
+                                <label class="form-label">Correo electrónico del responsable designado*</label>
+                                <InputText class="form-control" @bind-Value="nuevaSucursal.CorreoResponsable" />
+                                <ValidationMessage For="@(() => nuevaSucursal.CorreoResponsable)" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <InputCheckbox class="form-check-input" @bind-Value="nuevaSucursal.TrasladarDatosEmpresa" id="trasladarCheck" />
+                                <label class="form-check-label" for="trasladarCheck">
+                                    Trasladar datos de la empresa
+                                </label>
+                            </div>
+                            @if (nuevaSucursal.TrasladarDatosEmpresa)
+                            {
+                                <div class="row mt-2 text-muted small">
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li>-Descripción de la empresa</li>
+                                            <li>-Tipo de empresa</li>
+                                            <li>-Nombre, denominación o razón social</li>
+                                            <li>-RFC</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li>-Tipo de sociedad</li>
+                                            <li>-Sector de actividad</li>
+                                            <li>-Subsector</li>
+                                            <li>-Actividad económica principal</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                             <button type="button" class="btn btn-link text-decoration-none" style="color: #009B94;" @onclick="CerrarModalSucursal">Cancelar</button>
+                             <button type="submit" class="btn btn-danger text-white" style="background-color: #A02142; border-color: #A02142;">Agregar sucursal</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private EmpresaDto empresa = new();
+    private int pasoActual = 1;
+
+    // Modal Sucursal
+    private bool mostrarModalSucursal = false;
+    private SucursalDto nuevaSucursal = new();
+
+    private async Task HandleSubmit()
+    {
+        Console.WriteLine($"Creando cuenta para: {empresa.Nombre}");
+        var success = await EmpresaService.CrearEmpresa(empresa);
+        if (success)
+        {
+            pasoActual = 2; 
+        }
+    }
+
+    private void AvanzarPaso3()
+    {
+        Console.WriteLine("Avanzando al paso 3 (Tipo de empresa)");
+        pasoActual = 3;
+    }
+
+    private void AvanzarPaso4()
+    {
+        if (string.IsNullOrWhiteSpace(empresa.TipoEmpresa)) return;
+        
+        Console.WriteLine($"Tipo de empresa seleccionado: {empresa.TipoEmpresa}");
+        pasoActual = 4;
+    }
+
+    private void AvanzarPaso5()
+    {
+        // Simple manual validation for now since we relaxed DTO
+        if ((empresa.EsPersonaMoral && string.IsNullOrWhiteSpace(empresa.RFC)) ||
+            (!empresa.EsPersonaMoral && string.IsNullOrWhiteSpace(empresa.Curp) && string.IsNullOrWhiteSpace(empresa.PrimerApellido)))
+            return;
+
+        Console.WriteLine("Avanzando al paso 5...");
+        pasoActual = 5;
+    }
+
+    private void GuardarUbicacion()
+    {
+        if (string.IsNullOrWhiteSpace(empresa.CodigoPostal) || 
+            string.IsNullOrWhiteSpace(empresa.Estado) || 
+            string.IsNullOrWhiteSpace(empresa.Municipio)) return;
+
+        Console.WriteLine($"Ubicación guardada: {empresa.Calle}, {empresa.Municipio}, {empresa.Estado}");
+        // Avanzar al siguiente paso (Acerca de)
+        pasoActual = 6; 
+    }
+
+    private void GuardarAcercaDe()
+    {
+         if (string.IsNullOrWhiteSpace(empresa.NumeroEmpleados) || 
+             string.IsNullOrWhiteSpace(empresa.DescripcionEmpresa)) return;
+
+         Console.WriteLine($"Datos de empresa guardados. Empleados: {empresa.NumeroEmpleados}");
+         // Avanzar al siguiente paso
+         pasoActual = 7;
+    }
+
+    private void GuardarContacto()
+    {
+         if (string.IsNullOrWhiteSpace(empresa.ContactoCargo) || 
+             string.IsNullOrWhiteSpace(empresa.ContactoApellidos) ||
+             string.IsNullOrWhiteSpace(empresa.ContactoTelefono)) return;
+
+         Console.WriteLine($"Contacto guardado: {empresa.ContactoCargo}");
+         // Avanzar al siguiente paso (Finish?)
+         pasoActual = 8;
+    }
+
+    private void FinalizarRegistro()
+    {
+         if (!empresa.AceptaTerminos || !empresa.AseguraDatosCorrectos || !empresa.AceptaDerechosArco) return;
+
+         Console.WriteLine("Registro finalizado con éxito.");
+         pasoActual = 9;
+    }
+
+    private void IrACrearOferta()
+    {
+        Navigation.NavigateTo("/ofertas/nueva");
+    }
+
+    private void RetrocederPaso()
+    {
+        if (pasoActual > 1) pasoActual--;
+    }
+
+    private void CerrarModalSucursal()
+    {
+        mostrarModalSucursal = false;
+        nuevaSucursal = new(); // Reset
+        if (!empresa.Sucursales.Any()) empresa.TieneSucursales = false; // Reset check if canceled and list empty
+    }
+
+    private void AgregarSucursal()
+    {
+        empresa.Sucursales.Add(nuevaSucursal);
+        nuevaSucursal = new(); // Reset for next
+        mostrarModalSucursal = false;
+        empresa.TieneSucursales = true;
+    }
+}

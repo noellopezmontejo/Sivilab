@@ -39,6 +39,23 @@ namespace Sivilab.API.Controllers
             }
         }
 
+        // GET: api/Vacantes/categorias
+        [HttpGet("categorias")]
+        public async Task<IActionResult> ObtenerCategorias()
+        {
+            try
+            {
+                _logger.LogInformation("Obteniendo categorias vigentes");
+                var categorias = await _repository.ObtenerCategorias();
+                return Ok(categorias);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener categorias");
+                return StatusCode(500, new { mensaje = $"Error: {ex.Message}" });
+            }
+        }
+
         // GET: api/Vacantes/5
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerPorId(int id)
