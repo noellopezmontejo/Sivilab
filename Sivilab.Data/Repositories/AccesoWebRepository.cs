@@ -145,5 +145,21 @@ namespace Sivilab.Data.Repositories
 
             return resultado > 0;
         }
+
+        public async Task<IEnumerable<AccesoWeb>> ObtenerTodos()
+        {
+            return await _db.QueryAsync<AccesoWeb>("SELECT * FROM dbo.Acceso_Web");
+        }
+
+        public async Task<AccesoWeb?> ObtenerPorId(int id)
+        {
+            return await _db.QueryFirstOrDefaultAsync<AccesoWeb>("SELECT * FROM dbo.Acceso_Web WHERE CveAccesoWeb = @Id", new { Id = id });
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            var afectados = await _db.ExecuteAsync("DELETE FROM dbo.Acceso_Web WHERE CveAccesoWeb = @Id", new { Id = id });
+            return afectados > 0;
+        }
     }
 }

@@ -14,6 +14,16 @@
             </NavLink>
         </div>
 
+        <AuthorizeView Roles="Administrador">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="accesos">
+                        <span class="bi bi-people-fill" aria-hidden="true"></span> Usuarios Web
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
@@ -25,32 +35,61 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/registro">
                 <span class="oi oi-plus" aria-hidden="true"></span> Registro Usuario
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/validar-correo">
                 <span class="oi oi-check" aria-hidden="true"></span> Validar Correo
             </NavLink>
         </div>
-       
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/candidatos">
                 <span class="oi oi-plus" aria-hidden="true"></span> Candidatos
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/oferta/nueva">
-                <span class="bi bi-briefcase-fill" aria-hidden="true"></span> Nueva Oferta
-            </NavLink>
-        </div>
+
+        <AuthorizeView Roles="ConsejeroEmpleo,Administrador,Empresario">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/oferta/nueva">
+                        <span class="bi bi-briefcase-fill" aria-hidden="true"></span> Nueva Oferta
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/empresa/nueva">
                 <span class="bi bi-building-add" aria-hidden="true"></span> Nueva Empresa
             </NavLink>
         </div>
+
+        <!-- Login / Logout -->
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3 mt-4">
+                    <form action="/api/auth/logout" method="post">
+                        <AntiforgeryToken />
+                        <button type="submit" class="nav-link btn btn-link">
+                            <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item px-3 mt-4">
+                    <NavLink class="nav-link" href="/login">
+                        <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </nav>
 </div>
 

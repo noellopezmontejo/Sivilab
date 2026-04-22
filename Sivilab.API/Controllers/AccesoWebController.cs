@@ -277,8 +277,42 @@ namespace Sivilab.API.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObtenerTodos()
+        {
+            var data = await _repository.ObtenerTodos();
+            return Ok(data);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObtenerPorId(int id)
+        {
+            var data = await _repository.ObtenerPorId(id);
+            if (data == null) return NotFound();
+            return Ok(data);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var borrado = await _repository.Eliminar(id);
+            if (borrado) return Ok();
+            return BadRequest();
+        }
+
+        [HttpPost("validar-credenciales-web")]
+        public async Task<IActionResult> ValidarCredencialesWeb([FromBody] CredencialesRequest request)
+        {
+            // Este asume que password no viene hasheado y necesita hashearse o ya viene hasheado. Depende de cómo quieras manejarlo.
+            string hash = HashPassword(request.Contrasena);
+            var valido = await _repository.ValidarCredenciales(request.Email, hash);
+            if (valido) return Ok();
+            return Unauthorized();
+        }
+
         // Métodos auxiliares
         private string HashPassword(string password)
+
         {
             using var sha256 = SHA256.Create();
             var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));

@@ -14,5 +14,8 @@ namespace Sivilab.Data.Repositories
         Task<bool> ValidarCredenciales(string email, string passwordHash);
         Task<bool> ConfirmarEmail(string email, string confirmationCode);
         Task<bool> ActualizarContrasena(string email, string nuevaPasswordHash);
+        Task<IEnumerable<AccesoWeb>> ObtenerTodos();
+        Task<AccesoWeb?> ObtenerPorId(int id);
+        Task<bool> Eliminar(int id);
     }
 }

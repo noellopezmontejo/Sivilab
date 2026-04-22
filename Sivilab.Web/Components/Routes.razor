@@ -1,6 +1,28 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+                <NotAuthorized>
+                    <div class="alert alert-warning text-center mt-5">
+                        <h4>Acceso Denegado</h4>
+                        <p>No tienes permiso para ver esta página o tu sesión expiró.</p>
+                        <a href="/login" class="btn btn-primary">Ir a Iniciar Sesión</a>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>No encontrado</PageTitle>
+            <LayoutView Layout="typeof(Layout.MainLayout)">
+                <div class="alert alert-danger text-center mt-5">
+                    <h3>404 - Página no encontrada</h3>
+                    <p>Lo sentimos, no hay nada en esta dirección.</p>
+                    <a href="/" class="btn btn-primary">Ir al Inicio</a>
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

@@ -1,0 +1,63 @@
+@page "/accesos"
+@using Sivilab.Web.Services
+@using Sivilab.Models.Models
+@inject IAccesoWebService AccesoService
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Administrador")]
+@rendermode InteractiveServer
+
+<h3>Gestión de Usuarios (Accesos Web)</h3>
+
+@if (usuarios == null)
+{
+    <p>Cargando lista de accesos...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre Completo</th>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in usuarios)
+            {
+                <tr>
+                    <td>@usuario.NombreCompleto</td>
+                    <td>@usuario.UserName</td>
+                    <td>@usuario.Email</td>
+                    <td>@usuario.Role</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(usuario.CveAccesoWeb)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<AccesoWeb>? usuarios;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
+        usuarios = await AccesoService.ObtenerTodos();
+    }
+
+    private async Task Eliminar(int id)
+    {
+        if (await AccesoService.Eliminar(id))
+        {
+            await CargarUsuarios();
+        }
+    }
+}
